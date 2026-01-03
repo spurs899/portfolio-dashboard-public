@@ -56,5 +56,8 @@ public class SharesiesClientIntegrationTests
         var portfolio = await _sharesiesClient.GetPortfolioAsync(sharesiesProfilePortfolio.Id);
         portfolio.Should().NotBeNull("Portfolio should be retrieved after login");
         portfolio!.InstrumentReturns.Should().NotBeNull();
+
+        var sharesiesInstrumentResponse = await _sharesiesClient.GetInstrumentsAsync();
+        sharesiesInstrumentResponse.Should().NotBeNull();
     }
 }
