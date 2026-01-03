@@ -1,8 +1,18 @@
+using PortfolioManager.Api.Services;
+using PortfolioManager.Core.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddHttpClient<ISharesiesClient, SharesiesClient>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        UseCookies = true,
+        CookieContainer = new System.Net.CookieContainer()
+    });
 
 var app = builder.Build();
 
@@ -32,6 +42,24 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.MapPost("/sharesies/login", async (ISharesiesClient sharesiesClient, string email, string password) =>
+{
+    var success = await sharesiesClient.LoginAsync(email, password);
+    return success ? Results.Ok() : Results.Unauthorized();
+});
+
+app.MapGet("/sharesies/profile", async (ISharesiesClient sharesiesClient) =>
+{
+    var profile = await sharesiesClient.GetProfileAsync();
+    return profile != null ? Results.Ok(profile) : Results.NotFound();
+});
+
+app.MapGet("/sharesies/portfolio", async (ISharesiesClient sharesiesClient) =>
+{
+    var portfolio = await sharesiesClient.GetPortfolioAsync();
+    return portfolio != null ? Results.Ok(portfolio) : Results.NotFound();
+});
 
 app.Run();
 
