@@ -4,7 +4,7 @@ namespace PortfolioManager.Core.Interfaces;
 
 public interface ISharesiesClient
 {
-    Task<bool> LoginAsync(string email, string password);
-    Task<SharesiesProfile?> GetProfileAsync();
-    Task<SharesiesPortfolio?> GetPortfolioAsync();
+    Task<SharesiesLoginResponse> LoginAsync(string email, string password);
+    Task<SharesiesProfileResponse?> GetProfileAsync();
+    Task<SharesiesPortfolio?> GetPortfolioAsync(string? portfolioId = null);
 }

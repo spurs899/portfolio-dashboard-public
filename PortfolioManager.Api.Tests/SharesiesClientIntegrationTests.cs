@@ -2,12 +2,13 @@
 using PortfolioManager.Api.Services;
 using FluentAssertions;
 using System.Net;
+using PortfolioManager.Core.Interfaces;
 
 namespace PortfolioManager.Api.Tests;
 
 public class SharesiesClientIntegrationTests
 {
-    private readonly SharesiesClient _sut;
+    private readonly ISharesiesClient _sharesiesClient;
     private readonly string? _email;
     private readonly string? _password;
 
@@ -27,10 +28,11 @@ public class SharesiesClientIntegrationTests
             CookieContainer = new CookieContainer()
         };
         var httpClient = new HttpClient(handler);
-        _sut = new SharesiesClient(httpClient);
+        _sharesiesClient = new SharesiesClient(httpClient);
     }
 
-    [Fact(Skip = "Requires actual Sharesies credentials")]
+    //[Fact(Skip = "Requires actual Sharesies credentials")]
+    [Fact]
     public async Task FullIntegrationFlow_ShouldSucceed()
     {
         if (string.IsNullOrEmpty(_email) || string.IsNullOrEmpty(_password))
@@ -39,18 +41,20 @@ public class SharesiesClientIntegrationTests
         }
 
         // 1. Login
-        var loginResult = await _sut.LoginAsync(_email, _password);
-        loginResult.Should().BeTrue("Login should succeed with valid credentials");
+        var loginResult = await _sharesiesClient.LoginAsync(_email, _password);
+        loginResult.Should().NotBeNull("Login should succeed with valid credentials");
 
         // 2. Get Profile
-        var profile = await _sut.GetProfileAsync();
-        profile.Should().NotBeNull("Profile should be retrieved after login");
-        profile!.User.Should().NotBeNull();
-        profile.User!.Email.Should().Be(_email);
+        var profileResponse = await _sharesiesClient.GetProfileAsync();
+        profileResponse.Should().NotBeNull("Profile should be retrieved after login");
+        profileResponse!.Profiles.Should().NotBeNull().And.NotBeEmpty();
+        profileResponse.Profiles![0].Name.Should().NotBeNullOrEmpty();
 
         // 3. Get Portfolio
-        var portfolio = await _sut.GetPortfolioAsync();
+        var sharesiesProfile = profileResponse.Profiles.First();
+        var sharesiesProfilePortfolio = sharesiesProfile.Portfolios.First(x => x.Product == "INVEST");
+        var portfolio = await _sharesiesClient.GetPortfolioAsync(sharesiesProfilePortfolio.Id);
         portfolio.Should().NotBeNull("Portfolio should be retrieved after login");
-        portfolio!.Positions.Should().NotBeNull();
+        portfolio!.InstrumentReturns.Should().NotBeNull();
     }
 }

@@ -46,7 +46,7 @@ app.MapGet("/weatherforecast", () =>
 app.MapPost("/sharesies/login", async (ISharesiesClient sharesiesClient, string email, string password) =>
 {
     var success = await sharesiesClient.LoginAsync(email, password);
-    return success ? Results.Ok() : Results.Unauthorized();
+    return success is { Authenticated: true } ? Results.Ok() : Results.Unauthorized();
 });
 
 app.MapGet("/sharesies/profile", async (ISharesiesClient sharesiesClient) =>

@@ -5,6 +5,7 @@ using Moq.Protected;
 using PortfolioManager.Api.Services;
 using FluentAssertions;
 using PortfolioManager.Contracts.Models;
+using PortfolioManager.Core.Interfaces;
 
 namespace PortfolioManager.Api.Tests;
 
@@ -12,7 +13,7 @@ public class SharesiesClientTests
 {
     private readonly Mock<HttpMessageHandler> _handlerMock;
     private readonly HttpClient _httpClient;
-    private readonly SharesiesClient _sut;
+    private readonly ISharesiesClient _sharesiesClient;
 
     public SharesiesClientTests()
     {
@@ -21,7 +22,7 @@ public class SharesiesClientTests
         {
             BaseAddress = new Uri("https://app.sharesies.nz/api/")
         };
-        _sut = new SharesiesClient(_httpClient);
+        _sharesiesClient = new SharesiesClient(_httpClient);
     }
 
     [Fact]
@@ -30,7 +31,8 @@ public class SharesiesClientTests
         // Arrange
         var loginResponse = new SharesiesLoginResponse
         {
-            AuthenticatedUser = new SharesiesAuthenticatedUser { Token = "token", UserId = "user", Email = "test@test.com" }
+            Authenticated = true,
+            User = new SharesiesUser { Id = "user", Email = "test@test.com" }
         };
 
         _handlerMock
@@ -47,36 +49,43 @@ public class SharesiesClientTests
             });
 
         // Act
-        var result = await _sut.LoginAsync("test@test.com", "password");
+        var result = await _sharesiesClient.LoginAsync("test@test.com", "password");
 
         // Assert
-        result.Should().BeTrue();
+        result.Should().NotBeNull();
     }
 
     [Fact]
     public async Task GetProfileAsync_ReturnsProfile_WhenSuccessful()
     {
         // Arrange
-        var profile = new SharesiesProfile { User = new SharesiesUser { Id = "1", Email = "test@test.com" } };
+        var profileResponse = new SharesiesProfileResponse
+        {
+            Profiles = new List<SharesiesProfile>
+            {
+                new SharesiesProfile { Id = "1", Name = "Paul" }
+            }
+        };
 
         _handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(m => m.RequestUri!.AbsolutePath.Contains("identity/profile")),
+                ItExpr.Is<HttpRequestMessage>(m => m.RequestUri!.AbsolutePath.Contains("profiles")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = JsonContent.Create(profile)
+                Content = JsonContent.Create(profileResponse)
             });
 
         // Act
-        var result = await _sut.GetProfileAsync();
+        var result = await _sharesiesClient.GetProfileAsync();
 
         // Assert
         result.Should().NotBeNull();
-        result!.User!.Email.Should().Be("test@test.com");
+        result!.Profiles.Should().NotBeNull().And.HaveCount(1);
+        result.Profiles![0].Name.Should().Be("Paul");
     }
 }
