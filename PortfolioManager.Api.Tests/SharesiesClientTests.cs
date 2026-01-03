@@ -2,10 +2,9 @@
 using System.Net.Http.Json;
 using Moq;
 using Moq.Protected;
-using PortfolioManager.Api.Services;
 using FluentAssertions;
 using PortfolioManager.Contracts.Models;
-using PortfolioManager.Core.Interfaces;
+using PortfolioManager.Core.Services;
 
 namespace PortfolioManager.Api.Tests;
 

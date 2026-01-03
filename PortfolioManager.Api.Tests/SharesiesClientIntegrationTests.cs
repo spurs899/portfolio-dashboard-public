@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
-using PortfolioManager.Api.Services;
 using FluentAssertions;
 using System.Net;
-using PortfolioManager.Core.Interfaces;
+using PortfolioManager.Core.Services;
 
 namespace PortfolioManager.Api.Tests;
 

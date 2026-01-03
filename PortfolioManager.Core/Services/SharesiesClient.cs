@@ -1,8 +1,16 @@
-﻿using PortfolioManager.Contracts;
+﻿using System.Net.Http.Json;
+using PortfolioManager.Contracts;
 using PortfolioManager.Contracts.Models;
-using PortfolioManager.Core.Interfaces;
 
-namespace PortfolioManager.Api.Services;
+namespace PortfolioManager.Core.Services;
+
+public interface ISharesiesClient
+{
+    Task<SharesiesLoginResponse> LoginAsync(string email, string password);
+    Task<SharesiesProfileResponse?> GetProfileAsync();
+    Task<SharesiesPortfolio?> GetPortfolioAsync(string? portfolioId = null);
+    Task<SharesiesInstrumentResponse?> GetInstrumentsAsync();
+}
 
 public class SharesiesClient : ISharesiesClient
 {

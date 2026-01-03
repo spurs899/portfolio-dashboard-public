@@ -14,4 +14,8 @@
     <ProjectReference Include="..\PortfolioManager.Core\PortfolioManager.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

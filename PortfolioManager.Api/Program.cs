@@ -1,5 +1,4 @@
-using PortfolioManager.Api.Services;
-using PortfolioManager.Core.Interfaces;
+using PortfolioManager.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
