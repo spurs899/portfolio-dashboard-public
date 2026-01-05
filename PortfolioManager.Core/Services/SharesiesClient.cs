@@ -8,19 +8,19 @@ public interface ISharesiesClient
 {
     Task<SharesiesLoginResponse> LoginAsync(string email, string password, string? mfaCode = null);
     Task<SharesiesProfileResponse?> GetProfileAsync();
-    Task<SharesiesPortfolio?> GetPortfolioAsync(string? portfolioId = null);
-    Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(List<string>? instrumentIds = null);
+    Task<SharesiesPortfolio?> GetPortfolioAsync(string userId, string portfolioId);
+    Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(string userId, List<string> instrumentIds);
 }
 
 public class SharesiesClient : ISharesiesClient
 {
     private readonly HttpClient _httpClient;
-    private string? _rakaiaToken;
-    private string? _distillToken;
+    private readonly IMemoryCacheWrapper _memoryCacheWrapper;
 
-    public SharesiesClient(HttpClient httpClient)
+    public SharesiesClient(HttpClient httpClient, IMemoryCacheWrapper memoryCacheWrapper)
     {
         _httpClient = httpClient;
+        _memoryCacheWrapper = memoryCacheWrapper;
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
     }
 
@@ -52,12 +52,13 @@ public class SharesiesClient : ISharesiesClient
 
             if (loginResponse is { Authenticated: true })
             {
-                _rakaiaToken = loginResponse.RakaiaToken;
-                _distillToken = loginResponse.DistillToken;
+                var userId = loginResponse.User.Id;
+                _memoryCacheWrapper.Set(GetRakaiaTokenCacheKey(userId), loginResponse.RakaiaToken);
+                _memoryCacheWrapper.Set(GetDistillTokenCacheKey(userId), loginResponse.DistillToken);
                 return loginResponse;
             }
         }
-        return null;
+        throw new UnauthorizedAccessException($"Sharesies - Unable to login for user: {email}");
     }
 
     public async Task<SharesiesProfileResponse?> GetProfileAsync()
@@ -65,7 +66,7 @@ public class SharesiesClient : ISharesiesClient
         return await _httpClient.GetFromJsonAsync<SharesiesProfileResponse>($"{Constants.BaseSharesiesApiUrl}/profiles");
     }
 
-    public async Task<SharesiesPortfolio?> GetPortfolioAsync(string? portfolioId = null)
+    public async Task<SharesiesPortfolio?> GetPortfolioAsync(string userId, string portfolioId)
     {
         var url = $"{Constants.BasePortfolioSharesiesApiUrl}/portfolios/{portfolioId}/instruments";
         
@@ -74,16 +75,17 @@ public class SharesiesClient : ISharesiesClient
         // Add headers from the provided example
         request.Headers.Add("Accept", "*/*");
         request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
-        
-        if (!string.IsNullOrEmpty(_rakaiaToken))
-        {
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _rakaiaToken);
-        }
 
+        var rakiaToken = _memoryCacheWrapper.Get<string>(GetRakaiaTokenCacheKey(userId));
+        if (!string.IsNullOrEmpty(rakiaToken))
+        {
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", rakiaToken);
+        }
+        
         BindHeaders(request);
         
         var response = await _httpClient.SendAsync(request);
-
+        
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<SharesiesPortfolio>();
@@ -92,7 +94,7 @@ public class SharesiesClient : ISharesiesClient
         return null;
     }
 
-    public async Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(List<string>? instrumentIds = null)
+    public async Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(string userId, List<string> instrumentIds)
     {
         const string url = $"{Constants.BaseDataSharesiesApiUrl}/instruments";
         var payload = new
@@ -111,9 +113,10 @@ public class SharesiesClient : ISharesiesClient
         request.Headers.Add("Accept", "*/*");
         request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
 
-        if (!string.IsNullOrEmpty(_distillToken))
+        var distillToken = _memoryCacheWrapper.Get<string>(GetDistillTokenCacheKey(userId));
+        if (!string.IsNullOrEmpty(distillToken))
         {
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _distillToken);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", distillToken);
         }
 
         BindHeaders(request);
@@ -139,5 +142,15 @@ public class SharesiesClient : ISharesiesClient
         request.Headers.Add("sec-fetch-mode", "cors");
         request.Headers.Add("sec-fetch-site", "cross-site");
         request.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
+    }
+    
+    private static string GetDistillTokenCacheKey(string? userId)
+    {
+        return $"{userId}-_distillToken";
+    }
+
+    private static string GetRakaiaTokenCacheKey(string? userId)
+    {
+        return $"{userId}_rakaiaToken";
     }
 }

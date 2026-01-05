@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using FluentAssertions;
 using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 using PortfolioManager.Contracts.Models;
 using PortfolioManager.Core.Services;
 
@@ -28,7 +29,8 @@ public class SharesiesClientIntegrationTests
             CookieContainer = new CookieContainer()
         };
         var httpClient = new HttpClient(handler);
-        _sharesiesClient = new SharesiesClient(httpClient);
+        var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        _sharesiesClient = new SharesiesClient(httpClient, new MemoryCacheWrapper(memoryCache));
     }
 
     //[Fact(Skip = "Requires actual Sharesies credentials")]
@@ -57,6 +59,7 @@ public class SharesiesClientIntegrationTests
         }
         
         loginResult.Should().NotBeNull("Login should succeed with valid credentials");
+        var userId = loginResult.User.Id;
 
         // 2. Get Profile
         var profileResponse = await _sharesiesClient.GetProfileAsync();
@@ -67,13 +70,13 @@ public class SharesiesClientIntegrationTests
         // 3. Get Portfolio
         var sharesiesProfile = profileResponse.Profiles.First();
         var sharesiesProfilePortfolio = sharesiesProfile.Portfolios.First(x => x.Product == "INVEST");
-        var portfolio = await _sharesiesClient.GetPortfolioAsync(sharesiesProfilePortfolio.Id);
+        var portfolio = await _sharesiesClient.GetPortfolioAsync(userId, sharesiesProfilePortfolio.Id);
         portfolio.Should().NotBeNull("Portfolio should be retrieved after login");
         portfolio!.InstrumentReturns.Should().NotBeNull();
 
         // 4. Get Instruments
         var instrumentIds = portfolio.InstrumentReturns?.Keys.ToList() ?? new List<string>();
-        var sharesiesInstrumentResponse = await _sharesiesClient.GetInstrumentsAsync(instrumentIds);
+        var sharesiesInstrumentResponse = await _sharesiesClient.GetInstrumentsAsync(userId, instrumentIds);
         sharesiesInstrumentResponse.Should().NotBeNull("Instruments should be retrieved after login");
         sharesiesInstrumentResponse!.Instruments.Should().NotBeNullOrEmpty();
     }

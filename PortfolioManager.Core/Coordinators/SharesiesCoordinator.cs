@@ -8,7 +8,8 @@ public interface ISharesiesCoordinator
 {
     Task<SharesiesLoginResponse> Login(string email, string password);
     Task<SharesiesLoginResponse> LoginProvideMfaCode(string email, string password, string mfaCode);
-    Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync();
+    Task<SharesiesProfileResponse?> GetProfile();
+    Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId);
 }
 
 public class SharesiesCoordinator : ISharesiesCoordinator
@@ -29,10 +30,16 @@ public class SharesiesCoordinator : ISharesiesCoordinator
     {
         return await _sharesiesClient.LoginAsync(email, password, mfaCode);
     }
-    public async Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync()
+    
+    public async Task<SharesiesProfileResponse?> GetProfile()
+    {
+        return await _sharesiesClient.GetProfileAsync();
+    }
+    
+    public async Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId)
     {
         var profileResponse = await _sharesiesClient.GetProfileAsync();
-        if (profileResponse == null || profileResponse.Profiles == null || profileResponse.Profiles.Count == 0)
+        if (profileResponse?.Profiles == null || profileResponse.Profiles.Count == 0)
             return (null, null);
 
         var profile = profileResponse.Profiles[0];
@@ -40,10 +47,10 @@ public class SharesiesCoordinator : ISharesiesCoordinator
         if (portfolioId == null)
             return (null, null);
 
-        var portfolioResponse = await _sharesiesClient.GetPortfolioAsync(portfolioId);
+        var portfolioResponse = await _sharesiesClient.GetPortfolioAsync(userId, portfolioId);
         var instrumentIds = portfolioResponse.InstrumentReturns?.Keys.ToList() ?? new List<string>();
         
-        var instrumentsResponse = await _sharesiesClient.GetInstrumentsAsync(instrumentIds);
+        var instrumentsResponse = await _sharesiesClient.GetInstrumentsAsync(userId, instrumentIds);
 
         var userProfile = new UserProfile
         {
