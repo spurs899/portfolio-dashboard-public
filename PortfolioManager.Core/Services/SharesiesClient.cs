@@ -9,7 +9,7 @@ public interface ISharesiesClient
     Task<SharesiesLoginResponse> LoginAsync(string email, string password, string? mfaCode = null);
     Task<SharesiesProfileResponse?> GetProfileAsync();
     Task<SharesiesPortfolio?> GetPortfolioAsync(string? portfolioId = null);
-    Task<SharesiesInstrumentResponse?> GetInstrumentsAsync();
+    Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(List<string>? instrumentIds = null);
 }
 
 public class SharesiesClient : ISharesiesClient
@@ -92,15 +92,25 @@ public class SharesiesClient : ISharesiesClient
         return null;
     }
 
-    public async Task<SharesiesInstrumentResponse?> GetInstrumentsAsync()
+    public async Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(List<string>? instrumentIds = null)
     {
-        const string url = $"{Constants.BaseDataSharesiesApiUrl}/instruments/info";
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        
-        // Add headers from the provided example
+        const string url = $"{Constants.BaseDataSharesiesApiUrl}/instruments";
+        var payload = new
+        {
+            query = string.Empty,
+            instruments = instrumentIds ?? new List<string>(),
+            tradingStatuses = new[] { "active", "halt", "closeonly", "notrade", "inactive", "unknown" },
+            perPage = 500
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = JsonContent.Create(payload)
+        };
+
         request.Headers.Add("Accept", "*/*");
         request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
-        
+
         if (!string.IsNullOrEmpty(_distillToken))
         {
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _distillToken);

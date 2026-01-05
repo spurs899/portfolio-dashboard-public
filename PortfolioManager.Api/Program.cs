@@ -14,6 +14,8 @@ builder.Services.AddHttpClient<ISharesiesClient, SharesiesClient>()
         CookieContainer = new System.Net.CookieContainer()
     });
 
+builder.Services.AddScoped<PortfolioManager.Core.Coordinators.ISharesiesCoordinator, PortfolioManager.Core.Coordinators.SharesiesCoordinator>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -5,32 +5,20 @@ namespace PortfolioManager.Contracts.Models;
 
 public class SharesiesInstrumentResponse
 {
-    [JsonPropertyName("version")]
-    public string? Version { get; set; }
+    [JsonPropertyName("total")]
+    public int Total { get; set; }
 
-    [JsonPropertyName("filesHostAddress")]
-    public string? FilesHostAddress { get; set; }
+    [JsonPropertyName("currentPage")]
+    public int CurrentPage { get; set; }
 
-    [JsonPropertyName("categories")]
-    public List<string>? Categories { get; set; }
+    [JsonPropertyName("resultsPerPage")]
+    public int ResultsPerPage { get; set; }
 
-    [JsonPropertyName("exchanges")]
-    public List<SharesiesExchange>? Exchanges { get; set; }
+    [JsonPropertyName("numberOfPages")]
+    public int NumberOfPages { get; set; }
 
-    [JsonPropertyName("assetManagers")]
-    public List<SharesiesAssetManager>? AssetManagers { get; set; }
-
-    [JsonPropertyName("instrumentTypes")]
-    public List<SharesiesInstrumentType>? InstrumentTypes { get; set; }
-
-    [JsonPropertyName("filterOptions")]
-    public List<string>? FilterOptions { get; set; }
-
-    [JsonPropertyName("sortOptions")]
-    public List<SharesiesSortOption>? SortOptions { get; set; }
-
-    [JsonPropertyName("priceChangeTimeOptions")]
-    public List<string>? PriceChangeTimeOptions { get; set; }
+    [JsonPropertyName("instruments")]
+    public List<SharesiesInstrument>? Instruments { get; set; }
 }
 
 public class SharesiesExchange

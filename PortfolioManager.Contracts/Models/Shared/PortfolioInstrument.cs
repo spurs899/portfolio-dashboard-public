@@ -12,5 +12,5 @@ public class PortfolioInstrument
     public BrokerageType BrokerageType { get; set; }
     
     public decimal SharesOwned { get; set; }
-    public decimal InvestmentValue { get; set; }
+    public decimal SharePrice { get; set; }
 }
