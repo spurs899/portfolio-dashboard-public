@@ -1,57 +1,227 @@
 ﻿@page "/"
+@inject ISharesiesService SharesiesService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudText Typo="Typo.h4" Class="mb-4">Portfolio Dashboard</MudText>
 
-<button class="btn btn-primary" @onclick="StartIbkrQrLogin">Login with IBKR (QR)</button>
-
-@if (!string.IsNullOrEmpty(QrImageBase64))
+@if (!_isLoggedIn)
 {
-    <div>
-        <p>Scan this QR code with your IBKR app:</p>
-        <img src="@("data:image/png;base64," + QrImageBase64)" style="width:200px;height:200px;" />
-    </div>
-    <p>@(IsAuthenticated ? "Authenticated!" : "Waiting for approval...")</p>
+    <MudCard Elevation="2" Class="pa-4 mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" Class="mb-3">Connect Your Sharesies Account</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowLoginDialog">Login with Sharesies</MudButton>
+        </MudCardContent>
+    </MudCard>
+}
+else if (_isLoading)
+{
+    <MudProgressCircular Indeterminate="true" />
+    <MudText>Loading portfolio data...</MudText>
+}
+else if (_portfolioData != null)
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Total Value</MudText>
+                    <MudText Typo="Typo.h5" Class="mt-2">@GetTotalValue().ToString("C")</MudText>
+                    <MudText Typo="Typo.body2" Color="@(GetTotalReturn() >= 0 ? Color.Success : Color.Error)">
+                        @(GetTotalReturn() >= 0 ? "+" : "")@GetTotalReturn().ToString("C")
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Total Cost Basis</MudText>
+                    <MudText Typo="Typo.h5" Class="mt-2">@GetTotalCostBasis().ToString("C")</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Total Return</MudText>
+                    <MudText Typo="Typo.h5" Class="mt-2">@GetTotalReturn().ToString("C")</MudText>
+                    <MudText Typo="Typo.body2" Color="@(GetReturnPercentage() >= 0 ? Color.Success : Color.Error)">
+                        @(GetReturnPercentage() >= 0 ? "+" : "")@GetReturnPercentage().ToString("F2")%
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Holdings Count</MudText>
+                    <MudText Typo="Typo.h5" Class="mt-2">@GetHoldingsCount()</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Your Holdings</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="RefreshPortfolio">Refresh</MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="@GetHoldings()" Hover="true" Striped="true">
+                        <HeaderContent>
+                            <MudTh>Symbol</MudTh>
+                            <MudTh>Shares</MudTh>
+                            <MudTh>Value</MudTh>
+                            <MudTh>Cost Basis</MudTh>
+                            <MudTh>Return</MudTh>
+                            <MudTh>Return %</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Symbol">@context.Symbol</MudTd>
+                            <MudTd DataLabel="Shares">@context.SharesOwned.ToString("N2")</MudTd>
+                            <MudTd DataLabel="Value">@context.InvestmentValue.ToString("C")</MudTd>
+                            <MudTd DataLabel="Cost Basis">@context.CostBasis.ToString("C")</MudTd>
+                            <MudTd DataLabel="Return">
+                                <MudText Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)">
+                                    @(context.TotalReturn >= 0 ? "+" : "")@context.TotalReturn.ToString("C")
+                                </MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Return %">
+                                <MudText Color="@(context.ReturnPercentage >= 0 ? Color.Success : Color.Error)">
+                                    @(context.ReturnPercentage >= 0 ? "+" : "")@context.ReturnPercentage.ToString("F2")%
+                                </MudText>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 }
 
 @code {
-    private string? QrImageBase64;
-    private string? SessionId;
-    private bool IsAuthenticated;
+    private bool _isLoggedIn = false;
+    private bool _isLoading = false;
+    private string? _userId;
+    private PortfolioResponse? _portfolioData;
 
-    private async Task StartIbkrQrLogin()
+    private async Task ShowLoginDialog()
     {
-        var http = new HttpClient { BaseAddress = new Uri(Navigation.BaseUri) };
-        var resp = await http.PostAsJsonAsync("api/ibkr-qr-login/start", new { username = "your-username", password = "your-password" });
-        var result = await resp.Content.ReadFromJsonAsync<IbkrQrStartResult>();
-        QrImageBase64 = result?.qrImageBase64;
-        SessionId = result?.sessionId;
-        IsAuthenticated = false;
-        if (SessionId != null)
+        var parameters = new DialogParameters
         {
-            _ = PollStatus();
-        }
+            { "OnLoginSuccess", EventCallback.Factory.Create<string>(this, OnLoginSuccess) }
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<LoginDialog>("Login to Sharesies", parameters, options);
     }
 
-    private async Task PollStatus()
+    private async Task OnLoginSuccess(string userId)
     {
-        var http = new HttpClient { BaseAddress = new Uri(Navigation.BaseUri) };
-        while (!IsAuthenticated && !string.IsNullOrEmpty(SessionId))
+        _userId = userId;
+        _isLoggedIn = true;
+        await LoadPortfolioData();
+        StateHasChanged();
+    }
+
+    private async Task LoadPortfolioData()
+    {
+        try
         {
-            await Task.Delay(2000);
-            var resp = await http.GetAsync($"api/ibkr-qr-login/status/{SessionId}");
-            if (resp.IsSuccessStatusCode)
+            _isLoading = true;
+            StateHasChanged();
+
+            if (!string.IsNullOrEmpty(_userId))
             {
-                var status = await resp.Content.ReadFromJsonAsync<IbkrQrStatusResult>();
-                IsAuthenticated = status?.authenticated ?? false;
+                _portfolioData = await SharesiesService.GetPortfolioAsync(_userId);
             }
+
+            _isLoading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading portfolio: {ex.Message}", Severity.Error);
+            _isLoading = false;
+            StateHasChanged();
         }
     }
 
-    [Inject] NavigationManager Navigation { get; set; } = default!;
-    private class IbkrQrStartResult { public string? sessionId { get; set; } public string? qrImageBase64 { get; set; } }
-    private class IbkrQrStatusResult { public bool authenticated { get; set; } }
-}
+    private async Task RefreshPortfolio()
+    {
+        await LoadPortfolioData();
+        Snackbar.Add("Portfolio refreshed", Severity.Success);
+    }
 
-Welcome to your new app.
+    private decimal GetTotalValue()
+    {
+        return _portfolioData?.Instruments?.Sum(x => x.InvestmentValue) ?? 0;
+    }
+
+    private decimal GetTotalCostBasis()
+    {
+        return _portfolioData?.Instruments?.Sum(x => x.CostBasis) ?? 0;
+    }
+
+    private decimal GetTotalReturn()
+    {
+        return _portfolioData?.Instruments?.Sum(x => x.TotalReturn) ?? 0;
+    }
+
+    private decimal GetReturnPercentage()
+    {
+        var costBasis = GetTotalCostBasis();
+        return costBasis > 0 ? (GetTotalReturn() / costBasis * 100) : 0;
+    }
+
+    private int GetHoldingsCount()
+    {
+        return _portfolioData?.Instruments?.Count ?? 0;
+    }
+
+    private List<HoldingViewModel> GetHoldings()
+    {
+        if (_portfolioData?.Instruments == null)
+            return new List<HoldingViewModel>();
+
+        return _portfolioData.Instruments
+            .Select(instrument =>
+            {
+                var returnPercent = instrument.CostBasis > 0 
+                    ? (instrument.TotalReturn / instrument.CostBasis * 100) 
+                    : 0;
+
+                return new HoldingViewModel
+                {
+                    Symbol = instrument.Symbol ?? "N/A",
+                    SharesOwned = instrument.SharesOwned,
+                    InvestmentValue = instrument.InvestmentValue,
+                    CostBasis = instrument.CostBasis,
+                    TotalReturn = instrument.TotalReturn,
+                    ReturnPercentage = returnPercent
+                };
+            })
+            .OrderByDescending(x => x.InvestmentValue)
+            .ToList();
+    }
+
+    public class HoldingViewModel
+    {
+        public string Symbol { get; set; } = "";
+        public decimal SharesOwned { get; set; }
+        public decimal InvestmentValue { get; set; }
+        public decimal CostBasis { get; set; }
+        public decimal TotalReturn { get; set; }
+        public decimal ReturnPercentage { get; set; }
+    }
+}

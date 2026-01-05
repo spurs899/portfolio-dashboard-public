@@ -72,7 +72,13 @@ public class SharesiesCoordinator : ISharesiesCoordinator
                 Name = matchingInstrument.Name,
                 SharesOwned = x.Value.SharesOwned,
                 SharePrice = decimal.Parse(matchingInstrument.MarketPrice),
-                Symbol = matchingInstrument.Symbol };
+                Symbol = matchingInstrument.Symbol,
+                InvestmentValue = x.Value.InvestmentValue,
+                CostBasis = x.Value.CostBasis,
+                TotalReturn = x.Value.TotalReturn,
+                SimpleReturn = x.Value.SimpleReturn,
+                DividendsReceived = x.Value.DividendsReceived
+            };
             return portfolioInstrument;
         }).ToList();
         

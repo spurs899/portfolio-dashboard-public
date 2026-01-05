@@ -7,6 +7,16 @@ builder.Services.AddControllers(); // <-- Add this
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorWasm",
+        policy => policy
+            .WithOrigins("http://localhost:5262", "https://localhost:7262")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
 builder.Services.AddHttpClient<ISharesiesClient, SharesiesClient>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
@@ -38,6 +48,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowBlazorWasm");
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
