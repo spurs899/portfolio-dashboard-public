@@ -19,17 +19,45 @@ namespace PortfolioManager.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
         {
-            var success = await _sharesiesCoordinator.Login(email, password);
-            _logger.LogInformation($"Successfully logged in {success}");
-            return success is { Authenticated: true } ? Ok(success) : Unauthorized();
+            var loginResult = await _sharesiesCoordinator.Login(email, password);
+            _logger.LogInformation($"Login attempt for {email}. Result type: {loginResult?.Type}, Authenticated: {loginResult?.Authenticated}");
+            
+            // Check if MFA is required
+            if (loginResult is { Type: "identity_email_mfa_required" })
+            {
+                _logger.LogInformation($"MFA required for {email}");
+                return Unauthorized(new 
+                { 
+                    message = "MFA required. Please check your email for the verification code, then call the /api/Sharesies/login/mfa endpoint with the code.",
+                    requiresMfa = true,
+                    type = loginResult.Type
+                });
+            }
+            
+            if (loginResult is { Authenticated: true })
+            {
+                _logger.LogInformation($"Successfully logged in {email}");
+                return Ok(loginResult);
+            }
+            
+            _logger.LogWarning($"Login failed for {email}");
+            return Unauthorized(new { message = "Invalid credentials", requiresMfa = false });
         }
         
         [HttpPost("login/mfa")]
         public async Task<IActionResult> LoginMfa([FromForm] string email, [FromForm] string password, [FromForm] string mfaCode)
         {
-            var success = await _sharesiesCoordinator.LoginProvideMfaCode(email, password, mfaCode);
-            _logger.LogInformation($"Successfully logged in with MFA code {mfaCode} - {success}");
-            return success is { Authenticated: true } ? Ok(success) : Unauthorized();
+            var loginResult = await _sharesiesCoordinator.LoginProvideMfaCode(email, password, mfaCode);
+            _logger.LogInformation($"MFA login attempt for {email} with code {mfaCode}. Authenticated: {loginResult?.Authenticated}");
+            
+            if (loginResult is { Authenticated: true })
+            {
+                _logger.LogInformation($"Successfully logged in {email} with MFA");
+                return Ok(loginResult);
+            }
+            
+            _logger.LogWarning($"MFA login failed for {email}");
+            return Unauthorized(new { message = "Invalid MFA code or credentials" });
         }
 
         [HttpGet("profile")]

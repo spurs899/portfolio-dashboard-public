@@ -124,6 +124,7 @@ else if (_portfolioData != null)
                             <MudTh Class="ynex-table-header text-right">Market Value</MudTh>
                             <MudTh Class="ynex-table-header text-right">Daily Return</MudTh>
                             <MudTh Class="ynex-table-header text-right">Return %</MudTh>
+                            <MudTh Class="ynex-table-header">Brokerage</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Symbol">
@@ -160,6 +161,14 @@ else if (_portfolioData != null)
                                       aria-label="@($"Daily return percentage {(context.DailyReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.DailyReturnPercentage).ToString("F2")} percent")">
                                     @(context.DailyReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.DailyReturnPercentage).ToString("F2")%
                                 </span>
+                            </MudTd>
+                            <MudTd DataLabel="Brokerage">
+                                <div class="d-flex align-center">
+                                    <img src="@GetBrokerageLogoUrl(context.BrokerageType)" 
+                                         alt="@GetBrokerageName(context.BrokerageType)" 
+                                         class="brokerage-logo-img mr-2" />
+                                    <MudText Typo="Typo.body2">@GetBrokerageName(context.BrokerageType)</MudText>
+                                </div>
                             </MudTd>
                         </RowTemplate>
                     </MudTable>
@@ -313,7 +322,8 @@ else if (_portfolioData != null)
                     SharesOwned = instrument.SharesOwned,
                     InvestmentValue = instrument.InvestmentValue,
                     DailyReturn = instrument.SimpleReturn,
-                    DailyReturnPercentage = dailyReturnPercent
+                    DailyReturnPercentage = dailyReturnPercent,
+                    BrokerageType = instrument.BrokerageType
                 };
             })
             .OrderByDescending(x => x.InvestmentValue)
@@ -328,6 +338,26 @@ else if (_portfolioData != null)
         return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
     }
 
+    private string GetBrokerageName(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => "Sharesies",
+            1 => "IBKR",
+            _ => "Unknown"
+        };
+    }
+
+    private string GetBrokerageLogoUrl(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => "images/sharesies-logo.png",
+            1 => "images/ibkr-logo.svg",
+            _ => ""
+        };
+    }
+
     public class HoldingViewModel
     {
         public string Symbol { get; set; } = "";
@@ -338,5 +368,6 @@ else if (_portfolioData != null)
         public decimal InvestmentValue { get; set; }
         public decimal DailyReturn { get; set; }
         public decimal DailyReturnPercentage { get; set; }
+        public int BrokerageType { get; set; }
     }
 }

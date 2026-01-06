@@ -36,9 +36,21 @@ public class SharesiesService : ISharesiesService
             return new LoginResult
             {
                 Success = loginResponse?.Authenticated ?? false,
-                RequiresMfa = loginResponse?.Type == "identity_email_mfa_required",
+                RequiresMfa = false,
                 UserId = loginResponse?.User?.Id,
-                Message = loginResponse?.Type == "identity_email_mfa_required" ? "MFA code required" : "Login successful"
+                Message = "Login successful"
+            };
+        }
+        
+        // Handle 401 responses which could be MFA required or invalid credentials
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+            return new LoginResult
+            {
+                Success = false,
+                RequiresMfa = errorResponse?.RequiresMfa ?? false,
+                Message = errorResponse?.Message ?? "Login failed"
             };
         }
 
@@ -66,6 +78,17 @@ public class SharesiesService : ISharesiesService
                 Message = "Login successful"
             };
         }
+        
+        // Handle 401 responses
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+            return new LoginResult
+            {
+                Success = false,
+                Message = errorResponse?.Message ?? "MFA verification failed"
+            };
+        }
 
         return new LoginResult { Success = false, Message = "MFA login failed" };
     }
@@ -87,6 +110,18 @@ public class LoginResult
     public bool RequiresMfa { get; set; }
     public string? UserId { get; set; }
     public string? Message { get; set; }
+}
+
+public class ApiErrorResponse
+{
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+    
+    [JsonPropertyName("requiresMfa")]
+    public bool RequiresMfa { get; set; }
+    
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
 }
 
 public class LoginResponse
