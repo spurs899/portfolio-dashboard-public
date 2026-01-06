@@ -159,10 +159,24 @@ a, .btn-link {
 
 /* Ynex-Style Dashboard Styling */
 
+/* CSS Variables for consistency */
+:root {
+    --badge-success-bg: #d3f9d8;
+    --badge-success-color: #2b8a3e;
+    --badge-error-bg: #ffe3e3;
+    --badge-error-color: #c92a2a;
+    --badge-info-bg: #e7f5ff;
+    --badge-info-color: #1971c2;
+    --border-color: #e8eaed;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+}
+
 /* Stat Cards */
 .ynex-stat-card {
-    border: 1px solid #e8eaed !important;
-    border-radius: 12px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--border-radius-lg) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     background: white !important;
 }
@@ -177,17 +191,10 @@ a, .btn-link {
     box-shadow: 0 4px 12px rgba(var(--mud-palette-primary-rgb), 0.3) !important;
 }
 
-.ynex-badge {
-    font-weight: 600 !important;
-    padding: 4px 12px !important;
-    border-radius: 6px !important;
-    font-size: 0.75rem !important;
-}
-
 /* Table Styling */
 .ynex-table-card {
-    border: 1px solid #e8eaed !important;
-    border-radius: 12px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--border-radius-lg) !important;
     overflow: hidden !important;
     background: white !important;
 }
@@ -207,7 +214,7 @@ a, .btn-link {
     letter-spacing: 0.05em !important;
     color: #6c757d !important;
     padding: 16px 20px !important;
-    border-bottom: 2px solid #e8eaed !important;
+    border-bottom: 2px solid var(--border-color) !important;
 }
 
 .ynex-table tbody tr {
@@ -228,76 +235,71 @@ a, .btn-link {
 }
 
 .numeric-text {
-    font-family: 'Roboto Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace !important;
+    font-family: 'Roboto Mono', -apple-system, 'SF Mono', ui-monospace, 'Cascadia Code', 'Consolas', monospace !important;
     font-size: 0.875rem !important;
 }
 
-.ynex-return-badge {
-    font-weight: 700 !important;
-    padding: 6px 12px !important;
-    border-radius: 8px !important;
-    font-size: 0.75rem !important;
-}
-
-.currency-chip {
-    background-color: #e7f5ff !important;
-    color: #1971c2 !important;
-    font-weight: 600 !important;
-    padding: 6px 12px !important;
-    border-radius: 6px !important;
-    display: inline-block;
-    font-size: 0.75rem !important;
-}
-
-.currency-badge-lg {
-    background-color: #e7f5ff;
-    color: #1971c2;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.875rem;
-}
-
-.ynex-badge-success {
-    background-color: #d3f9d8;
-    color: #2b8a3e;
+/* Badge Base Styles */
+.ynex-badge,
+.ynex-badge-success,
+.ynex-badge-error {
     font-weight: 600;
     padding: 4px 12px;
-    border-radius: 6px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.75rem;
     display: inline-block;
 }
 
+.ynex-badge-success {
+    background-color: var(--badge-success-bg);
+    color: var(--badge-success-color);
+}
+
 .ynex-badge-error {
-    background-color: #ffe3e3;
-    color: #c92a2a;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 6px;
+    background-color: var(--badge-error-bg);
+    color: var(--badge-error-color);
+}
+
+/* Return Badge Styles */
+.ynex-return-badge-success,
+.ynex-return-badge-error {
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--border-radius-md);
     font-size: 0.75rem;
     display: inline-block;
 }
 
 .ynex-return-badge-success {
-    background-color: #d3f9d8;
-    color: #2b8a3e;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    display: inline-block;
+    background-color: var(--badge-success-bg);
+    color: var(--badge-success-color);
 }
 
 .ynex-return-badge-error {
-    background-color: #ffe3e3;
-    color: #c92a2a;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
+    background-color: var(--badge-error-bg);
+    color: var(--badge-error-color);
+}
+
+/* Currency Badge Styles */
+.currency-chip,
+.currency-badge-lg {
+    background-color: var(--badge-info-bg);
+    color: var(--badge-info-color);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
     display: inline-block;
+}
+
+.currency-chip {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+}
+
+.currency-badge-lg {
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.875rem;
 }
 
 /* Utility Classes */

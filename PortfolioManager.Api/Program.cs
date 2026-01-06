@@ -1,4 +1,5 @@
 using PortfolioManager.Core.Services;
+using Sentry.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(); // <-- Add this
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.WebHost.UseSentry((SentryAspNetCoreOptions  options) =>
+{
+    builder.Configuration.GetSection("Sentry").Bind(options);
+    
+    options.MinimumBreadcrumbLevel = LogLevel.Information;
+    options.MinimumEventLevel = LogLevel.Error;
+    
+    // Optional but useful
+    options.TracesSampleRate = 0.0; // set >0 only if you want performance monitoring
+});
 
 builder.Services.AddCors(options =>
 {
@@ -54,5 +66,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+SentrySdk.CaptureMessage("Sentry Initialised");
 
 app.Run();

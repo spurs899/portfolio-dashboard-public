@@ -52,7 +52,8 @@ else if (_portfolioData != null)
                     </div>
                     <MudText Typo="Typo.h4" Class="fw-bold mb-2">@GetTotalValue().ToString("C")</MudText>
                     <div class="d-flex align-center">
-                        <span class="ynex-badge-success">
+                        <span class="@(GetTotalReturn() >= 0 ? "ynex-badge-success" : "ynex-badge-error")" 
+                              aria-label="@($"Return {(GetTotalReturn() >= 0 ? "gain" : "loss")} of {GetTotalReturn().ToString("C")}")">
                             @(GetTotalReturn() >= 0 ? "▲" : "▼") @(GetTotalReturn() >= 0 ? "+" : "")@GetTotalReturn().ToString("C")
                         </span>
                         <MudText Typo="Typo.caption" Class="text-muted ml-2">from invested</MudText>
@@ -73,7 +74,8 @@ else if (_portfolioData != null)
                     </div>
                     <MudText Typo="Typo.h4" Class="fw-bold mb-2">@GetTotalReturn().ToString("C")</MudText>
                     <div class="d-flex align-center">
-                        <span class="@(GetReturnPercentage() >= 0 ? "ynex-badge-success" : "ynex-badge-error")">
+                        <span class="@(GetReturnPercentage() >= 0 ? "ynex-badge-success" : "ynex-badge-error")"
+                              aria-label="@($"Return percentage {(GetReturnPercentage() >= 0 ? "gain" : "loss")} of {Math.Abs(GetReturnPercentage()).ToString("F2")} percent")">
                             @(GetReturnPercentage() >= 0 ? "▲" : "▼") @(GetReturnPercentage() >= 0 ? "+" : "")@GetReturnPercentage().ToString("F2")%
                         </span>
                         <MudText Typo="Typo.caption" Class="text-muted ml-2">percentage gain</MudText>
@@ -144,8 +146,8 @@ else if (_portfolioData != null)
                         <RowTemplate>
                             <MudTd DataLabel="Symbol">
                                 <div class="d-flex align-center">
-                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3">
-                                        @context.Symbol.Substring(0, Math.Min(2, context.Symbol.Length))
+                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
+                                        @GetSymbolAvatarText(context.Symbol)
                                     </MudAvatar>
                                     <div>
                                         <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
@@ -165,12 +167,14 @@ else if (_portfolioData != null)
                                 <MudText Typo="Typo.body2" Class="numeric-text">@context.CostBasis.ToString("C")</MudText>
                             </MudTd>
                             <MudTd DataLabel="Total Return" Class="text-right">
-                                <MudText Typo="Typo.body2" Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text">
+                                <MudText Typo="Typo.body2" Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
+                                         aria-label="@($"Total return {(context.TotalReturn >= 0 ? "gain" : "loss")} {context.TotalReturn.ToString("C")}")">
                                     @(context.TotalReturn >= 0 ? "+" : "")@context.TotalReturn.ToString("C")
                                 </MudText>
                             </MudTd>
                             <MudTd DataLabel="Return %" Class="text-right">
-                                <span class="@(context.ReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")">
+                                <span class="@(context.ReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")"
+                                      aria-label="@($"Return percentage {(context.ReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.ReturnPercentage).ToString("F2")} percent")">
                                     @(context.ReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.ReturnPercentage).ToString("F2")%
                                 </span>
                             </MudTd>
@@ -183,10 +187,21 @@ else if (_portfolioData != null)
 }
 
 @code {
+    private const string DefaultCurrency = "N/A";
+    private const int MinSymbolAvatarLength = 1;
+    private const int MaxSymbolAvatarLength = 2;
+    
     private bool _isLoggedIn = false;
     private bool _isLoading = false;
     private string? _userId;
     private PortfolioResponse? _portfolioData;
+    
+    // Cached computed values
+    private decimal _cachedTotalValue;
+    private decimal _cachedTotalCostBasis;
+    private decimal _cachedTotalReturn;
+    private decimal _cachedReturnPercentage;
+    private int _cachedHoldingsCount;
     
     private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
@@ -223,6 +238,7 @@ else if (_portfolioData != null)
             if (!string.IsNullOrEmpty(_userId))
             {
                 _portfolioData = await SharesiesService.GetPortfolioAsync(_userId);
+                ComputePortfolioMetrics();
             }
 
             _isLoading = false;
@@ -235,6 +251,35 @@ else if (_portfolioData != null)
             StateHasChanged();
         }
     }
+    
+    private void ComputePortfolioMetrics()
+    {
+        if (_portfolioData?.Instruments == null)
+        {
+            _cachedTotalValue = 0;
+            _cachedTotalCostBasis = 0;
+            _cachedTotalReturn = 0;
+            _cachedReturnPercentage = 0;
+            _cachedHoldingsCount = 0;
+            return;
+        }
+
+        _cachedTotalValue = 0;
+        _cachedTotalCostBasis = 0;
+        _cachedTotalReturn = 0;
+        _cachedHoldingsCount = _portfolioData.Instruments.Count;
+
+        foreach (var instrument in _portfolioData.Instruments)
+        {
+            _cachedTotalValue += instrument.InvestmentValue;
+            _cachedTotalCostBasis += instrument.CostBasis;
+            _cachedTotalReturn += instrument.TotalReturn;
+        }
+
+        _cachedReturnPercentage = _cachedTotalCostBasis > 0 
+            ? (_cachedTotalReturn / _cachedTotalCostBasis * 100) 
+            : 0;
+    }
 
     private async Task RefreshPortfolio()
     {
@@ -244,34 +289,33 @@ else if (_portfolioData != null)
 
     private decimal GetTotalValue()
     {
-        return _portfolioData?.Instruments?.Sum(x => x.InvestmentValue) ?? 0;
+        return _cachedTotalValue;
     }
 
     private decimal GetTotalCostBasis()
     {
-        return _portfolioData?.Instruments?.Sum(x => x.CostBasis) ?? 0;
+        return _cachedTotalCostBasis;
     }
 
     private decimal GetTotalReturn()
     {
-        return _portfolioData?.Instruments?.Sum(x => x.TotalReturn) ?? 0;
+        return _cachedTotalReturn;
     }
 
     private decimal GetReturnPercentage()
     {
-        var costBasis = GetTotalCostBasis();
-        return costBasis > 0 ? (GetTotalReturn() / costBasis * 100) : 0;
+        return _cachedReturnPercentage;
     }
 
     private int GetHoldingsCount()
     {
-        return _portfolioData?.Instruments?.Count ?? 0;
+        return _cachedHoldingsCount;
     }
 
     private string GetPortfolioCurrency()
     {
         var firstInstrument = _portfolioData?.Instruments?.FirstOrDefault();
-        return firstInstrument?.Currency ?? "USD";
+        return firstInstrument?.Currency ?? DefaultCurrency;
     }
 
     private List<HoldingViewModel> GetHoldings()
@@ -289,7 +333,7 @@ else if (_portfolioData != null)
                 return new HoldingViewModel
                 {
                     Symbol = instrument.Symbol ?? "N/A",
-                    Currency = instrument.Currency ?? "USD",
+                    Currency = instrument.Currency ?? DefaultCurrency,
                     SharesOwned = instrument.SharesOwned,
                     InvestmentValue = instrument.InvestmentValue,
                     CostBasis = instrument.CostBasis,
@@ -299,6 +343,14 @@ else if (_portfolioData != null)
             })
             .OrderByDescending(x => x.InvestmentValue)
             .ToList();
+    }
+
+    private string GetSymbolAvatarText(string symbol)
+    {
+        if (string.IsNullOrEmpty(symbol) || symbol.Length < MinSymbolAvatarLength)
+            return "??";
+        
+        return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
     }
 
     public class HoldingViewModel
