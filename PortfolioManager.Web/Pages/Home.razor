@@ -119,6 +119,7 @@ else if (_portfolioData != null)
                         <HeaderContent>
                             <MudTh Class="ynex-table-header">Symbol</MudTh>
                             <MudTh Class="ynex-table-header">Currency</MudTh>
+                            <MudTh Class="ynex-table-header text-right">Share Price</MudTh>
                             <MudTh Class="ynex-table-header text-right">Shares</MudTh>
                             <MudTh Class="ynex-table-header text-right">Market Value</MudTh>
                             <MudTh Class="ynex-table-header text-right">Daily Return</MudTh>
@@ -132,11 +133,15 @@ else if (_portfolioData != null)
                                     </MudAvatar>
                                     <div>
                                         <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
+                                        <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
                                     </div>
                                 </div>
                             </MudTd>
                             <MudTd DataLabel="Currency">
                                 <span class="currency-chip">@context.Currency</span>
+                            </MudTd>
+                            <MudTd DataLabel="Share Price" Class="text-right">
+                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
                             </MudTd>
                             <MudTd DataLabel="Shares" Class="text-right">
                                 <MudText Typo="Typo.body2" Class="numeric-text">@context.SharesOwned.ToString("N2")</MudText>
@@ -302,7 +307,9 @@ else if (_portfolioData != null)
                 return new HoldingViewModel
                 {
                     Symbol = instrument.Symbol ?? "N/A",
+                    Name = instrument.Name ?? "",
                     Currency = instrument.Currency ?? DefaultCurrency,
+                    SharePrice = instrument.SharePrice,
                     SharesOwned = instrument.SharesOwned,
                     InvestmentValue = instrument.InvestmentValue,
                     DailyReturn = instrument.SimpleReturn,
@@ -324,7 +331,9 @@ else if (_portfolioData != null)
     public class HoldingViewModel
     {
         public string Symbol { get; set; } = "";
+        public string Name { get; set; } = "";
         public string Currency { get; set; } = "";
+        public decimal SharePrice { get; set; }
         public decimal SharesOwned { get; set; }
         public decimal InvestmentValue { get; set; }
         public decimal DailyReturn { get; set; }
