@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject ISharesiesService SharesiesService
+@inject IAuthStateService AuthStateService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -203,6 +204,22 @@ else if (_portfolioData != null)
         new BreadcrumbItem("Dashboard", href: null, disabled: true)
     };
 
+    protected override async Task OnInitializedAsync()
+    {
+        await TryAutoLoginAsync();
+    }
+
+    private async Task TryAutoLoginAsync()
+    {
+        var isAuthenticated = await AuthStateService.IsAuthenticatedAsync();
+        if (isAuthenticated)
+        {
+            _userId = await AuthStateService.GetUserIdAsync();
+            _isLoggedIn = true;
+            await LoadPortfolioData();
+        }
+    }
+
     private async Task ShowLoginDialog()
     {
         var parameters = new DialogParameters
@@ -231,12 +248,32 @@ else if (_portfolioData != null)
 
             if (!string.IsNullOrEmpty(_userId))
             {
-                _portfolioData = await SharesiesService.GetPortfolioAsync(_userId);
+                var (userId, rakaiaToken, distillToken) = await AuthStateService.GetAuthDataAsync();
+                
+                if (string.IsNullOrEmpty(rakaiaToken) || string.IsNullOrEmpty(distillToken))
+                {
+                    await HandleAuthenticationExpired();
+                    return;
+                }
+                
+                _portfolioData = await SharesiesService.GetPortfolioAsync(_userId, rakaiaToken, distillToken);
+                
+                // Check if token expired (401)
+                if (_portfolioData == null)
+                {
+                    await HandleAuthenticationExpired();
+                    return;
+                }
+                
                 ComputePortfolioMetrics();
             }
 
             _isLoading = false;
             StateHasChanged();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            await HandleAuthenticationExpired();
         }
         catch (Exception ex)
         {
@@ -244,6 +281,17 @@ else if (_portfolioData != null)
             _isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private async Task HandleAuthenticationExpired()
+    {
+        await AuthStateService.ClearAuthStateAsync();
+        _isLoggedIn = false;
+        _userId = null;
+        _portfolioData = null;
+        _isLoading = false;
+        Snackbar.Add("Session expired. Please login again.", Severity.Warning);
+        StateHasChanged();
     }
     
     private void ComputePortfolioMetrics()

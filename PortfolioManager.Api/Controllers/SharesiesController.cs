@@ -69,9 +69,15 @@ namespace PortfolioManager.Api.Controllers
         }
 
         [HttpGet("portfolio")]
-        public async Task<IActionResult> Portfolio(string userId)
+        public async Task<IActionResult> Portfolio(string userId, [FromHeader(Name = "X-Rakaia-Token")] string? rakaiaToken, [FromHeader(Name = "X-Distill-Token")] string? distillToken)
         {
-            var portfolio = await _sharesiesCoordinator.GetAggregatedProfileAndInstrumentsAsync(userId);
+            if (string.IsNullOrEmpty(rakaiaToken) || string.IsNullOrEmpty(distillToken))
+            {
+                _logger.LogWarning("Portfolio request missing authentication tokens");
+                return Unauthorized(new { message = "Authentication tokens required" });
+            }
+
+            var portfolio = await _sharesiesCoordinator.GetAggregatedProfileAndInstrumentsAsync(userId, rakaiaToken, distillToken);
             
             _logger.LogInformation($"Successfully retrieved portfolio {portfolio}");
             

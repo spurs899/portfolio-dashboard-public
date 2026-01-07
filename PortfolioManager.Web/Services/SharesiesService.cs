@@ -8,7 +8,7 @@ public interface ISharesiesService
     Task<LoginResult> LoginAsync(string email, string password);
     Task<LoginResult> LoginMfaAsync(string email, string password, string mfaCode);
     Task<ProfileResponse?> GetProfileAsync();
-    Task<PortfolioResponse?> GetPortfolioAsync(string userId);
+    Task<PortfolioResponse?> GetPortfolioAsync(string userId, string rakaiaToken, string distillToken);
 }
 
 public class SharesiesService : ISharesiesService
@@ -38,6 +38,8 @@ public class SharesiesService : ISharesiesService
                 Success = loginResponse?.Authenticated ?? false,
                 RequiresMfa = false,
                 UserId = loginResponse?.User?.Id,
+                RakaiaToken = loginResponse?.RakaiaToken,
+                DistillToken = loginResponse?.DistillToken,
                 Message = "Login successful"
             };
         }
@@ -75,6 +77,8 @@ public class SharesiesService : ISharesiesService
             {
                 Success = loginResponse?.Authenticated ?? false,
                 UserId = loginResponse?.User?.Id,
+                RakaiaToken = loginResponse?.RakaiaToken,
+                DistillToken = loginResponse?.DistillToken,
                 Message = "Login successful"
             };
         }
@@ -98,9 +102,28 @@ public class SharesiesService : ISharesiesService
         return await _httpClient.GetFromJsonAsync<ProfileResponse>("api/Sharesies/profile");
     }
 
-    public async Task<PortfolioResponse?> GetPortfolioAsync(string userId)
+    public async Task<PortfolioResponse?> GetPortfolioAsync(string userId, string rakaiaToken, string distillToken)
     {
-        return await _httpClient.GetFromJsonAsync<PortfolioResponse>($"api/Sharesies/portfolio?userId={userId}");
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Sharesies/portfolio?userId={userId}");
+            request.Headers.Add("X-Rakaia-Token", rakaiaToken);
+            request.Headers.Add("X-Distill-Token", distillToken);
+            
+            var response = await _httpClient.SendAsync(request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<PortfolioResponse>();
+            }
+            
+            return null;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            // Return null to indicate authentication failure
+            return null;
+        }
     }
 }
 
@@ -110,6 +133,8 @@ public class LoginResult
     public bool RequiresMfa { get; set; }
     public string? UserId { get; set; }
     public string? Message { get; set; }
+    public string? RakaiaToken { get; set; }
+    public string? DistillToken { get; set; }
 }
 
 public class ApiErrorResponse
@@ -134,6 +159,12 @@ public class LoginResponse
 
     [JsonPropertyName("user")]
     public UserInfo? User { get; set; }
+    
+    [JsonPropertyName("rakaia_token")]
+    public string? RakaiaToken { get; set; }
+    
+    [JsonPropertyName("distill_token")]
+    public string? DistillToken { get; set; }
 }
 
 public class UserInfo

@@ -46,9 +46,6 @@ builder.Services.AddHttpClient<ISharesiesClient, SharesiesClient>()
 
 builder.Services.AddScoped<PortfolioManager.Core.Coordinators.ISharesiesCoordinator, PortfolioManager.Core.Coordinators.SharesiesCoordinator>();
 
-builder.Services.AddMemoryCache();
-builder.Services.AddScoped<PortfolioManager.Core.Services.IMemoryCacheWrapper, PortfolioManager.Core.Services.MemoryCacheWrapper>();
-
 var app = builder.Build();
 
 // Use Sentry request tracking

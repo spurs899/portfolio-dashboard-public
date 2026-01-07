@@ -9,7 +9,7 @@ public interface ISharesiesCoordinator
     Task<SharesiesLoginResponse> Login(string email, string password);
     Task<SharesiesLoginResponse> LoginProvideMfaCode(string email, string password, string mfaCode);
     Task<SharesiesProfileResponse?> GetProfile();
-    Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId);
+    Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId, string rakaiaToken, string distillToken);
 }
 
 public class SharesiesCoordinator : ISharesiesCoordinator
@@ -36,7 +36,7 @@ public class SharesiesCoordinator : ISharesiesCoordinator
         return await _sharesiesClient.GetProfileAsync();
     }
     
-    public async Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId)
+    public async Task<(UserProfile, List<PortfolioInstrument>)> GetAggregatedProfileAndInstrumentsAsync(string userId, string rakaiaToken, string distillToken)
     {
         var profileResponse = await _sharesiesClient.GetProfileAsync();
         if (profileResponse?.Profiles == null || profileResponse.Profiles.Count == 0)
@@ -47,10 +47,10 @@ public class SharesiesCoordinator : ISharesiesCoordinator
         if (portfolioId == null)
             return (null, null);
 
-        var portfolioResponse = await _sharesiesClient.GetPortfolioAsync(userId, portfolioId);
+        var portfolioResponse = await _sharesiesClient.GetPortfolioAsync(userId, portfolioId, rakaiaToken);
         var instrumentIds = portfolioResponse.InstrumentReturns?.Keys.ToList() ?? new List<string>();
         
-        var instrumentsResponse = await _sharesiesClient.GetInstrumentsAsync(userId, instrumentIds);
+        var instrumentsResponse = await _sharesiesClient.GetInstrumentsAsync(userId, instrumentIds, distillToken);
 
         var userProfile = new UserProfile
         {
