@@ -7,6 +7,21 @@
 
 PortfolioDashboard is a .NET 9.0 solution for managing and visualising investment portfolios across multiple brokerages. It provides a modern web interface for viewing aggregated portfolio data from Sharesies and Interactive Brokers.
 
+**🚀 [Live Demo](https://spurs899.github.io/portfolio-dashboard/)** - View the demo with sample portfolio data
+
+## CI/CD
+
+### Build and Test
+Automatically runs on every push and pull request to `master`, `main`, or `develop` branches. Builds all projects and runs 22+ unit tests to ensure code quality.
+
+### Deploy to GitHub Pages
+Manual deployment workflow for the demo site. Deploys a Blazor WASM app with demo data (no API required).
+
+**To deploy manually:**
+1. Go to Actions → "Deploy to GitHub Pages"
+2. Click "Run workflow" → Select `master` branch
+3. Site deploys to [https://spurs899.github.io/portfolio-dashboard/](https://spurs899.github.io/portfolio-dashboard/)
+
 ## Screenshots
 
 ### Dashboard
