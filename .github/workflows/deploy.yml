@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   deploy:
@@ -34,7 +32,7 @@ jobs:
     
     - name: Fix base path
       run: |
-        sed -i 's|<base href="/" />|<base href="/PortfolioDashboard/" />|g' release/wwwroot/index.html
+        sed -i 's|<base href="/" />|<base href="/portfolio-dashboard/" />|g' release/wwwroot/index.html
     
     - name: Add .nojekyll
       run: touch release/wwwroot/.nojekyll
