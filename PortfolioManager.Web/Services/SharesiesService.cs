@@ -27,7 +27,19 @@ public class SharesiesService : ISharesiesService
     {
         if (_demoMode)
         {
-            await Task.Delay(500); // Simulate network delay
+            await Task.Delay(800); // Simulate network delay
+            
+            // Accept any credentials in demo mode
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                return new LoginResult
+                {
+                    Success = false,
+                    RequiresMfa = false,
+                    Message = "Please enter email and password"
+                };
+            }
+            
             return new LoginResult
             {
                 Success = true,
@@ -80,7 +92,17 @@ public class SharesiesService : ISharesiesService
     {
         if (_demoMode)
         {
-            await Task.Delay(500);
+            await Task.Delay(600);
+            
+            if (string.IsNullOrWhiteSpace(mfaCode))
+            {
+                return new LoginResult
+                {
+                    Success = false,
+                    Message = "Please enter MFA code"
+                };
+            }
+            
             return new LoginResult
             {
                 Success = true,

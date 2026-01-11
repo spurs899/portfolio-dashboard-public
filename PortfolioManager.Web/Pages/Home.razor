@@ -3,6 +3,7 @@
 @inject IAuthStateService AuthStateService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject IConfiguration Configuration
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -28,10 +29,16 @@
 {
     <MudCard Elevation="2" Class="pa-4 mb-4">
         <MudCardContent>
+            @if (_demoMode)
+            {
+                <MudAlert Severity="Severity.Success" Class="mb-3" Dense="true" Icon="@Icons.Material.Filled.Info">
+                    <strong>Demo Mode Active:</strong> This is a sample portfolio with demo data. Login with any credentials to explore!
+                </MudAlert>
+            }
             <MudText Typo="Typo.h6" Class="mb-3">Connect Your Sharesies Account</MudText>
             <MudButton Variant="Variant.Filled" Class="sharesies-login-btn" OnClick="ShowLoginDialog">
                 <img src="images/sharesies-logo.png" alt="Sharesies" class="mr-2" />
-                Login with Sharesies
+                @(_demoMode ? "Try Demo Login" : "Login with Sharesies")
             </MudButton>
         </MudCardContent>
     </MudCard>
@@ -187,6 +194,7 @@ else if (_portfolioData != null)
     private const int MinSymbolAvatarLength = 1;
     private const int MaxSymbolAvatarLength = 2;
     
+    private bool _demoMode;
     private bool _isLoggedIn = false;
     private bool _isLoading = false;
     private string? _userId;
@@ -206,6 +214,7 @@ else if (_portfolioData != null)
 
     protected override async Task OnInitializedAsync()
     {
+        _demoMode = Configuration.GetValue<bool>("DemoMode");
         await TryAutoLoginAsync();
     }
 

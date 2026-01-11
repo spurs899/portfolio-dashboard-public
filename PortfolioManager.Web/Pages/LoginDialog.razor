@@ -3,22 +3,32 @@
 @inject ISharesiesService SharesiesService
 @inject IAuthStateService AuthStateService
 @inject ISnackbar Snackbar
+@inject IConfiguration Configuration
 
 <MudDialog>
     <DialogContent>
+        @if (_demoMode)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-3" Dense="true">
+                <strong>Demo Mode:</strong> Enter any credentials to view sample portfolio data
+            </MudAlert>
+        }
+        
         @if (!_requiresMfa)
         {
             <MudTextField @bind-Value="_email" 
                           Label="Email" 
                           Variant="Variant.Outlined" 
                           Class="mb-3"
-                          OnKeyDown="HandleKeyDown" />
+                          OnKeyDown="HandleKeyDown"
+                          Placeholder="@(_demoMode ? "demo@example.com" : "")" />
             <MudTextField @bind-Value="_password" 
                           Label="Password" 
                           Variant="Variant.Outlined" 
                           InputType="InputType.Password" 
                           Class="mb-3"
-                          OnKeyDown="HandleKeyDown" />
+                          OnKeyDown="HandleKeyDown"
+                          Placeholder="@(_demoMode ? "any password" : "")" />
         }
         else
         {
@@ -55,12 +65,18 @@
     
     [Parameter] public EventCallback<string> OnLoginSuccess { get; set; }
 
+    private bool _demoMode;
     private string _email = "";
     private string _password = "";
     private string _mfaCode = "";
     private bool _requiresMfa = false;
     private bool _isLoading = false;
     private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        _demoMode = Configuration.GetValue<bool>("DemoMode");
+    }
 
     private async Task HandleLogin()
     {
