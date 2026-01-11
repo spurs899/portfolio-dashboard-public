@@ -17,6 +17,7 @@ public class AuthStateService : IAuthStateService
     private const string UserIdKey = "sharesies_userId";
     private const string RakaiaTokenKey = "sharesies_rakaiaToken";
     private const string DistillTokenKey = "sharesies_distillToken";
+    private const string DemoAuthKey = "demo_authenticated";
     
     private readonly IJSRuntime _jsRuntime;
     private readonly bool _demoMode;
@@ -31,7 +32,8 @@ public class AuthStateService : IAuthStateService
     {
         if (_demoMode)
         {
-            return true;
+            var demoAuth = await GetFromLocalStorageAsync(DemoAuthKey);
+            return demoAuth == "true";
         }
 
         var userId = await GetFromLocalStorageAsync(UserIdKey);
@@ -51,16 +53,30 @@ public class AuthStateService : IAuthStateService
 
     public async Task SaveAuthStateAsync(string userId, string rakaiaToken, string distillToken)
     {
-        await SetInLocalStorageAsync(UserIdKey, userId);
-        await SetInLocalStorageAsync(RakaiaTokenKey, rakaiaToken);
-        await SetInLocalStorageAsync(DistillTokenKey, distillToken);
+        if (_demoMode)
+        {
+            await SetInLocalStorageAsync(DemoAuthKey, "true");
+        }
+        else
+        {
+            await SetInLocalStorageAsync(UserIdKey, userId);
+            await SetInLocalStorageAsync(RakaiaTokenKey, rakaiaToken);
+            await SetInLocalStorageAsync(DistillTokenKey, distillToken);
+        }
     }
 
     public async Task ClearAuthStateAsync()
     {
-        await RemoveFromLocalStorageAsync(UserIdKey);
-        await RemoveFromLocalStorageAsync(RakaiaTokenKey);
-        await RemoveFromLocalStorageAsync(DistillTokenKey);
+        if (_demoMode)
+        {
+            await RemoveFromLocalStorageAsync(DemoAuthKey);
+        }
+        else
+        {
+            await RemoveFromLocalStorageAsync(UserIdKey);
+            await RemoveFromLocalStorageAsync(RakaiaTokenKey);
+            await RemoveFromLocalStorageAsync(DistillTokenKey);
+        }
     }
 
     public async Task<(string? userId, string? rakaiaToken, string? distillToken)> GetAuthDataAsync()

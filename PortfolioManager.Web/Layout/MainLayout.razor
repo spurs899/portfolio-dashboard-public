@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
 <MudThemeProvider Theme="@_theme" />
 <MudLayout>
@@ -9,7 +12,14 @@
         <MudSpacer />
         <MudText Typo="Typo.body2" Class="mr-4 appbar-date-desktop" Style="color: rgba(255,255,255,0.8);">@DateTime.Now.ToString("MMM dd, yyyy")</MudText>
         <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" />
-        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" />
+        <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+            <MudMenuItem OnClick="@Logout">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Logout" Class="mr-2" Size="Size.Small" />
+                    Logout
+                </div>
+            </MudMenuItem>
+        </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Class="professional-drawer">
         <MudDrawerHeader Class="drawer-header">
@@ -50,5 +60,12 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task Logout()
+    {
+        await AuthStateService.ClearAuthStateAsync();
+        Snackbar.Add("Logged out successfully", Severity.Success);
+        Navigation.NavigateTo("/", forceLoad: true);
     }
 }
