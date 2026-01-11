@@ -142,27 +142,117 @@ else if (_portfolioData != null)
 
         <!-- Holdings Table -->
         <MudItem xs="12">
+            <!-- Aggregated Holdings by Symbol -->
+            <MudCard Elevation="0" Class="ynex-table-card mb-4">
+                <MudCardHeader Class="pb-0">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Class="fw-bold">Aggregated Holdings</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">Combined positions across all brokerages</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.PieChart" Color="Color.Default" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudTable Items="@GetAggregatedHoldings()" 
+                              Hover="true" 
+                              Class="ynex-table" 
+                              Elevation="0" 
+                              Bordered="false"
+                              SortLabel="Sort By"
+                              AllowUnsorted="true"
+                              Dense="false">
+                        <HeaderContent>
+                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalShares)">Total Shares</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalValue)">Total Value</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalReturn)">Total Return</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.AverageReturnPercentage)">Avg Return %</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header">Brokerages</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Symbol">
+                                <div class="d-flex align-center">
+                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
+                                        @GetSymbolAvatarText(context.Symbol)
+                                    </MudAvatar>
+                                    <div>
+                                        <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
+                                        <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
+                                    </div>
+                                </div>
+                            </MudTd>
+                            <MudTd DataLabel="Currency">
+                                <span class="currency-chip">@context.Currency</span>
+                            </MudTd>
+                            <MudTd DataLabel="Share Price" Class="text-right">
+                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Shares" Class="text-right">
+                                <MudText Typo="Typo.body2" Class="numeric-text">@context.TotalShares</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Value" Class="text-right">
+                                <MudText Typo="Typo.body2" Class="fw-semibold numeric-text">@context.TotalValue.ToString("C")</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Return" Class="text-right">
+                                <MudText Typo="Typo.body2" Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
+                                         aria-label="@($"Total return {(context.TotalReturn >= 0 ? "gain" : "loss")} {context.TotalReturn.ToString("C")}")">
+                                    @(context.TotalReturn >= 0 ? "+" : "")@context.TotalReturn.ToString("C")
+                                </MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Avg Return %" Class="text-right">
+                                <span class="@(context.AverageReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")"
+                                      aria-label="@($"Average return percentage {(context.AverageReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.AverageReturnPercentage).ToString("F2")} percent")">
+                                    @(context.AverageReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.AverageReturnPercentage).ToString("F2")%
+                                </span>
+                            </MudTd>
+                            <MudTd DataLabel="Brokerages">
+                                <div class="d-flex align-center gap-2">
+                                    @foreach (var brokerageType in context.BrokerageTypes)
+                                    {
+                                        <img src="@GetBrokerageLogoUrl(brokerageType)" 
+                                             alt="@GetBrokerageName(brokerageType)" 
+                                             class="brokerage-logo-img" 
+                                             title="@GetBrokerageName(brokerageType)" />
+                                    }
+                                </div>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+            
+            <!-- Detailed Holdings by Brokerage -->
             <MudCard Elevation="0" Class="ynex-table-card">
                 <MudCardHeader Class="pb-0">
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Class="fw-bold">Portfolio Holdings</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">Overview of your investment positions</MudText>
+                        <MudText Typo="Typo.h6" Class="fw-bold">Detailed Holdings</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">Individual positions per brokerage</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" />
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent Class="pa-0">
-                    <MudTable Items="@GetHoldings()" Hover="true" Class="ynex-table" Elevation="0" Bordered="false">
+                    <MudTable Items="@GetHoldings()" 
+                              Hover="true" 
+                              Class="ynex-table" 
+                              Elevation="0" 
+                              Bordered="false"
+                              SortLabel="Sort By"
+                              AllowUnsorted="true"
+                              Dense="false">
                         <HeaderContent>
-                            <MudTh Class="ynex-table-header">Symbol</MudTh>
-                            <MudTh Class="ynex-table-header">Currency</MudTh>
-                            <MudTh Class="ynex-table-header text-right">Share Price</MudTh>
-                            <MudTh Class="ynex-table-header text-right">Shares</MudTh>
-                            <MudTh Class="ynex-table-header text-right">Market Value</MudTh>
-                            <MudTh Class="ynex-table-header text-right">Daily Return</MudTh>
-                            <MudTh Class="ynex-table-header text-right">Return %</MudTh>
-                            <MudTh Class="ynex-table-header">Brokerage</MudTh>
+                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharesOwned)">Shares</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<HoldingViewModel, object>(x => x.InvestmentValue)">Market Value</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturn)">Daily Return</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturnPercentage)">Return %</MudTableSortLabel></MudTh>
+                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.BrokerageType)">Brokerage</MudTableSortLabel></MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Symbol">
@@ -231,7 +321,6 @@ else if (_portfolioData != null)
     private decimal _cachedTotalValue;
     private decimal _cachedDailyReturn;
     private decimal _cachedDailyReturnPercentage;
-    private int _cachedHoldingsCount;
     
     // Time and timezone tracking
     private System.Threading.Timer? _timer;
@@ -477,13 +566,11 @@ else if (_portfolioData != null)
             _cachedTotalValue = 0;
             _cachedDailyReturn = 0;
             _cachedDailyReturnPercentage = 0;
-            _cachedHoldingsCount = 0;
             return;
         }
 
         _cachedTotalValue = 0;
         _cachedDailyReturn = 0;
-        _cachedHoldingsCount = _portfolioData.Instruments.Count;
 
         foreach (var instrument in _portfolioData.Instruments)
         {
@@ -491,7 +578,7 @@ else if (_portfolioData != null)
             _cachedDailyReturn += instrument.SimpleReturn;
         }
 
-        _cachedDailyReturnPercentage = _cachedTotalValue > 0 
+        _cachedDailyReturnPercentage = _cachedTotalValue > 0
             ? (_cachedDailyReturn / _cachedTotalValue * 100) 
             : 0;
     }
@@ -519,13 +606,49 @@ else if (_portfolioData != null)
 
     private int GetHoldingsCount()
     {
-        return _cachedHoldingsCount;
+        // Count unique symbols (aggregated)
+        return _portfolioData?.Instruments?.Select(i => i.Symbol).Distinct().Count() ?? 0;
     }
 
     private string GetPortfolioCurrency()
     {
         var firstInstrument = _portfolioData?.Instruments?.FirstOrDefault();
         return firstInstrument?.Currency ?? DefaultCurrency;
+    }
+
+    private List<AggregatedHoldingViewModel> GetAggregatedHoldings()
+    {
+        if (_portfolioData?.Instruments == null)
+            return new List<AggregatedHoldingViewModel>();
+
+        return _portfolioData.Instruments
+            .GroupBy(i => i.Symbol)
+            .Select(group =>
+            {
+                var instruments = group.ToList();
+                var firstInstrument = instruments.First();
+                
+                var totalShares = instruments.Sum(i => i.SharesOwned);
+                var totalValue = instruments.Sum(i => i.InvestmentValue);
+                var totalCostBasis = instruments.Sum(i => i.CostBasis);
+                var totalReturn = totalValue - totalCostBasis;
+                var averageReturnPercentage = totalCostBasis > 0 ? (totalReturn / totalCostBasis * 100) : 0;
+                
+                return new AggregatedHoldingViewModel
+                {
+                    Symbol = firstInstrument.Symbol ?? "N/A",
+                    Name = firstInstrument.Name ?? "",
+                    Currency = firstInstrument.Currency ?? DefaultCurrency,
+                    SharePrice = firstInstrument.SharePrice,
+                    TotalShares = totalShares,
+                    TotalValue = totalValue,
+                    TotalReturn = totalReturn,
+                    AverageReturnPercentage = averageReturnPercentage,
+                    BrokerageTypes = instruments.Select(i => i.BrokerageType).Distinct().OrderBy(x => x).ToList()
+                };
+            })
+            .OrderByDescending(x => x.TotalValue)
+            .ToList();
     }
 
     private List<HoldingViewModel> GetHoldings()
@@ -596,5 +719,18 @@ else if (_portfolioData != null)
         public decimal DailyReturn { get; set; }
         public decimal DailyReturnPercentage { get; set; }
         public int BrokerageType { get; set; }
+    }
+
+    public class AggregatedHoldingViewModel
+    {
+        public string Symbol { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Currency { get; set; } = "";
+        public decimal SharePrice { get; set; }
+        public decimal TotalShares { get; set; }
+        public decimal TotalValue { get; set; }
+        public decimal TotalReturn { get; set; }
+        public decimal AverageReturnPercentage { get; set; }
+        public List<int> BrokerageTypes { get; set; } = new();
     }
 }

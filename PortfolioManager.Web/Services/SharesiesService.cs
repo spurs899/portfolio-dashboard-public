@@ -175,80 +175,133 @@ public class SharesiesService : ISharesiesService
                 },
                 Instruments = new List<InstrumentDto>
                 {
+                    // AAPL - Sharesies (Cost: $150/share, Current: $175.50)
                     new InstrumentDto
                     {
                         Id = "1",
                         Symbol = "AAPL",
                         Name = "Apple Inc.",
                         Currency = "USD",
-                        BrokerageType = 1,
+                        BrokerageType = 0,  // Sharesies
                         SharesOwned = 50,
                         SharePrice = 175.50m,
-                        InvestmentValue = 8775.00m,
-                        CostBasis = 7500.00m,
-                        TotalReturn = 1275.00m,
-                        SimpleReturn = 17.00m,
+                        InvestmentValue = 8775.00m,      // 50 * $175.50
+                        CostBasis = 7500.00m,            // 50 * $150
+                        TotalReturn = 1275.00m,          // $8775 - $7500
+                        SimpleReturn = 87.75m,           // Daily return: 1% of investment value
                         DividendsReceived = 125.00m
                     },
+                    // AAPL - Interactive Brokers (Cost: $160/share, Current: $175.50)
                     new InstrumentDto
                     {
                         Id = "2",
-                        Symbol = "MSFT",
-                        Name = "Microsoft Corporation",
+                        Symbol = "AAPL",
+                        Name = "Apple Inc.",
                         Currency = "USD",
-                        BrokerageType = 0,
-                        SharesOwned = 75,
-                        SharePrice = 380.00m,
-                        InvestmentValue = 28500.00m,
-                        CostBasis = 25000.00m,
-                        TotalReturn = 3500.00m,
-                        SimpleReturn = 14.00m,
-                        DividendsReceived = 450.00m
+                        BrokerageType = 1,  // IBKR
+                        SharesOwned = 100,
+                        SharePrice = 175.50m,
+                        InvestmentValue = 17550.00m,     // 100 * $175.50
+                        CostBasis = 16000.00m,           // 100 * $160
+                        TotalReturn = 1550.00m,          // $17550 - $16000
+                        SimpleReturn = 175.50m,          // Daily return: 1% of investment value
+                        DividendsReceived = 250.00m
                     },
+                    // MSFT - Sharesies (Cost: $340/share, Current: $380)
                     new InstrumentDto
                     {
                         Id = "3",
-                        Symbol = "GOOGL",
-                        Name = "Alphabet Inc.",
+                        Symbol = "MSFT",
+                        Name = "Microsoft Corporation",
                         Currency = "USD",
-                        BrokerageType = 1,
-                        SharesOwned = 30,
-                        SharePrice = 140.25m,
-                        InvestmentValue = 4207.50m,
-                        CostBasis = 4500.00m,
-                        TotalReturn = -292.50m,
-                        SimpleReturn = -6.50m,
-                        DividendsReceived = 0.00m
+                        BrokerageType = 0,  // Sharesies
+                        SharesOwned = 75,
+                        SharePrice = 380.00m,
+                        InvestmentValue = 28500.00m,     // 75 * $380
+                        CostBasis = 25500.00m,           // 75 * $340
+                        TotalReturn = 3000.00m,          // $28500 - $25500
+                        SimpleReturn = 285.00m,          // Daily return: 1% of investment value
+                        DividendsReceived = 450.00m
                     },
+                    // MSFT - Interactive Brokers (Cost: $350/share, Current: $380)
                     new InstrumentDto
                     {
                         Id = "4",
-                        Symbol = "TSLA",
-                        Name = "Tesla Inc.",
+                        Symbol = "MSFT",
+                        Name = "Microsoft Corporation",
                         Currency = "USD",
-                        BrokerageType = 1,
-                        SharesOwned = 20,
-                        SharePrice = 245.00m,
-                        InvestmentValue = 4900.00m,
-                        CostBasis = 3800.00m,
-                        TotalReturn = 1100.00m,
-                        SimpleReturn = 28.95m,
-                        DividendsReceived = 0.00m
+                        BrokerageType = 1,  // IBKR
+                        SharesOwned = 50,
+                        SharePrice = 380.00m,
+                        InvestmentValue = 19000.00m,     // 50 * $380
+                        CostBasis = 17500.00m,           // 50 * $350
+                        TotalReturn = 1500.00m,          // $19000 - $17500
+                        SimpleReturn = 190.00m,          // Daily return: 1% of investment value
+                        DividendsReceived = 300.00m
                     },
+                    // GOOGL - Sharesies only (Cost: $150/share, Current: $140.25 - LOSS)
                     new InstrumentDto
                     {
                         Id = "5",
+                        Symbol = "GOOGL",
+                        Name = "Alphabet Inc.",
+                        Currency = "USD",
+                        BrokerageType = 0,  // Sharesies
+                        SharesOwned = 30,
+                        SharePrice = 140.25m,
+                        InvestmentValue = 4207.50m,      // 30 * $140.25
+                        CostBasis = 4500.00m,            // 30 * $150
+                        TotalReturn = -292.50m,          // $4207.50 - $4500
+                        SimpleReturn = -42.08m,          // Daily return: -1% of investment value
+                        DividendsReceived = 0.00m
+                    },
+                    // TSLA - Interactive Brokers only (Cost: $190/share, Current: $245)
+                    new InstrumentDto
+                    {
+                        Id = "6",
+                        Symbol = "TSLA",
+                        Name = "Tesla Inc.",
+                        Currency = "USD",
+                        BrokerageType = 1,  // IBKR
+                        SharesOwned = 20,
+                        SharePrice = 245.00m,
+                        InvestmentValue = 4900.00m,      // 20 * $245
+                        CostBasis = 3800.00m,            // 20 * $190
+                        TotalReturn = 1100.00m,          // $4900 - $3800
+                        SimpleReturn = 49.00m,           // Daily return: 1% of investment value
+                        DividendsReceived = 0.00m
+                    },
+                    // NVDA - Sharesies (Cost: $280/share, Current: $495)
+                    new InstrumentDto
+                    {
+                        Id = "7",
                         Symbol = "NVDA",
                         Name = "NVIDIA Corporation",
                         Currency = "USD",
-                        BrokerageType = 0,
+                        BrokerageType = 0,  // Sharesies
                         SharesOwned = 15,
                         SharePrice = 495.00m,
-                        InvestmentValue = 7425.00m,
-                        CostBasis = 4200.00m,
-                        TotalReturn = 3225.00m,
-                        SimpleReturn = 76.79m,
+                        InvestmentValue = 7425.00m,      // 15 * $495
+                        CostBasis = 4200.00m,            // 15 * $280
+                        TotalReturn = 3225.00m,          // $7425 - $4200
+                        SimpleReturn = 74.25m,           // Daily return: 1% of investment value
                         DividendsReceived = 25.00m
+                    },
+                    // NVDA - Interactive Brokers (Cost: $340/share, Current: $495)
+                    new InstrumentDto
+                    {
+                        Id = "8",
+                        Symbol = "NVDA",
+                        Name = "NVIDIA Corporation",
+                        Currency = "USD",
+                        BrokerageType = 1,  // IBKR
+                        SharesOwned = 25,
+                        SharePrice = 495.00m,
+                        InvestmentValue = 12375.00m,     // 25 * $495
+                        CostBasis = 8500.00m,            // 25 * $340
+                        TotalReturn = 3875.00m,          // $12375 - $8500
+                        SimpleReturn = 123.75m,          // Daily return: 1% of investment value
+                        DividendsReceived = 50.00m
                     }
                 }
             };
