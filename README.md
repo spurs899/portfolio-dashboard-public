@@ -1,14 +1,29 @@
 # PortfolioDashboard
 
-PortfolioDashboard is a .NET 9.0 solution for managing and visualizing investment portfolios across multiple brokerages. It provides a modern web interface for viewing aggregated portfolio data from Sharesies and Interactive Brokers.
+PortfolioDashboard is a .NET 9.0 solution for managing and visualising investment portfolios across multiple brokerages. It provides a modern web interface for viewing aggregated portfolio data from Sharesies and Interactive Brokers.
+
+## Screenshots
+
+### Dashboard
+![Dashboard](dashboard.png)
+*Portfolio overview with real-time analytics, holdings breakdown, and multi-brokerage support*
+
+### Login Flow
+<table>
+  <tr>
+    <td><img src="login.png" alt="Login Page" /><br/><em>Initial login page</em></td>
+    <td><img src="login_credentials.png" alt="Login Credentials" /><br/><em>Enter your credentials</em></td>
+    <td><img src="login_mfa.png" alt="MFA Verification" /><br/><em>MFA code verification</em></td>
+  </tr>
+</table>
 
 ## Features
 
-- 🎯 **Multi-Brokerage Portfolio Aggregation** - View holdings from multiple brokers in one dashboard
-- 📊 **Real-Time Analytics** - Track total value, daily returns, and performance metrics
-- 🔐 **Secure Authentication** - MFA support for Sharesies login
-- 💼 **Holdings Management** - Detailed instrument breakdown with returns tracking
-- 🎨 **Modern UI** - Blazor WebAssembly with MudBlazor Material Design components
+- **Multi-Brokerage Portfolio Aggregation** - View holdings from multiple brokers in one dashboard
+- **Real-Time Analytics** - Track total value, daily returns, and performance metrics
+- **Secure Authentication** - MFA support for Sharesies login
+- **Holdings Management** - Detailed instrument breakdown with returns tracking
+- **Modern UI** - Blazor WebAssembly with MudBlazor Material Design components
 
 ## Projects
 

@@ -8,15 +8,28 @@
     <DialogContent>
         @if (!_requiresMfa)
         {
-            <MudTextField @bind-Value="_email" Label="Email" Variant="Variant.Outlined" Class="mb-3" />
-            <MudTextField @bind-Value="_password" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password" Class="mb-3" />
+            <MudTextField @bind-Value="_email" 
+                          Label="Email" 
+                          Variant="Variant.Outlined" 
+                          Class="mb-3"
+                          OnKeyDown="HandleKeyDown" />
+            <MudTextField @bind-Value="_password" 
+                          Label="Password" 
+                          Variant="Variant.Outlined" 
+                          InputType="InputType.Password" 
+                          Class="mb-3"
+                          OnKeyDown="HandleKeyDown" />
         }
         else
         {
             <MudAlert Severity="Severity.Info" Class="mb-3">
                 An MFA code has been sent to your email. Please enter it below.
             </MudAlert>
-            <MudTextField @bind-Value="_mfaCode" Label="MFA Code" Variant="Variant.Outlined" Class="mb-3" />
+            <MudTextField @bind-Value="_mfaCode" 
+                          Label="MFA Code" 
+                          Variant="Variant.Outlined" 
+                          Class="mb-3"
+                          OnKeyDown="HandleKeyDown" />
         }
 
         @if (_isLoading)
@@ -101,6 +114,14 @@
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !_isLoading)
+        {
+            await HandleLogin();
         }
     }
 
