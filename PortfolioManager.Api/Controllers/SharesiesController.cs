@@ -7,6 +7,8 @@ namespace PortfolioManager.Api.Controllers
     [Route("api/[controller]")]
     public class SharesiesController : ControllerBase
     {
+        private const string MfaRequiredType = "identity_email_mfa_required";
+        
         private readonly ISharesiesCoordinator _sharesiesCoordinator;
         private readonly ILogger<SharesiesController> _logger;
 
@@ -19,11 +21,16 @@ namespace PortfolioManager.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
         {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                return BadRequest(new { message = "Email and password are required" });
+            }
+
             var loginResult = await _sharesiesCoordinator.Login(email, password);
             _logger.LogInformation($"Login attempt for {email}. Result type: {loginResult?.Type}, Authenticated: {loginResult?.Authenticated}");
             
             // Check if MFA is required
-            if (loginResult is { Type: "identity_email_mfa_required" })
+            if (loginResult is { Type: MfaRequiredType })
             {
                 _logger.LogInformation($"MFA required for {email}");
                 return Unauthorized(new 
@@ -47,8 +54,13 @@ namespace PortfolioManager.Api.Controllers
         [HttpPost("login/mfa")]
         public async Task<IActionResult> LoginMfa([FromForm] string email, [FromForm] string password, [FromForm] string mfaCode)
         {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(mfaCode))
+            {
+                return BadRequest(new { message = "Email, password, and MFA code are required" });
+            }
+
             var loginResult = await _sharesiesCoordinator.LoginProvideMfaCode(email, password, mfaCode);
-            _logger.LogInformation($"MFA login attempt for {email} with code {mfaCode}. Authenticated: {loginResult?.Authenticated}");
+            _logger.LogInformation($"MFA login attempt for {email}. Authenticated: {loginResult?.Authenticated}");
             
             if (loginResult is { Authenticated: true })
             {
@@ -71,6 +83,12 @@ namespace PortfolioManager.Api.Controllers
         [HttpGet("portfolio")]
         public async Task<IActionResult> Portfolio(string userId, [FromHeader(Name = "X-Rakaia-Token")] string? rakaiaToken, [FromHeader(Name = "X-Distill-Token")] string? distillToken)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                _logger.LogWarning("Portfolio request missing userId");
+                return BadRequest(new { message = "UserId is required" });
+            }
+
             if (string.IsNullOrEmpty(rakaiaToken) || string.IsNullOrEmpty(distillToken))
             {
                 _logger.LogWarning("Portfolio request missing authentication tokens");

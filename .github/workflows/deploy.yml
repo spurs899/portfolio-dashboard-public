@@ -32,6 +32,7 @@ jobs:
           cat > PortfolioManager.Web/wwwroot/appsettings.json << EOF
         {
           "DemoMode": true,
+          "ApiBaseUrl": "http://localhost:5269",
           "Sentry": {
             "Dsn": "$SENTRY_DSN",
             "Environment": "demo"
@@ -41,7 +42,8 @@ jobs:
         else
           cat > PortfolioManager.Web/wwwroot/appsettings.json << 'EOF'
         {
-          "DemoMode": true
+          "DemoMode": true,
+          "ApiBaseUrl": "http://localhost:5269"
         }
         EOF
         fi

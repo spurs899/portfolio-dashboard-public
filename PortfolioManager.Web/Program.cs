@@ -18,7 +18,9 @@ if (config != null)
         new KeyValuePair<string, string?>(kvp.Key, kvp.Value?.ToString())));
 }
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5269") });
+// Configure HttpClient with API base URL from configuration
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5269";
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 builder.Services.AddScoped<ISharesiesService, SharesiesService>();
 builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 builder.Services.AddMudServices();

@@ -14,6 +14,7 @@ public interface ISharesiesClient
 
 public class SharesiesClient : ISharesiesClient
 {
+    private const string MfaRequiredType = "identity_email_mfa_required";
     private readonly HttpClient _httpClient;
 
     public SharesiesClient(HttpClient httpClient)
@@ -42,7 +43,7 @@ public class SharesiesClient : ISharesiesClient
         {
             var loginResponse = await response.Content.ReadFromJsonAsync<SharesiesLoginResponse>();
 
-            if (loginResponse?.Type == "identity_email_mfa_required" && string.IsNullOrEmpty(mfaCode))
+            if (loginResponse?.Type == MfaRequiredType && string.IsNullOrEmpty(mfaCode))
             {
                 // MFA required but not provided
                 return loginResponse;

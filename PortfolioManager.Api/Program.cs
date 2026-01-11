@@ -4,9 +4,10 @@ using Sentry.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers(); // <-- Add this
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMemoryCache();
 
 builder.WebHost.UseSentry((SentryAspNetCoreOptions  options) =>
 {
@@ -31,7 +32,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",
         policy => policy
-            .WithOrigins("http://localhost:5262", "https://localhost:7262")
+            .WithOrigins(
+                "http://localhost:5262", 
+                "https://localhost:7262",
+                "https://spurs899.github.io")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
