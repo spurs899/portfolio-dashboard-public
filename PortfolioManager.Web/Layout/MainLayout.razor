@@ -4,9 +4,10 @@
 <MudLayout>
     <MudAppBar Elevation="0" Dense="false" Class="professional-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h6" Class="appbar-title">Portfolio Manager</MudText>
+        <img src="favicon.svg" alt="Logo" class="appbar-logo-mobile" />
+        <MudText Typo="Typo.h6" Class="appbar-title appbar-title-desktop">Portfolio Manager</MudText>
         <MudSpacer />
-        <MudText Typo="Typo.body2" Class="mr-4" Style="color: rgba(255,255,255,0.8);">@DateTime.Now.ToString("MMM dd, yyyy")</MudText>
+        <MudText Typo="Typo.body2" Class="mr-4 appbar-date-desktop" Style="color: rgba(255,255,255,0.8);">@DateTime.Now.ToString("MMM dd, yyyy")</MudText>
         <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" />
         <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" />
     </MudAppBar>

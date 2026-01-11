@@ -317,6 +317,35 @@ a, .btn-link {
     color: #ffffff !important;
 }
 
+.appbar-logo-mobile {
+    display: none;
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+}
+
+/* Mobile responsive navbar */
+@media (max-width: 768px) {
+    .appbar-title-desktop {
+        display: none !important;
+    }
+    
+    .appbar-logo-mobile {
+        display: block !important;
+    }
+    
+    .appbar-date-desktop {
+        display: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .appbar-logo-mobile {
+        height: 28px;
+        width: 28px;
+    }
+}
+
 .professional-drawer {
     border-right: 1px solid #2d3748 !important;
     background: #1b263b !important;
