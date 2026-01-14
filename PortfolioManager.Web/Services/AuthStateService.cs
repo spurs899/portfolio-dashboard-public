@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
+using PortfolioManager.Contracts;
 
 namespace PortfolioManager.Web.Services;
 
@@ -7,16 +8,17 @@ public interface IAuthStateService
 {
     Task<bool> IsAuthenticatedAsync();
     Task<string?> GetUserIdAsync();
-    Task SaveAuthStateAsync(string userId, string rakaiaToken, string distillToken);
+    Task<string?> GetBrokerageTypeAsync();
+    Task SaveAuthStateAsync(string brokerageType, string userId, Dictionary<string, string>? tokens);
     Task ClearAuthStateAsync();
-    Task<(string? userId, string? rakaiaToken, string? distillToken)> GetAuthDataAsync();
+    Task<(string? brokerageType, string? userId, Dictionary<string, string>? tokens)> GetAuthDataAsync();
 }
 
 public class AuthStateService : IAuthStateService
 {
-    private const string UserIdKey = "sharesies_userId";
-    private const string RakaiaTokenKey = "sharesies_rakaiaToken";
-    private const string DistillTokenKey = "sharesies_distillToken";
+    private const string BrokerageTypeKey = "auth_brokerageType";
+    private const string UserIdKey = "auth_userId";
+    private const string TokensKey = "auth_tokens";
     private const string DemoAuthKey = "demo_authenticated";
     
     private readonly IJSRuntime _jsRuntime;
@@ -37,8 +39,8 @@ public class AuthStateService : IAuthStateService
         }
 
         var userId = await GetFromLocalStorageAsync(UserIdKey);
-        var rakaiaToken = await GetFromLocalStorageAsync(RakaiaTokenKey);
-        return !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(rakaiaToken);
+        var brokerageType = await GetFromLocalStorageAsync(BrokerageTypeKey);
+        return !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(brokerageType);
     }
 
     public async Task<string?> GetUserIdAsync()
@@ -51,7 +53,17 @@ public class AuthStateService : IAuthStateService
         return await GetFromLocalStorageAsync(UserIdKey);
     }
 
-    public async Task SaveAuthStateAsync(string userId, string rakaiaToken, string distillToken)
+    public async Task<string?> GetBrokerageTypeAsync()
+    {
+        if (_demoMode)
+        {
+            return Constants.BrokerageSharesies;
+        }
+
+        return await GetFromLocalStorageAsync(BrokerageTypeKey);
+    }
+
+    public async Task SaveAuthStateAsync(string brokerageType, string userId, Dictionary<string, string>? tokens)
     {
         if (_demoMode)
         {
@@ -59,9 +71,14 @@ public class AuthStateService : IAuthStateService
         }
         else
         {
+            await SetInLocalStorageAsync(BrokerageTypeKey, brokerageType);
             await SetInLocalStorageAsync(UserIdKey, userId);
-            await SetInLocalStorageAsync(RakaiaTokenKey, rakaiaToken);
-            await SetInLocalStorageAsync(DistillTokenKey, distillToken);
+            
+            if (tokens != null)
+            {
+                var tokensJson = System.Text.Json.JsonSerializer.Serialize(tokens);
+                await SetInLocalStorageAsync(TokensKey, tokensJson);
+            }
         }
     }
 
@@ -73,23 +90,41 @@ public class AuthStateService : IAuthStateService
         }
         else
         {
+            await RemoveFromLocalStorageAsync(BrokerageTypeKey);
             await RemoveFromLocalStorageAsync(UserIdKey);
-            await RemoveFromLocalStorageAsync(RakaiaTokenKey);
-            await RemoveFromLocalStorageAsync(DistillTokenKey);
+            await RemoveFromLocalStorageAsync(TokensKey);
         }
     }
 
-    public async Task<(string? userId, string? rakaiaToken, string? distillToken)> GetAuthDataAsync()
+    public async Task<(string? brokerageType, string? userId, Dictionary<string, string>? tokens)> GetAuthDataAsync()
     {
         if (_demoMode)
         {
-            return ("demo-user-123", "demo-rakaia-token", "demo-distill-token");
+            return (Constants.BrokerageSharesies, "demo-user-123", new Dictionary<string, string>
+            {
+                ["RakaiaToken"] = "demo-rakaia-token",
+                ["DistillToken"] = "demo-distill-token"
+            });
         }
 
+        var brokerageType = await GetFromLocalStorageAsync(BrokerageTypeKey);
         var userId = await GetFromLocalStorageAsync(UserIdKey);
-        var rakaiaToken = await GetFromLocalStorageAsync(RakaiaTokenKey);
-        var distillToken = await GetFromLocalStorageAsync(DistillTokenKey);
-        return (userId, rakaiaToken, distillToken);
+        var tokensJson = await GetFromLocalStorageAsync(TokensKey);
+        
+        Dictionary<string, string>? tokens = null;
+        if (!string.IsNullOrEmpty(tokensJson))
+        {
+            try
+            {
+                tokens = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(tokensJson);
+            }
+            catch
+            {
+                // Ignore deserialization errors
+            }
+        }
+
+        return (brokerageType, userId, tokens);
     }
 
     private async Task<string?> GetFromLocalStorageAsync(string key)

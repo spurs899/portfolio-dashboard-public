@@ -3,5 +3,5 @@
 public enum BrokerageType
 {
     Sharesies = 0,
-    IBKR = 1
+    InteractiveBrokers = 1
 }

@@ -1,6 +1,8 @@
 @using MudBlazor
 @using Microsoft.AspNetCore.Components
-@inject ISharesiesService SharesiesService
+@using PortfolioManager.Contracts
+@using PortfolioManager.Web.Services
+@inject IBrokerageService BrokerageService
 @inject IAuthStateService AuthStateService
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
@@ -87,16 +89,16 @@
 
             if (!_requiresMfa)
             {
-                var result = await SharesiesService.LoginAsync(_email, _password);
+                var result = await BrokerageService.AuthenticateAsync(Constants.BrokerageSharesies, _email, _password);
                 
                 if (result.RequiresMfa)
                 {
                     _requiresMfa = true;
                     Snackbar.Add("MFA code sent to your email", Severity.Info);
                 }
-                else if (result.Success && !string.IsNullOrEmpty(result.UserId))
+                else if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
                 {
-                    await AuthStateService.SaveAuthStateAsync(result.UserId, result.RakaiaToken ?? "", result.DistillToken ?? "");
+                    await AuthStateService.SaveAuthStateAsync(Constants.BrokerageSharesies, result.UserId, result.Tokens);
                     Snackbar.Add("Login successful!", Severity.Success);
                     await OnLoginSuccess.InvokeAsync(result.UserId);
                     MudDialog.Close(DialogResult.Ok(result.UserId));
@@ -108,11 +110,18 @@
             }
             else
             {
-                var result = await SharesiesService.LoginMfaAsync(_email, _password, _mfaCode);
-                
-                if (result.Success && !string.IsNullOrEmpty(result.UserId))
+                var continuation = new AuthenticationContinuation
                 {
-                    await AuthStateService.SaveAuthStateAsync(result.UserId, result.RakaiaToken ?? "", result.DistillToken ?? "");
+                    Username = _email,
+                    Password = _password,
+                    MfaCode = _mfaCode
+                };
+                
+                var result = await BrokerageService.ContinueAuthenticationAsync(Constants.BrokerageSharesies, continuation);
+                
+                if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
+                {
+                    await AuthStateService.SaveAuthStateAsync(Constants.BrokerageSharesies, result.UserId, result.Tokens);
                     Snackbar.Add("Login successful!", Severity.Success);
                     await OnLoginSuccess.InvokeAsync(result.UserId);
                     MudDialog.Close(DialogResult.Ok(result.UserId));

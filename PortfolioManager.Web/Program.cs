@@ -21,7 +21,14 @@ if (config != null)
 // Configure HttpClient with API base URL from configuration
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5269";
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+
+// Brokerage services - New unified service
+builder.Services.AddScoped<IBrokerageService, BrokerageService>();
+
+// Legacy service for backward compatibility
 builder.Services.AddScoped<ISharesiesService, SharesiesService>();
+
+// Common services
 builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 builder.Services.AddScoped<IMarketStatusService, MarketStatusService>();
 builder.Services.AddMudServices();

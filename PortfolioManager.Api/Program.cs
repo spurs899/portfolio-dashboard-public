@@ -1,4 +1,5 @@
 using PortfolioManager.Core.Services;
+using PortfolioManager.Core.Services.Brokerage;
 using PortfolioManager.Core.Services.Market;
 using Sentry.AspNetCore;
 
@@ -14,6 +15,12 @@ builder.Services.AddHttpClient();
 // Market services
 builder.Services.AddHttpClient<IMarketDataProvider, PolygonMarketDataProvider>();
 builder.Services.AddScoped<IOfflineMarketStatusCalculator, NyseOfflineMarketStatusCalculator>();
+
+// Brokerage services - Register all implementations
+builder.Services.AddScoped<IQrAuthenticationService, IbkrQrAuthenticationService>();
+builder.Services.AddScoped<IBrokerageService, SharesiesBrokerageService>();
+builder.Services.AddScoped<IBrokerageService, InteractiveBrokersBrokerageService>();
+builder.Services.AddScoped<IBrokerageServiceFactory, BrokerageServiceFactory>();
 
 builder.WebHost.UseSentry((SentryAspNetCoreOptions  options) =>
 {
@@ -48,6 +55,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHttpClient<ISharesiesClient, SharesiesClient>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        UseCookies = true,
+        CookieContainer = new System.Net.CookieContainer()
+    });
+
+builder.Services.AddHttpClient<IInteractiveBrokersClient, InteractiveBrokersClient>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
         UseCookies = true,

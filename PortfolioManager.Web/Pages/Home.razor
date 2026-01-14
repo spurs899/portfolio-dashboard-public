@@ -1,11 +1,13 @@
 ﻿@page "/"
-@inject ISharesiesService SharesiesService
+@inject IBrokerageService BrokerageService
 @inject IAuthStateService AuthStateService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
 @inject IMarketStatusService MarketStatusService
+@using PortfolioManager.Contracts
 @using PortfolioManager.Contracts.Web
+@using PortfolioManager.Contracts.Models.Brokerage
 @implements IDisposable
 
 <PageTitle>Dashboard</PageTitle>
@@ -65,7 +67,7 @@
             }
             <MudText Typo="Typo.h6" Class="mb-3">Connect Your Sharesies Account</MudText>
             <MudButton Variant="Variant.Filled" Class="sharesies-login-btn" OnClick="ShowLoginDialog">
-                <img src="images/sharesies-logo.png" alt="Sharesies" class="mr-2" />
+                <img src="images/sharesies-logo.png" alt="@Constants.BrokerageSharesies" class="mr-2" />
                 @(_demoMode ? "Try Demo Login" : "Login with Sharesies")
             </MudButton>
         </MudCardContent>
@@ -514,15 +516,24 @@ else if (_portfolioData != null)
 
             if (!string.IsNullOrEmpty(_userId))
             {
-                var (userId, rakaiaToken, distillToken) = await AuthStateService.GetAuthDataAsync();
+                var (brokerageType, userId, tokens) = await AuthStateService.GetAuthDataAsync();
                 
-                if (string.IsNullOrEmpty(rakaiaToken) || string.IsNullOrEmpty(distillToken))
+                if (tokens == null || tokens.Count == 0)
                 {
                     await HandleAuthenticationExpired();
                     return;
                 }
                 
-                _portfolioData = await SharesiesService.GetPortfolioAsync(_userId, rakaiaToken, distillToken);
+                // Create authentication result for API call
+                var authResult = new AuthenticationResult
+                {
+                    IsAuthenticated = true,
+                    UserId = userId ?? _userId,
+                    Tokens = tokens,
+                    Step = AuthenticationStep.Completed
+                };
+                
+                _portfolioData = await BrokerageService.GetPortfolioAsync(authResult);
                 
                 // Check if token expired (401)
                 if (_portfolioData == null)
@@ -693,8 +704,8 @@ else if (_portfolioData != null)
     {
         return brokerageType switch
         {
-            0 => "Sharesies",
-            1 => "IBKR",
+            0 => Constants.BrokerageSharesies,
+            1 => Constants.BrokerageIbkrAcronym,
             _ => "Unknown"
         };
     }
