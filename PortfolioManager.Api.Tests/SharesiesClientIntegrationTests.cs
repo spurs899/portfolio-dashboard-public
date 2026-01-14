@@ -2,6 +2,8 @@
 using FluentAssertions;
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using Moq;
 using PortfolioManager.Contracts.Models;
 using PortfolioManager.Core.Services;
 
@@ -29,7 +31,8 @@ public class SharesiesClientIntegrationTests
             CookieContainer = new CookieContainer()
         };
         var httpClient = new HttpClient(handler);
-        _sharesiesClient = new SharesiesClient(httpClient);
+        var loggerMock = new Mock<ILogger<SharesiesClient>>();
+        _sharesiesClient = new SharesiesClient(httpClient, loggerMock.Object);
     }
 
     [Fact(Skip = "Requires actual Sharesies credentials")]

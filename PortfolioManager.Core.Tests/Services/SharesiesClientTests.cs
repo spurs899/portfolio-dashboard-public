@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using PortfolioManager.Contracts.Models;
@@ -17,7 +18,8 @@ public class SharesiesClientTests
     {
         _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-        _client = new SharesiesClient(httpClient);
+        var loggerMock = new Mock<ILogger<SharesiesClient>>();
+        _client = new SharesiesClient(httpClient, loggerMock.Object);
     }
 
     [Fact]
