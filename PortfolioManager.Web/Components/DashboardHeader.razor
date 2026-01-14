@@ -1,0 +1,32 @@
+@using MudBlazor
+
+<div class="d-flex justify-space-between align-center mb-6">
+    <div>
+        <MudText Typo="Typo.h4" Class="fw-bold mb-1">Portfolio Dashboard</MudText>
+        <MudBreadcrumbs Items="_breadcrumbItems" Class="pa-0"></MudBreadcrumbs>
+    </div>
+    @if (!string.IsNullOrEmpty(Currency) && Currency != "N/A")
+    {
+        <div class="d-flex align-center gap-3">
+            <div class="currency-badge-lg">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Small" Class="mr-1" />
+                @Currency
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Primary" Variant="Variant.Filled" OnClick="OnRefresh" Class="rounded-lg" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Currency { get; set; } = "";
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Dashboard", href: "/", disabled: true)
+    };
+}

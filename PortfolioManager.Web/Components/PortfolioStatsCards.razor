@@ -1,0 +1,79 @@
+@using MudBlazor
+
+<MudGrid Spacing="4">
+    <!-- Total Portfolio Value Card -->
+    <MudItem xs="12" sm="6" lg="4">
+        <MudCard Elevation="0" Class="ynex-stat-card">
+            <MudCardContent Class="pa-5">
+                <div class="d-flex justify-space-between align-center mb-3">
+                    <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Total Portfolio Value</MudText>
+                    <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="ynex-avatar-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Medium" />
+                    </MudAvatar>
+                </div>
+                <MudText Typo="Typo.h4" Class="fw-bold mb-2">@TotalValue.ToString("C")</MudText>
+                <div class="d-flex align-center">
+                    <span class="@(DailyReturn >= 0 ? "ynex-badge-success" : "ynex-badge-error")" 
+                          aria-label="@($"Daily return {(DailyReturn >= 0 ? "gain" : "loss")} of {DailyReturn.ToString("C")}")">
+                        @(DailyReturn >= 0 ? "▲" : "▼") @(DailyReturn >= 0 ? "+" : "")@DailyReturn.ToString("C")
+                    </span>
+                    <MudText Typo="Typo.caption" Class="text-muted ml-2">today</MudText>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <!-- Daily Return Card -->
+    <MudItem xs="12" sm="6" lg="4">
+        <MudCard Elevation="0" Class="ynex-stat-card">
+            <MudCardContent Class="pa-5">
+                <div class="d-flex justify-space-between align-center mb-3">
+                    <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Daily Return</MudText>
+                    <MudAvatar Color="Color.Success" Size="Size.Medium" Class="ynex-avatar-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Size="Size.Medium" />
+                    </MudAvatar>
+                </div>
+                <MudText Typo="Typo.h4" Class="fw-bold mb-2">@DailyReturn.ToString("C")</MudText>
+                <div class="d-flex align-center">
+                    <span class="@(DailyReturnPercentage >= 0 ? "ynex-badge-success" : "ynex-badge-error")"
+                          aria-label="@($"Daily return percentage {(DailyReturnPercentage >= 0 ? "gain" : "loss")} of {Math.Abs(DailyReturnPercentage).ToString("F2")} percent")">
+                        @(DailyReturnPercentage >= 0 ? "▲" : "▼") @(DailyReturnPercentage >= 0 ? "+" : "")@DailyReturnPercentage.ToString("F2")%
+                    </span>
+                    <MudText Typo="Typo.caption" Class="text-muted ml-2">percentage change</MudText>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <!-- Total Holdings Card -->
+    <MudItem xs="12" sm="6" lg="4">
+        <MudCard Elevation="0" Class="ynex-stat-card">
+            <MudCardContent Class="pa-5">
+                <div class="d-flex justify-space-between align-center mb-3">
+                    <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Total Holdings</MudText>
+                    <MudAvatar Color="Color.Info" Size="Size.Medium" Class="ynex-avatar-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Inventory" Size="Size.Medium" />
+                    </MudAvatar>
+                </div>
+                <MudText Typo="Typo.h4" Class="fw-bold mb-2">@HoldingsCount</MudText>
+                <div class="d-flex align-center">
+                    <MudText Typo="Typo.caption" Class="text-muted">Unique instruments</MudText>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public decimal TotalValue { get; set; }
+
+    [Parameter]
+    public decimal DailyReturn { get; set; }
+
+    [Parameter]
+    public decimal DailyReturnPercentage { get; set; }
+
+    [Parameter]
+    public int HoldingsCount { get; set; }
+}

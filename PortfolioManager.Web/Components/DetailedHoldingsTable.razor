@@ -1,0 +1,129 @@
+@using MudBlazor
+@using PortfolioManager.Contracts
+
+<MudCard Elevation="0" Class="ynex-table-card">
+    <MudCardHeader Class="pb-0">
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6" Class="fw-bold">Detailed Holdings</MudText>
+            <MudText Typo="Typo.body2" Class="text-muted">Individual positions per brokerage</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudTable Items="@Holdings" 
+                  Hover="true" 
+                  Class="ynex-table" 
+                  Elevation="0" 
+                  Bordered="false"
+                  SortLabel="Sort By"
+                  AllowUnsorted="true"
+                  Dense="false">
+            <HeaderContent>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharesOwned)">Shares</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<HoldingViewModel, object>(x => x.InvestmentValue)">Market Value</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturn)">Daily Return</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturnPercentage)">Return %</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.BrokerageType)">Brokerage</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Symbol">
+                    <div class="d-flex align-center">
+                        <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
+                            @GetSymbolAvatarText(context.Symbol)
+                        </MudAvatar>
+                        <div>
+                            <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
+                            <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
+                        </div>
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Currency">
+                    <span class="currency-chip">@context.Currency</span>
+                </MudTd>
+                <MudTd DataLabel="Share Price" Class="text-right">
+                    <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
+                </MudTd>
+                <MudTd DataLabel="Shares" Class="text-right">
+                    <MudText Typo="Typo.body2" Class="numeric-text">@context.SharesOwned.ToString("N2")</MudText>
+                </MudTd>
+                <MudTd DataLabel="Market Value" Class="text-right">
+                    <MudText Typo="Typo.body2" Class="fw-semibold numeric-text">@context.InvestmentValue.ToString("C")</MudText>
+                </MudTd>
+                <MudTd DataLabel="Daily Return" Class="text-right">
+                    <MudText Typo="Typo.body2" Color="@(context.DailyReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
+                             aria-label="@($"Daily return {(context.DailyReturn >= 0 ? "gain" : "loss")} {context.DailyReturn.ToString("C")}")">
+                        @(context.DailyReturn >= 0 ? "+" : "")@context.DailyReturn.ToString("C")
+                    </MudText>
+                </MudTd>
+                <MudTd DataLabel="Return %" Class="text-right">
+                    <span class="@(context.DailyReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")"
+                          aria-label="@($"Daily return percentage {(context.DailyReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.DailyReturnPercentage).ToString("F2")} percent")">
+                        @(context.DailyReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.DailyReturnPercentage).ToString("F2")%
+                    </span>
+                </MudTd>
+                <MudTd DataLabel="Brokerage">
+                    <div class="d-flex align-center">
+                        <img src="@GetBrokerageLogoUrl(context.BrokerageType)" 
+                             alt="@GetBrokerageName(context.BrokerageType)" 
+                             class="brokerage-logo-img mr-2" />
+                        <MudText Typo="Typo.body2">@GetBrokerageName(context.BrokerageType)</MudText>
+                    </div>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private const int MinSymbolAvatarLength = 1;
+    private const int MaxSymbolAvatarLength = 2;
+
+    [Parameter]
+    public List<HoldingViewModel> Holdings { get; set; } = new();
+
+    private string GetSymbolAvatarText(string symbol)
+    {
+        if (string.IsNullOrEmpty(symbol) || symbol.Length < MinSymbolAvatarLength)
+            return "??";
+        
+        return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
+    }
+
+    private string GetBrokerageName(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => Constants.BrokerageSharesies,
+            1 => Constants.BrokerageIbkrAcronym,
+            _ => "Unknown"
+        };
+    }
+
+    private string GetBrokerageLogoUrl(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => "images/sharesies-logo.png",
+            1 => "images/ibkr-logo.svg",
+            _ => ""
+        };
+    }
+
+    public class HoldingViewModel
+    {
+        public string Symbol { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Currency { get; set; } = "";
+        public decimal SharePrice { get; set; }
+        public decimal SharesOwned { get; set; }
+        public decimal InvestmentValue { get; set; }
+        public decimal DailyReturn { get; set; }
+        public decimal DailyReturnPercentage { get; set; }
+        public int BrokerageType { get; set; }
+    }
+}

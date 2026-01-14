@@ -8,77 +8,20 @@
 @using PortfolioManager.Contracts
 @using PortfolioManager.Contracts.Web
 @using PortfolioManager.Contracts.Models.Brokerage
+@using PortfolioManager.Web.Components
 @implements IDisposable
 
 <PageTitle>Dashboard</PageTitle>
 
-<!-- Timezone Information -->
-<MudCard Elevation="0" Class="mb-4" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <MudCardContent Class="pa-3 pa-sm-4">
-        <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <!-- Desktop/Tablet View - Horizontal Layout -->
-            <div class="d-flex justify-space-between align-center flex-wrap">
-                <div class="d-flex align-center">
-                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Medium" Class="mr-3" Style="color: white;" />
-                    <div>
-                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.9); font-weight: 500;">Local Time (@_localTimeZone)</MudText>
-                        <MudText Typo="Typo.h6" Style="color: white; font-weight: 600;">@_localTime</MudText>
-                    </div>
-                </div>
-                <div class="d-flex align-center">
-                    <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Medium" Class="mr-3" Style="color: white;" />
-                    <div>
-                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.9); font-weight: 500;">NYSE (Eastern Time)</MudText>
-                        <MudText Typo="Typo.h6" Style="color: white; font-weight: 600;">@_nyseTime</MudText>
-                    </div>
-                </div>
-                <div class="d-flex align-center">
-                    <MudChip T="string" Size="Size.Small" Style="@GetMarketStatusStyle()">@_marketStatus</MudChip>
-                </div>
-            </div>
-        </MudHidden>
-        <MudHidden Breakpoint="Breakpoint.MdAndUp">
-            <!-- Mobile View - Compact Layout -->
-            <div class="d-flex justify-space-between align-center">
-                <div class="d-flex align-center" style="flex: 1;">
-                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Small" Class="mr-2" Style="color: white;" />
-                    <div>
-                        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.9);">@_localTimeZone</MudText>
-                        <MudText Typo="Typo.body2" Style="color: white; font-weight: 600;">@_localTime</MudText>
-                    </div>
-                </div>
-                <div class="d-flex align-center" style="flex: 1;">
-                    <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Small" Class="mr-2" Style="color: white;" />
-                    <div>
-                        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.9);">NYSE</MudText>
-                        <MudText Typo="Typo.body2" Style="color: white; font-weight: 600;">@_nyseTime</MudText>
-                    </div>
-                </div>
-                <div>
-                    <MudChip T="string" Size="Size.Small" Style="@GetMarketStatusStyle()">@_marketStatus</MudChip>
-                </div>
-            </div>
-        </MudHidden>
-    </MudCardContent>
-</MudCard>
+<TimeAndMarketStatusCard 
+    LocalTime="@_localTime"
+    LocalTimeZone="@_localTimeZone"
+    NyseTime="@_nyseTime"
+    MarketStatus="@_marketStatus" />
 
-<!-- Dashboard Header with Breadcrumb and Actions -->
-<div class="d-flex justify-space-between align-center mb-6">
-    <div>
-        <MudText Typo="Typo.h4" Class="fw-bold mb-1">Portfolio Dashboard</MudText>
-        <MudBreadcrumbs Items="_breadcrumbItems" Class="pa-0"></MudBreadcrumbs>
-    </div>
-    @if (!string.IsNullOrEmpty(GetPortfolioCurrency()))
-    {
-        <div class="d-flex align-center gap-3">
-            <div class="currency-badge-lg">
-                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Small" Class="mr-1" />
-                @GetPortfolioCurrency()
-            </div>
-            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Primary" Variant="Variant.Filled" OnClick="RefreshPortfolio" Class="rounded-lg" />
-        </div>
-    }
-</div>
+<DashboardHeader 
+    Currency="@GetPortfolioCurrency()"
+    OnRefresh="@RefreshPortfolio" />
 
 @if (!_isLoggedIn)
 {
@@ -105,239 +48,21 @@ else if (_isLoading)
 }
 else if (_portfolioData != null)
 {
-    <MudGrid Spacing="4">
-        <!-- Total Portfolio Value Card -->
-        <MudItem xs="12" sm="6" lg="4">
-            <MudCard Elevation="0" Class="ynex-stat-card">
-                <MudCardContent Class="pa-5">
-                    <div class="d-flex justify-space-between align-center mb-3">
-                        <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Total Portfolio Value</MudText>
-                        <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="ynex-avatar-icon">
-                            <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Medium" />
-                        </MudAvatar>
-                    </div>
-                    <MudText Typo="Typo.h4" Class="fw-bold mb-2">@GetTotalValue().ToString("C")</MudText>
-                    <div class="d-flex align-center">
-                        <span class="@(GetDailyReturn() >= 0 ? "ynex-badge-success" : "ynex-badge-error")" 
-                              aria-label="@($"Daily return {(GetDailyReturn() >= 0 ? "gain" : "loss")} of {GetDailyReturn().ToString("C")}")">
-                            @(GetDailyReturn() >= 0 ? "▲" : "▼") @(GetDailyReturn() >= 0 ? "+" : "")@GetDailyReturn().ToString("C")
-                        </span>
-                        <MudText Typo="Typo.caption" Class="text-muted ml-2">today</MudText>
-                    </div>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        
-        <!-- Daily Return Card -->
-        <MudItem xs="12" sm="6" lg="4">
-            <MudCard Elevation="0" Class="ynex-stat-card">
-                <MudCardContent Class="pa-5">
-                    <div class="d-flex justify-space-between align-center mb-3">
-                        <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Daily Return</MudText>
-                        <MudAvatar Color="Color.Success" Size="Size.Medium" Class="ynex-avatar-icon">
-                            <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Size="Size.Medium" />
-                        </MudAvatar>
-                    </div>
-                    <MudText Typo="Typo.h4" Class="fw-bold mb-2">@GetDailyReturn().ToString("C")</MudText>
-                    <div class="d-flex align-center">
-                        <span class="@(GetDailyReturnPercentage() >= 0 ? "ynex-badge-success" : "ynex-badge-error")"
-                              aria-label="@($"Daily return percentage {(GetDailyReturnPercentage() >= 0 ? "gain" : "loss")} of {Math.Abs(GetDailyReturnPercentage()).ToString("F2")} percent")">
-                            @(GetDailyReturnPercentage() >= 0 ? "▲" : "▼") @(GetDailyReturnPercentage() >= 0 ? "+" : "")@GetDailyReturnPercentage().ToString("F2")%
-                        </span>
-                        <MudText Typo="Typo.caption" Class="text-muted ml-2">percentage change</MudText>
-                    </div>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        
-        <!-- Total Holdings Card -->
-        <MudItem xs="12" sm="6" lg="4">
-            <MudCard Elevation="0" Class="ynex-stat-card">
-                <MudCardContent Class="pa-5">
-                    <div class="d-flex justify-space-between align-center mb-3">
-                        <MudText Typo="Typo.body2" Class="text-muted fw-semibold text-uppercase">Total Holdings</MudText>
-                        <MudAvatar Color="Color.Info" Size="Size.Medium" Class="ynex-avatar-icon">
-                            <MudIcon Icon="@Icons.Material.Filled.Inventory" Size="Size.Medium" />
-                        </MudAvatar>
-                    </div>
-                    <MudText Typo="Typo.h4" Class="fw-bold mb-2">@GetHoldingsCount()</MudText>
-                    <div class="d-flex align-center">
-                        <MudText Typo="Typo.caption" Class="text-muted">Unique instruments</MudText>
-                    </div>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+    <PortfolioStatsCards 
+        TotalValue="@GetTotalValue()"
+        DailyReturn="@GetDailyReturn()"
+        DailyReturnPercentage="@GetDailyReturnPercentage()"
+        HoldingsCount="@GetHoldingsCount()" />
 
-        <!-- Holdings Table -->
-        <MudItem xs="12">
-            <!-- Aggregated Holdings by Symbol -->
-            <MudCard Elevation="0" Class="ynex-table-card mb-4">
-                <MudCardHeader Class="pb-0">
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Class="fw-bold">Aggregated Holdings</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">Combined positions across all brokerages</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.PieChart" Color="Color.Default" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent Class="pa-0">
-                    <MudTable Items="@GetAggregatedHoldings()" 
-                              Hover="true" 
-                              Class="ynex-table" 
-                              Elevation="0" 
-                              Bordered="false"
-                              SortLabel="Sort By"
-                              AllowUnsorted="true"
-                              Dense="false">
-                        <HeaderContent>
-                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalShares)">Total Shares</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalValue)">Total Value</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalReturn)">Total Return</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.AverageReturnPercentage)">Avg Return %</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header">Brokerages</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Symbol">
-                                <div class="d-flex align-center">
-                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
-                                        @GetSymbolAvatarText(context.Symbol)
-                                    </MudAvatar>
-                                    <div>
-                                        <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
-                                        <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
-                                    </div>
-                                </div>
-                            </MudTd>
-                            <MudTd DataLabel="Currency">
-                                <span class="currency-chip">@context.Currency</span>
-                            </MudTd>
-                            <MudTd DataLabel="Share Price" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Total Shares" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="numeric-text">@context.TotalShares</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Total Value" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="fw-semibold numeric-text">@context.TotalValue.ToString("C")</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Total Return" Class="text-right">
-                                <MudText Typo="Typo.body2" Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
-                                         aria-label="@($"Total return {(context.TotalReturn >= 0 ? "gain" : "loss")} {context.TotalReturn.ToString("C")}")">
-                                    @(context.TotalReturn >= 0 ? "+" : "")@context.TotalReturn.ToString("C")
-                                </MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Avg Return %" Class="text-right">
-                                <span class="@(context.AverageReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")"
-                                      aria-label="@($"Average return percentage {(context.AverageReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.AverageReturnPercentage).ToString("F2")} percent")">
-                                    @(context.AverageReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.AverageReturnPercentage).ToString("F2")%
-                                </span>
-                            </MudTd>
-                            <MudTd DataLabel="Brokerages">
-                                <div class="d-flex align-center gap-2">
-                                    @foreach (var brokerageType in context.BrokerageTypes)
-                                    {
-                                        <img src="@GetBrokerageLogoUrl(brokerageType)" 
-                                             alt="@GetBrokerageName(brokerageType)" 
-                                             class="brokerage-logo-img" 
-                                             title="@GetBrokerageName(brokerageType)" />
-                                    }
-                                </div>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </MudCardContent>
-            </MudCard>
-            
-            <!-- Detailed Holdings by Brokerage -->
-            <MudCard Elevation="0" Class="ynex-table-card">
-                <MudCardHeader Class="pb-0">
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Class="fw-bold">Detailed Holdings</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">Individual positions per brokerage</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent Class="pa-0">
-                    <MudTable Items="@GetHoldings()" 
-                              Hover="true" 
-                              Class="ynex-table" 
-                              Elevation="0" 
-                              Bordered="false"
-                              SortLabel="Sort By"
-                              AllowUnsorted="true"
-                              Dense="false">
-                        <HeaderContent>
-                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharesOwned)">Shares</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<HoldingViewModel, object>(x => x.InvestmentValue)">Market Value</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturn)">Daily Return</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturnPercentage)">Return %</MudTableSortLabel></MudTh>
-                            <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.BrokerageType)">Brokerage</MudTableSortLabel></MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Symbol">
-                                <div class="d-flex align-center">
-                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
-                                        @GetSymbolAvatarText(context.Symbol)
-                                    </MudAvatar>
-                                    <div>
-                                        <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
-                                        <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
-                                    </div>
-                                </div>
-                            </MudTd>
-                            <MudTd DataLabel="Currency">
-                                <span class="currency-chip">@context.Currency</span>
-                            </MudTd>
-                            <MudTd DataLabel="Share Price" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Shares" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharesOwned.ToString("N2")</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Market Value" Class="text-right">
-                                <MudText Typo="Typo.body2" Class="fw-semibold numeric-text">@context.InvestmentValue.ToString("C")</MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Daily Return" Class="text-right">
-                                <MudText Typo="Typo.body2" Color="@(context.DailyReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
-                                         aria-label="@($"Daily return {(context.DailyReturn >= 0 ? "gain" : "loss")} {context.DailyReturn.ToString("C")}")">
-                                    @(context.DailyReturn >= 0 ? "+" : "")@context.DailyReturn.ToString("C")
-                                </MudText>
-                            </MudTd>
-                            <MudTd DataLabel="Return %" Class="text-right">
-                                <span class="@(context.DailyReturnPercentage >= 0 ? "ynex-return-badge-success" : "ynex-return-badge-error")"
-                                      aria-label="@($"Daily return percentage {(context.DailyReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.DailyReturnPercentage).ToString("F2")} percent")">
-                                    @(context.DailyReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.DailyReturnPercentage).ToString("F2")%
-                                </span>
-                            </MudTd>
-                            <MudTd DataLabel="Brokerage">
-                                <div class="d-flex align-center">
-                                    <img src="@GetBrokerageLogoUrl(context.BrokerageType)" 
-                                         alt="@GetBrokerageName(context.BrokerageType)" 
-                                         class="brokerage-logo-img mr-2" />
-                                    <MudText Typo="Typo.body2">@GetBrokerageName(context.BrokerageType)</MudText>
-                                </div>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
+    <MudItem xs="12" Class="mt-4">
+        <AggregatedHoldingsTable Holdings="@GetAggregatedHoldings()" />
+        
+        <DetailedHoldingsTable Holdings="@GetHoldings()" />
+    </MudItem>
 }
 
 @code {
     private const string DefaultCurrency = "N/A";
-    private const int MinSymbolAvatarLength = 1;
-    private const int MaxSymbolAvatarLength = 2;
     
     private bool _demoMode;
     private bool _isLoggedIn = false;
@@ -356,12 +81,6 @@ else if (_portfolioData != null)
     private string _localTimeZone = "";
     private string _nyseTime = "";
     private string _marketStatus = "";
-    
-    private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
-        new BreadcrumbItem("Dashboard", href: "/", disabled: true)
-    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -370,7 +89,6 @@ else if (_portfolioData != null)
         StartTimerAsync();
         await TryAutoLoginAsync();
         
-        // Fetch initial market status from API
         if (!_demoMode)
         {
             await UpdateMarketStatusFromApi();
@@ -383,7 +101,6 @@ else if (_portfolioData != null)
         {
             UpdateTimes();
             
-            // Update from API every 60 seconds in non-demo mode
             if (!_demoMode && DateTime.Now.Second == 0)
             {
                 await UpdateMarketStatusFromApi();
@@ -402,7 +119,6 @@ else if (_portfolioData != null)
         }
         catch
         {
-            // Fall back to calculated if API fails
             UpdateTimes();
         }
     }
@@ -410,14 +126,8 @@ else if (_portfolioData != null)
     private void UpdateTimes()
     {
         var now = DateTime.Now;
-        
-        // Calculate Eastern Time (UTC-5 or UTC-4 during DST)
-        // Note: In browser/WASM, we can't use TimeZoneInfo.FindSystemTimeZoneById
-        // We'll use UTC and calculate offset manually
         var utcNow = DateTime.UtcNow;
         
-        // Eastern Time is UTC-5 (EST) or UTC-4 (EDT during daylight saving)
-        // Approximate DST: 2nd Sunday in March to 1st Sunday in November
         var isDST = IsDaylightSavingTime(utcNow);
         var easternOffset = isDST ? -4 : -5;
         var nyseNow = utcNow.AddHours(easternOffset);
@@ -426,7 +136,6 @@ else if (_portfolioData != null)
         _localTimeZone = $"UTC{GetUtcOffset(now)}";
         _nyseTime = nyseNow.ToString("h:mm:ss tt");
         
-        // Determine market status (NYSE trading hours: 9:30 AM - 4:00 PM ET, Monday-Friday)
         if (nyseNow.DayOfWeek == DayOfWeek.Saturday || nyseNow.DayOfWeek == DayOfWeek.Sunday)
         {
             _marketStatus = "Market Closed (Weekend)";
@@ -456,15 +165,13 @@ else if (_portfolioData != null)
     {
         var year = utcTime.Year;
         
-        // DST starts: 2nd Sunday in March at 2 AM
         var marchFirst = new DateTime(year, 3, 1);
         var daysUntilSunday = ((int)DayOfWeek.Sunday - (int)marchFirst.DayOfWeek + 7) % 7;
-        var dstStart = marchFirst.AddDays(daysUntilSunday + 7).AddHours(7); // 2 AM EST = 7 AM UTC
+        var dstStart = marchFirst.AddDays(daysUntilSunday + 7).AddHours(7);
         
-        // DST ends: 1st Sunday in November at 2 AM
         var novemberFirst = new DateTime(year, 11, 1);
         daysUntilSunday = ((int)DayOfWeek.Sunday - (int)novemberFirst.DayOfWeek + 7) % 7;
-        var dstEnd = novemberFirst.AddDays(daysUntilSunday).AddHours(6); // 2 AM EDT = 6 AM UTC
+        var dstEnd = novemberFirst.AddDays(daysUntilSunday).AddHours(6);
         
         return utcTime >= dstStart && utcTime < dstEnd;
     }
@@ -483,18 +190,6 @@ else if (_portfolioData != null)
         {
             return minutes > 0 ? $"{hours}:{minutes:D2}" : $"{hours}";
         }
-    }
-
-    private string GetMarketStatusStyle()
-    {
-        return _marketStatus switch
-        {
-            "Market Open" => "background-color: #4caf50; color: white; font-weight: 600;",
-            "Market Closed (Weekend)" => "background-color: #9e9e9e; color: white; font-weight: 600;",
-            "Pre-Market" => "background-color: #ff9800; color: white; font-weight: 600;",
-            "After Hours" => "background-color: #2196f3; color: white; font-weight: 600;",
-            _ => "background-color: #9e9e9e; color: white; font-weight: 600;"
-        };
     }
 
     public void Dispose()
@@ -549,7 +244,6 @@ else if (_portfolioData != null)
                     return;
                 }
                 
-                // Create authentication result for API call
                 var authResult = new AuthenticationResult
                 {
                     IsAuthenticated = true,
@@ -560,7 +254,6 @@ else if (_portfolioData != null)
                 
                 _portfolioData = await BrokerageService.GetPortfolioAsync(authResult);
                 
-                // Check if token expired (401)
                 if (_portfolioData == null)
                 {
                     await HandleAuthenticationExpired();
@@ -626,24 +319,12 @@ else if (_portfolioData != null)
         Snackbar.Add("Portfolio refreshed", Severity.Success);
     }
 
-    private decimal GetTotalValue()
-    {
-        return _cachedTotalValue;
-    }
-
-    private decimal GetDailyReturn()
-    {
-        return _cachedDailyReturn;
-    }
-
-    private decimal GetDailyReturnPercentage()
-    {
-        return _cachedDailyReturnPercentage;
-    }
+    private decimal GetTotalValue() => _cachedTotalValue;
+    private decimal GetDailyReturn() => _cachedDailyReturn;
+    private decimal GetDailyReturnPercentage() => _cachedDailyReturnPercentage;
 
     private int GetHoldingsCount()
     {
-        // Count unique symbols (aggregated)
         return _portfolioData?.Instruments?.Select(i => i.Symbol).Distinct().Count() ?? 0;
     }
 
@@ -653,10 +334,10 @@ else if (_portfolioData != null)
         return firstInstrument?.Currency ?? DefaultCurrency;
     }
 
-    private List<AggregatedHoldingViewModel> GetAggregatedHoldings()
+    private List<AggregatedHoldingsTable.AggregatedHoldingViewModel> GetAggregatedHoldings()
     {
         if (_portfolioData?.Instruments == null)
-            return new List<AggregatedHoldingViewModel>();
+            return new List<AggregatedHoldingsTable.AggregatedHoldingViewModel>();
 
         return _portfolioData.Instruments
             .GroupBy(i => i.Symbol)
@@ -671,7 +352,7 @@ else if (_portfolioData != null)
                 var totalReturn = totalValue - totalCostBasis;
                 var averageReturnPercentage = totalCostBasis > 0 ? (totalReturn / totalCostBasis * 100) : 0;
                 
-                return new AggregatedHoldingViewModel
+                return new AggregatedHoldingsTable.AggregatedHoldingViewModel
                 {
                     Symbol = firstInstrument.Symbol ?? "N/A",
                     Name = firstInstrument.Name ?? "",
@@ -688,10 +369,10 @@ else if (_portfolioData != null)
             .ToList();
     }
 
-    private List<HoldingViewModel> GetHoldings()
+    private List<DetailedHoldingsTable.HoldingViewModel> GetHoldings()
     {
         if (_portfolioData?.Instruments == null)
-            return new List<HoldingViewModel>();
+            return new List<DetailedHoldingsTable.HoldingViewModel>();
 
         return _portfolioData.Instruments
             .Select(instrument =>
@@ -700,7 +381,7 @@ else if (_portfolioData != null)
                     ? (instrument.SimpleReturn / instrument.InvestmentValue * 100) 
                     : 0;
 
-                return new HoldingViewModel
+                return new DetailedHoldingsTable.HoldingViewModel
                 {
                     Symbol = instrument.Symbol ?? "N/A",
                     Name = instrument.Name ?? "",
@@ -715,59 +396,5 @@ else if (_portfolioData != null)
             })
             .OrderByDescending(x => x.InvestmentValue)
             .ToList();
-    }
-
-    private string GetSymbolAvatarText(string symbol)
-    {
-        if (string.IsNullOrEmpty(symbol) || symbol.Length < MinSymbolAvatarLength)
-            return "??";
-        
-        return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
-    }
-
-    private string GetBrokerageName(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => Constants.BrokerageSharesies,
-            1 => Constants.BrokerageIbkrAcronym,
-            _ => "Unknown"
-        };
-    }
-
-    private string GetBrokerageLogoUrl(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => "images/sharesies-logo.png",
-            1 => "images/ibkr-logo.svg",
-            _ => ""
-        };
-    }
-
-    public class HoldingViewModel
-    {
-        public string Symbol { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Currency { get; set; } = "";
-        public decimal SharePrice { get; set; }
-        public decimal SharesOwned { get; set; }
-        public decimal InvestmentValue { get; set; }
-        public decimal DailyReturn { get; set; }
-        public decimal DailyReturnPercentage { get; set; }
-        public int BrokerageType { get; set; }
-    }
-
-    public class AggregatedHoldingViewModel
-    {
-        public string Symbol { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Currency { get; set; } = "";
-        public decimal SharePrice { get; set; }
-        public decimal TotalShares { get; set; }
-        public decimal TotalValue { get; set; }
-        public decimal TotalReturn { get; set; }
-        public decimal AverageReturnPercentage { get; set; }
-        public List<int> BrokerageTypes { get; set; } = new();
     }
 }
