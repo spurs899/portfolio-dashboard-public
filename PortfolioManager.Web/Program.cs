@@ -25,8 +25,16 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseU
 // Brokerage services - New unified service
 builder.Services.AddScoped<IBrokerageService, BrokerageService>();
 
-// Legacy service for backward compatibility
-builder.Services.AddScoped<ISharesiesService, SharesiesService>();
+// Legacy service for backward compatibility - bind based on DemoMode
+var demoMode = builder.Configuration.GetValue<bool>("DemoMode");
+if (demoMode)
+{
+    builder.Services.AddScoped<ISharesiesService, SharesiesDemoService>();
+}
+else
+{
+    builder.Services.AddScoped<ISharesiesService, SharesiesService>();
+}
 
 // Auth state services
 builder.Services.AddScoped<AuthStateService>();
