@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
 using PortfolioManager.Contracts;
 using PortfolioManager.Contracts.Models;
+using PortfolioManager.Core.Extensions;
 
 namespace PortfolioManager.Core.Services;
 
@@ -25,45 +27,58 @@ public class SharesiesClient : ISharesiesClient
 {
     private const string MfaRequiredType = "identity_email_mfa_required";
     private readonly HttpClient _httpClient;
+    private readonly ILogger<SharesiesClient> _logger;
 
-    public SharesiesClient(HttpClient httpClient)
+    public SharesiesClient(HttpClient httpClient, ILogger<SharesiesClient> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
         _httpClient.DefaultRequestHeaders.Add(CoreConstants.UserAgent, CoreConstants.UserAgentValue);
     }
 
     public async Task<SharesiesLoginResponse> LoginAsync(string email, string password, string? mfaCode = null)
     {
-        var loginRequest = new SharesiesLoginRequest
+        try
         {
-            Email = email,
-            Password = password,
-            Remember = true
-        };
-
-        if (!string.IsNullOrEmpty(mfaCode))
-        {
-            loginRequest.EmailMfaToken = mfaCode;
-        }
-
-        var response = await _httpClient.PostAsJsonAsync($"{Constants.BaseSharesiesApiUrl}/identity/login", loginRequest);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var loginResponse = await response.Content.ReadFromJsonAsync<SharesiesLoginResponse>();
-
-            if (loginResponse?.Type == MfaRequiredType && string.IsNullOrEmpty(mfaCode))
+            var loginRequest = new SharesiesLoginRequest
             {
-                // MFA required but not provided
-                return loginResponse;
+                Email = email,
+                Password = password,
+                Remember = true
+            };
+
+            if (!string.IsNullOrEmpty(mfaCode))
+            {
+                loginRequest.EmailMfaToken = mfaCode;
             }
 
-            if (loginResponse is { Authenticated: true })
+            var response = await _httpClient.PostAsJsonAsync($"{Constants.BaseSharesiesApiUrl}/identity/login", loginRequest);
+
+            if (response.IsSuccessStatusCode)
             {
-                return loginResponse;
+                var loginResponse = await response.Content.ReadFromJsonAsync<SharesiesLoginResponse>();
+
+                if (loginResponse?.Type == MfaRequiredType && string.IsNullOrEmpty(mfaCode))
+                {
+                    _logger.LogInformation("MFA required for user: {Email}", email);
+                    return loginResponse;
+                }
+
+                if (loginResponse is { Authenticated: true })
+                {
+                    _logger.LogInformation("Successfully authenticated user: {Email}", email);
+                    return loginResponse;
+                }
             }
+            
+            _logger.LogWarning("Login failed for user: {Email}, Status: {StatusCode}", email, response.StatusCode);
+            throw new UnauthorizedAccessException($"Sharesies - Unable to login for user: {email}");
         }
-        throw new UnauthorizedAccessException($"Sharesies - Unable to login for user: {email}");
+        catch (Exception ex) when (ex is not UnauthorizedAccessException)
+        {
+            _logger.LogError(ex, "Error during Sharesies login for user: {Email}", email);
+            throw;
+        }
     }
 
     public async Task<SharesiesProfileResponse?> GetProfileAsync()
@@ -73,76 +88,71 @@ public class SharesiesClient : ISharesiesClient
 
     public async Task<SharesiesPortfolio?> GetPortfolioAsync(string userId, string portfolioId, string rakaiaToken)
     {
-        var url = $"{Constants.BasePortfolioSharesiesApiUrl}/portfolios/{portfolioId}/instruments";
-        
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        
-        request.Headers.Add("Accept", "*/*");
-        request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
-
-        if (!string.IsNullOrEmpty(rakaiaToken))
+        try
         {
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", rakaiaToken);
-        }
-        
-        BindHeaders(request);
-        
-        var response = await _httpClient.SendAsync(request);
-        
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<SharesiesPortfolio>();
-        }
+            var url = $"{Constants.BasePortfolioSharesiesApiUrl}/portfolios/{portfolioId}/instruments";
+            
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.AddCommonBrowserHeaders();
+            request.AddBearerToken(rakaiaToken);
+            request.AddSharesiesBrowserHeaders(Constants.Origin);
+            request.Headers.TryAddWithoutValidation(CoreConstants.UserAgent, CoreConstants.UserAgentValue);
+            
+            var response = await _httpClient.SendAsync(request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<SharesiesPortfolio>();
+            }
 
-        return null;
+            _logger.LogWarning("Failed to get portfolio for user: {UserId}, Status: {StatusCode}", userId, response.StatusCode);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting portfolio for user: {UserId}", userId);
+            return null;
+        }
     }
 
     public async Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(string userId, List<string> instrumentIds, string distillToken)
     {
-        const string url = $"{Constants.BaseDataSharesiesApiUrl}/instruments";
-        var payload = new
+        try
         {
-            query = string.Empty,
-            instruments = instrumentIds ?? new List<string>(),
-            tradingStatuses = new[] { "active", "halt", "closeonly", "notrade", "inactive", "unknown" },
-            perPage = 500
-        };
+            const string url = $"{Constants.BaseDataSharesiesApiUrl}/instruments";
+            var payload = new
+            {
+                query = string.Empty,
+                instruments = instrumentIds ?? new List<string>(),
+                tradingStatuses = new[] { "active", "halt", "closeonly", "notrade", "inactive", "unknown" },
+                perPage = 500
+            };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, url)
-        {
-            Content = JsonContent.Create(payload)
-        };
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = JsonContent.Create(payload)
+            };
 
-        request.Headers.Add("Accept", "*/*");
-        request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
+            request.AddCommonBrowserHeaders();
+            request.AddBearerToken(distillToken);
+            request.AddSharesiesBrowserHeaders(Constants.Origin);
+            request.Headers.TryAddWithoutValidation(CoreConstants.UserAgent, CoreConstants.UserAgentValue);
 
-        if (!string.IsNullOrEmpty(distillToken))
-        {
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", distillToken);
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<SharesiesInstrumentResponse>();
+            }
+
+            _logger.LogWarning("Failed to get instruments for user: {UserId}, Status: {StatusCode}", userId, response.StatusCode);
+            return null;
         }
-
-        BindHeaders(request);
-
-        var response = await _httpClient.SendAsync(request);
-
-        if (response.IsSuccessStatusCode)
+        catch (Exception ex)
         {
-            return await response.Content.ReadFromJsonAsync<SharesiesInstrumentResponse>();
+            _logger.LogError(ex, "Error getting instruments for user: {UserId}", userId);
+            return null;
         }
-
-        return null;
-    }
-
-    private static void BindHeaders(HttpRequestMessage request)
-    {
-        request.Headers.Add("Origin", Constants.Origin);
-        request.Headers.Add("Referer", Constants.Origin);
-        request.Headers.Add("sec-ch-ua", "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"");
-        request.Headers.Add("sec-ch-ua-mobile", "?0");
-        request.Headers.Add("sec-ch-ua-platform", "\"Windows\"");
-        request.Headers.Add("sec-fetch-dest", "empty");
-        request.Headers.Add("sec-fetch-mode", "cors");
-        request.Headers.Add("sec-fetch-site", "cross-site");
-        request.Headers.TryAddWithoutValidation(CoreConstants.UserAgent, CoreConstants.UserAgentValue);
     }
 }
+
