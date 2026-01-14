@@ -1,16 +1,23 @@
 using PortfolioManager.Contracts.Models;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace PortfolioManager.Core.Services;
 
-public interface IInteractiveBrokersClient
+public interface IIbkrAuthClient
 {
     Task<IBLoginResponse?> AuthenticateAsync(string username, string password);
     Task<bool> ValidateSessionAsync();
+}
+
+public interface IIbkrDataClient
+{
     Task<IBProfileResponse?> GetAccountAsync();
     Task<IBPortfolioResponse?> GetPositionsAsync(string accountId);
+}
+
+// Composite interface for backward compatibility
+public interface IInteractiveBrokersClient : IIbkrAuthClient, IIbkrDataClient
+{
 }
 
 public class InteractiveBrokersClient : IInteractiveBrokersClient

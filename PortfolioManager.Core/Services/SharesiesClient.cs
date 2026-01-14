@@ -4,12 +4,21 @@ using PortfolioManager.Contracts.Models;
 
 namespace PortfolioManager.Core.Services;
 
-public interface ISharesiesClient
+public interface ISharesiesAuthClient
 {
     Task<SharesiesLoginResponse> LoginAsync(string email, string password, string? mfaCode = null);
+}
+
+public interface ISharesiesDataClient
+{
     Task<SharesiesProfileResponse?> GetProfileAsync();
     Task<SharesiesPortfolio?> GetPortfolioAsync(string userId, string portfolioId, string rakaiaToken);
     Task<SharesiesInstrumentResponse?> GetInstrumentsAsync(string userId, List<string> instrumentIds, string distillToken);
+}
+
+// Composite interface for backward compatibility
+public interface ISharesiesClient : ISharesiesAuthClient, ISharesiesDataClient
+{
 }
 
 public class SharesiesClient : ISharesiesClient

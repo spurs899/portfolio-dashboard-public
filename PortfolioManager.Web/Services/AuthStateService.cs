@@ -1,17 +1,25 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using PortfolioManager.Contracts;
 
 namespace PortfolioManager.Web.Services;
 
-public interface IAuthStateService
+public interface IAuthStateReader
 {
     Task<bool> IsAuthenticatedAsync();
     Task<string?> GetUserIdAsync();
     Task<string?> GetBrokerageTypeAsync();
+    Task<(string? brokerageType, string? userId, Dictionary<string, string>? tokens)> GetAuthDataAsync();
+}
+
+public interface IAuthStateWriter
+{
     Task SaveAuthStateAsync(string brokerageType, string userId, Dictionary<string, string>? tokens);
     Task ClearAuthStateAsync();
-    Task<(string? brokerageType, string? userId, Dictionary<string, string>? tokens)> GetAuthDataAsync();
+}
+
+// Composite interface for backward compatibility
+public interface IAuthStateService : IAuthStateReader, IAuthStateWriter
+{
 }
 
 public class AuthStateService : IAuthStateService
