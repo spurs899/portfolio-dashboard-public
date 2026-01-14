@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using PortfolioManager.Contracts.Models.Market;
 using PortfolioManager.Contracts.Web;
 
 namespace PortfolioManager.Web.Services;

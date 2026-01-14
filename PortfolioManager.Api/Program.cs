@@ -1,4 +1,5 @@
 using PortfolioManager.Core.Services;
+using PortfolioManager.Core.Services.Market;
 using Sentry.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+
+// Market services
+builder.Services.AddHttpClient<IMarketDataProvider, PolygonMarketDataProvider>();
+builder.Services.AddScoped<IMarketStatusCalculator, NyseMarketStatusCalculator>();
 
 builder.WebHost.UseSentry((SentryAspNetCoreOptions  options) =>
 {
