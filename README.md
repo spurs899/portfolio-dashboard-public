@@ -281,6 +281,24 @@ The repo includes a GitHub Actions workflow for automated deployment:
 
 Before deploying, run `.\update-version.ps1` locally and commit the updated `index.html`.
 
+## Roadmap & Known Limitations
+
+### Remaining Work
+
+- **API Authentication** - The API currently has no authentication/authorization. This needs to be implemented before production deployment:
+  - Add JWT or API key authentication
+  - Implement user identity and session management
+  - Secure brokerage credentials storage per user
+  - Add authorization middleware to protect endpoints
+  
+- **IBKR Integration** - Complete Interactive Brokers authentication and portfolio retrieval
+
+### Security Notes
+
+⚠️ **Important**: The current API implementation includes security hardening (rate limiting, input validation, secure logging) but lacks authentication. Do not deploy the API to production without implementing proper authentication first.
+
+The demo mode in the web app is safe for public deployment as it uses no real credentials or API calls.
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
