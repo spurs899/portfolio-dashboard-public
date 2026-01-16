@@ -43,15 +43,71 @@ else if (_isLoading)
 }
 else if (_portfolioData != null)
 {
-    <PortfolioStatsCards 
-        TotalValue="@GetTotalValue()"
-        DailyReturn="@GetDailyReturn()"
-        DailyReturnPercentage="@GetDailyReturnPercentage()"
-        HoldingsCount="@GetHoldingsCount()" />
+    <!-- Desktop Layout -->
+    <div class="d-none d-md-block">
+        <PortfolioStatsCards 
+            TotalValue="@GetTotalValue()"
+            DailyReturn="@GetDailyReturn()"
+            DailyReturnPercentage="@GetDailyReturnPercentage()"
+            HoldingsCount="@GetHoldingsCount()" />
 
-    <MudItem xs="12" Class="mt-4">
-        <AggregatedHoldingsTable Holdings="@GetAggregatedHoldings()" />
-        
-        <DetailedHoldingsTable Holdings="@GetHoldings()" />
-    </MudItem>
+        <MudItem xs="12" Class="mt-4">
+            <AggregatedHoldingsTable Holdings="@GetAggregatedHoldings()" />
+            
+            <DetailedHoldingsTable Holdings="@GetHoldings()" />
+        </MudItem>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="d-block d-md-none mobile-portfolio-layout">
+        <!-- Daily Return Card -->
+        <MudCard Class="mobile-return-card mb-3" Elevation="0">
+            <MudCardContent>
+                <div class="d-flex justify-space-between align-start">
+                    <div>
+                        <MudText Typo="Typo.caption" Class="mobile-return-label">DAILY RETURN</MudText>
+                        <MudText Typo="Typo.h5" Class="mobile-return-value">@GetDailyReturn().ToString("C")</MudText>
+                        <div class="mobile-return-percentage @(GetDailyReturnPercentage() >= 0 ? "positive" : "negative")">
+                            <MudIcon Icon="@(GetDailyReturnPercentage() >= 0 ? Icons.Material.Filled.ArrowDropUp : Icons.Material.Filled.ArrowDropDown)" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="fw-bold">@(GetDailyReturnPercentage() >= 0 ? "+" : "")@GetDailyReturnPercentage().ToString("F2")% Today</MudText>
+                        </div>
+                    </div>
+                </div>
+            </MudCardContent>
+        </MudCard>
+
+        <!-- Active Holdings Section -->
+        <div class="mobile-holdings-header">
+            <MudText Typo="Typo.h6" Class="fw-bold">Active Holdings</MudText>
+        </div>
+
+        <!-- Condensed Holdings List -->
+        <div class="mobile-holdings-list">
+            @foreach (var holding in GetAggregatedHoldings())
+            {
+                <MudCard Class="mobile-holding-card mb-2" Elevation="0">
+                    <MudCardContent Class="pa-3">
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex align-center gap-3">
+                                <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="mobile-holding-avatar">
+                                    @GetSymbolAvatarText(holding.Symbol)
+                                </MudAvatar>
+                                <div>
+                                    <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.Symbol</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-muted">@holding.Name</MudText>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.TotalValue.ToString("C")</MudText>
+                                <div class="mobile-holding-return @(holding.AverageReturnPercentage >= 0 ? "positive" : "negative")">
+                                    <MudIcon Icon="@(holding.AverageReturnPercentage >= 0 ? Icons.Material.Filled.ArrowDropUp : Icons.Material.Filled.ArrowDropDown)" Size="Size.Small" />
+                                    <MudText Typo="Typo.caption" Class="fw-bold">@(holding.AverageReturnPercentage >= 0 ? "+" : "")@holding.AverageReturnPercentage.ToString("F2")%</MudText>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            }
+        </div>
+    </div>
 }

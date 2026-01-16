@@ -353,4 +353,12 @@ public partial class Home : IDisposable
             .OrderByDescending(x => x.InvestmentValue)
             .ToList();
     }
+
+    private string GetSymbolAvatarText(string symbol)
+    {
+        if (string.IsNullOrEmpty(symbol) || symbol == "N/A")
+            return "?";
+        
+        return symbol.Length >= 2 ? symbol[..2].ToUpper() : symbol.ToUpper();
+    }
 }

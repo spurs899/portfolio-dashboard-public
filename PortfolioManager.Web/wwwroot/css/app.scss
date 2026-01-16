@@ -1245,3 +1245,136 @@ code {
   object-fit: contain;
   border-radius: $border-radius-sm;
 }
+
+// ============================================================================
+// Mobile Portfolio Layout - Stitch Design Pattern
+// ============================================================================
+
+.mobile-portfolio-layout {
+  padding: 0;
+}
+
+.mobile-return-card {
+  background: $color-bg-white !important;
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-xl !important;
+  box-shadow: $shadow-sm !important;
+  
+  .mud-card-content {
+    padding: $spacing-6 !important;
+  }
+  
+  .mobile-return-label {
+    font-size: $font-size-xs !important;
+    font-weight: $font-weight-bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: $letter-spacing-wider !important;
+    color: $color-text-secondary !important;
+    margin-bottom: $spacing-1 !important;
+  }
+  
+  .mobile-return-value {
+    font-size: $font-size-2xl !important;
+    font-weight: $font-weight-bold !important;
+    letter-spacing: $letter-spacing-tight !important;
+    color: $color-text-primary !important;
+    margin-bottom: $spacing-2 !important;
+  }
+  
+  .mobile-return-percentage {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: $font-size-sm !important;
+    font-weight: $font-weight-bold !important;
+    
+    &.positive {
+      color: $color-stock-green !important;
+      
+      .mud-icon-root {
+        color: $color-stock-green !important;
+      }
+    }
+    
+    &.negative {
+      color: $color-stock-red !important;
+      
+      .mud-icon-root {
+        color: $color-stock-red !important;
+      }
+    }
+  }
+}
+
+.mobile-holdings-header {
+  padding: $spacing-4 $spacing-5;
+  margin-bottom: $spacing-2;
+  
+  h6 {
+    font-size: $font-size-lg !important;
+    font-weight: $font-weight-bold !important;
+    letter-spacing: $letter-spacing-tight !important;
+    color: $color-text-primary !important;
+    margin: 0 !important;
+  }
+}
+
+.mobile-holdings-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.mobile-holding-card {
+  background: $color-bg-white !important;
+  border: 1px solid $color-border-light !important;
+  border-radius: $border-radius-xl !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease-in-out;
+  
+  &:hover {
+    background-color: $color-bg-slate-50 !important;
+    border-color: $color-border !important;
+  }
+  
+  .mud-card-content {
+    padding: $spacing-4 !important;
+  }
+  
+  .mobile-holding-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: $border-radius-lg !important;
+    font-size: $font-size-sm !important;
+    font-weight: $font-weight-bold !important;
+    background-color: rgba(30, 64, 175, 0.1) !important;
+    color: $color-primary !important;
+  }
+  
+  .mobile-holding-return {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-size: $font-size-xs !important;
+    
+    &.positive {
+      color: $color-stock-green !important;
+      
+      .mud-icon-root {
+        color: $color-stock-green !important;
+      }
+    }
+    
+    &.negative {
+      color: $color-stock-red !important;
+      
+      .mud-icon-root {
+        color: $color-stock-red !important;
+      }
+    }
+    
+    .mud-icon-root {
+      font-size: 14px !important;
+    }
+  }
+}
