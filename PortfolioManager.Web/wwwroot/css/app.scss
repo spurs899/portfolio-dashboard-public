@@ -1337,6 +1337,16 @@ code {
     background-color: $color-bg-slate-50 !important;
     border-color: $color-border !important;
   }
+
+  .mobile-brokerage-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: $color-bg-white;
+    padding: 2px;
+    border: 1px solid $color-border-light;
+  }
   
   .mud-card-content {
     padding: $spacing-4 !important;

@@ -93,7 +93,18 @@ else if (_portfolioData != null)
                                     @GetSymbolAvatarText(holding.Symbol)
                                 </MudAvatar>
                                 <div>
-                                    <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.Symbol</MudText>
+                                    <div class="d-flex align-center gap-2 mb-1">
+                                        <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.Symbol</MudText>
+                                        <div class="d-flex gap-1">
+                                            @foreach (var brokerageType in holding.BrokerageTypes)
+                                            {
+                                                <img src="@GetBrokerageIcon(brokerageType)" 
+                                                     alt="@GetBrokerageName(brokerageType)" 
+                                                     class="mobile-brokerage-icon" 
+                                                     title="@GetBrokerageName(brokerageType)" />
+                                            }
+                                        </div>
+                                    </div>
                                     <MudText Typo="Typo.caption" Class="text-muted">@holding.Name</MudText>
                                 </div>
                             </div>

@@ -361,4 +361,24 @@ public partial class Home : IDisposable
         
         return symbol.Length >= 2 ? symbol[..2].ToUpper() : symbol.ToUpper();
     }
+
+    private string GetBrokerageIcon(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => "images/sharesies-logo.png",
+            1 => "images/ibkr-logo.svg",
+            _ => ""
+        };
+    }
+
+    private string GetBrokerageName(int brokerageType)
+    {
+        return brokerageType switch
+        {
+            0 => "Sharesies",
+            1 => "Interactive Brokers",
+            _ => "Unknown"
+        };
+    }
 }
