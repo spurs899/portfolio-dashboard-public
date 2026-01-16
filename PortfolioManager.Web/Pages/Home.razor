@@ -14,9 +14,11 @@
     NyseTime="@_nyseTime"
     MarketStatus="@_marketStatus" />
 
-<DashboardHeader 
-    Currency="@GetPortfolioCurrency()"
-    OnRefresh="@RefreshPortfolio" />
+<div class="d-none d-md-block">
+    <DashboardHeader 
+        Currency="@GetPortfolioCurrency()"
+        OnRefresh="@RefreshPortfolio" />
+</div>
 
 @if (!_isLoggedIn)
 {
