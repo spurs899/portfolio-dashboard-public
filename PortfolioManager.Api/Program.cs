@@ -2,11 +2,19 @@ using PortfolioManager.Core.Services;
 using PortfolioManager.Core.Services.Brokerage;
 using PortfolioManager.Core.Services.Market;
 using Sentry.AspNetCore;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    // Add request size limit
+    options.Filters.Add(new RequestSizeLimitAttribute(1048576)); // 1 MB
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
@@ -73,6 +81,68 @@ builder.WebHost.UseSentry((SentryAspNetCoreOptions  options) =>
     options.TracesSampleRate = 0.0; // set >0 only if you want performance monitoring
 });
 
+// Add Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    // Global rate limit for all endpoints
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ipAddress,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+    });
+
+    // Strict rate limit for authentication endpoints
+    options.AddFixedWindowLimiter("auth", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+
+    // More lenient for portfolio data
+    options.AddFixedWindowLimiter("portfolio", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 30;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 2;
+    });
+
+    // Custom response when rate limit is exceeded
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            message = "Too many requests. Please try again later.",
+            retryAfter = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter) 
+                ? retryAfter.TotalSeconds 
+                : 60
+        }, cancellationToken: token);
+    };
+});
+
+// Configure request size limits
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 1048576; // 1 MB
+});
+
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 1048576; // 1 MB
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",
@@ -91,6 +161,39 @@ var app = builder.Build();
 // Use Sentry request tracking
 app.UseSentryTracing();
 
+// Add Security Headers
+app.Use(async (context, next) =>
+{
+    // Prevent MIME type sniffing
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    
+    // Prevent clickjacking
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    
+    // Enable XSS protection
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    
+    // Referrer policy
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    
+    // Content Security Policy (adjust as needed)
+    context.Response.Headers.Append("Content-Security-Policy", 
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+    
+    // HTTPS enforcement (in production)
+    if (!app.Environment.IsDevelopment())
+    {
+        context.Response.Headers.Append("Strict-Transport-Security", 
+            "max-age=31536000; includeSubDomains");
+    }
+    
+    // Permissions policy
+    context.Response.Headers.Append("Permissions-Policy", 
+        "geolocation=(), microphone=(), camera=()");
+
+    await next();
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -108,6 +211,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseCors("AllowBlazorWasm");
 app.UseRouting();
 app.MapControllers();

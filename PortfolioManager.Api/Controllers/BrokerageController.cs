@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PortfolioManager.Contracts;
 using PortfolioManager.Contracts.Models.Brokerage;
 using PortfolioManager.Contracts.Models.Shared;
@@ -22,6 +23,7 @@ public class BrokerageController : ControllerBase
     }
 
     [HttpPost("{brokerageType}/authenticate")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Authenticate(
         string brokerageType,
         [FromBody] AuthenticationCredentials credentials)
@@ -94,6 +96,7 @@ public class BrokerageController : ControllerBase
     }
 
     [HttpPost("{brokerageType}/authenticate/continue")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> ContinueAuthentication(
         string brokerageType,
         [FromBody] AuthenticationCredentials credentials)
@@ -155,6 +158,7 @@ public class BrokerageController : ControllerBase
     }
 
     [HttpPost("{brokerageType}/portfolio")]
+    [EnableRateLimiting("portfolio")]
     public async Task<IActionResult> GetPortfolio(
         string brokerageType,
         [FromBody] AuthenticationResult authResult)
