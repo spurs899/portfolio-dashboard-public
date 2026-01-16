@@ -178,6 +178,21 @@ For running integration tests, create `appsettings.json` in test projects:
 
 ## Architecture
 
+### Frontend Styling
+- **Design System**: Stitch Design System (Tailwind-inspired)
+- **Preprocessor**: Sass/SCSS with DartSassBuilder
+- **Component Library**: MudBlazor with custom overrides
+- **Compilation**: Automatic during build via DartSassBuilder NuGet package
+
+**Key styling files:**
+- `wwwroot/css/app.scss` - Main stylesheet with design tokens and component styles
+- `Components/*.razor.scss` - Component-scoped styles (auto-compiled)
+
+**Cache Busting:**
+After deployment, CSS and assets are versioned to force cache refresh. See [Deployment](#deployment) section.
+
+### Technology Stack
+
 ### API Endpoints
 
 **Sharesies** (`/api/sharesies`)
@@ -221,6 +236,45 @@ dotnet build  # Automatically compiles all .scss files
 ```
 
 No manual Sass compilation needed - DartSassBuilder handles it during the build.
+
+## Deployment
+
+### Cache Busting for Production
+
+When deploying updates (especially CSS/styling changes), use the version update script to force browsers to load fresh assets:
+
+```powershell
+# Update version with timestamp (e.g., 20260116.1430)
+.\update-version.ps1
+
+# Or specify a custom version (e.g., 2.1.0)
+.\update-version.ps1 -Version "2.1.0"
+```
+
+**What it does:**
+- Updates version query strings in `index.html` (`app.css?v=X.X.X`)
+- Updates the `APP_VERSION` constant for cache clearing
+- Writes version to `wwwroot/version.txt`
+- On user's next visit, browser automatically clears old cached assets
+
+**Deployment workflow:**
+1. Make your changes (CSS, components, etc.)
+2. Run `.\update-version.ps1`
+3. Build: `dotnet build`
+4. Publish: `dotnet publish -c Release`
+5. Deploy to hosting (GitHub Pages, Azure, etc.)
+
+Users will automatically see the new version - no manual cache clearing needed!
+
+### GitHub Pages Deployment
+
+The repo includes a GitHub Actions workflow for automated deployment:
+
+1. Go to **Actions** → **Deploy to GitHub Pages**
+2. Click **Run workflow** → Select `master` branch
+3. Site deploys to [https://spurs899.github.io/portfolio-dashboard/](https://spurs899.github.io/portfolio-dashboard/)
+
+Before deploying, run `.\update-version.ps1` locally and commit the updated `index.html`.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
