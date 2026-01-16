@@ -1,267 +1,145 @@
 // ============================================================================
-// Portfolio Dashboard - Main Stylesheet (Flattened)
+// Portfolio Dashboard - Updated Stylesheet (Stitch Design System)
 // ============================================================================
 
 // Import Google Fonts
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 // ============================================================================
-// SASS Variables
+// SASS Variables - Stitch Design System
 // ============================================================================
 
-// Colors - Primary Palette
-$color-primary: #1a237e;
-$color-primary-dark: #0d1b2a;
-$color-primary-gradient-start: #667eea;
-$color-primary-gradient-end: #764ba2;
-$color-secondary: #415a77;
-$color-drawer-bg: #1b263b;
-$color-drawer-border: #2d3748;
-
-// Colors - Text
-$color-text-primary: #0d1b2a;
-$color-text-secondary: #e0e1dd;
-$color-text-muted: #6c757d;
+// Colors - Primary Palette (from Stitch design)
+$color-primary: #1e40af; // Deep Blue Accent
+$color-primary-dark: #1e3a8a;
+$color-primary-hover: #1d4ed8;
+$color-sidebar-navy: #0f172a; // Dark Navy Blue
+$color-deep-blue: #1a365d;
 
 // Colors - Background
-$color-white: #ffffff;
-$color-background: #f8f9fa;
-$color-background-hover: #f8f9fa;
-$color-border: #e8eaed;
-$color-border-light: #f1f3f5;
+$color-bg-light-grey: #f1f5f9; // Light Grey Background
+$color-bg-white: #ffffff; // Card White
+$color-bg-slate-50: #f8fafc;
+$color-bg-slate-100: #f1f5f9;
+$color-bg-hover: #f8fafc;
+
+// Colors - Text
+$color-text-primary: #0f172a; // slate-900
+$color-text-secondary: #64748b; // slate-500
+$color-text-muted: #94a3b8; // slate-400
+$color-text-white: #ffffff;
+
+// Colors - Borders
+$color-border: #e2e8f0; // slate-200
+$color-border-light: #f1f5f9; // slate-100
+$color-border-dark: #1e293b; // slate-800
 
 // Colors - Status
-$color-success: #4caf50;
-$color-success-bg: #d3f9d8;
-$color-success-text: #2b8a3e;
-$color-error: #c92a2a;
-$color-error-bg: #ffe3e3;
-$color-error-text: #c92a2a;
-$color-warning: #ff9800;
-$color-info: #2196f3;
-$color-info-bg: #e7f5ff;
-$color-info-text: #1971c2;
-$color-grey: #9e9e9e;
+$color-stock-green: #22c55e; // green-500
+$color-stock-green-light: #dcfce7; // green-100
+$color-stock-red: #ef4444; // red-500
+$color-stock-red-light: #fee2e2; // red-100
+$color-orange: #f97316; // orange-500
+$color-orange-light: #fed7aa; // orange-200
 
-// Colors - Sharesies Brand
+// Colors - Brand
 $color-sharesies-primary: #ff4785;
 $color-sharesies-dark: #ff1f6b;
 $color-sharesies-darker: #e6195e;
 
-// Spacing Scale
-$spacing-xs: 4px;
-$spacing-sm: 8px;
-$spacing-md: 12px;
-$spacing-lg: 16px;
-$spacing-xl: 20px;
-$spacing-2xl: 24px;
+// Spacing Scale (following Tailwind conventions)
+$spacing-1: 0.25rem; // 4px
+$spacing-2: 0.5rem;  // 8px
+$spacing-3: 0.75rem; // 12px
+$spacing-4: 1rem;    // 16px
+$spacing-5: 1.25rem; // 20px
+$spacing-6: 1.5rem;  // 24px
+$spacing-8: 2rem;    // 32px
+$spacing-10: 2.5rem; // 40px
+$spacing-12: 3rem;   // 48px
 
-// Border Radius
-$border-radius-sm: 6px;
-$border-radius-md: 8px;
-$border-radius-lg: 12px;
-$border-radius-circle: 50%;
+// Border Radius (following Stitch design)
+$border-radius-sm: 0.5rem;   // 8px
+$border-radius-md: 0.75rem;  // 12px
+$border-radius-lg: 1rem;     // 16px
+$border-radius-xl: 1.25rem;  // 20px
+$border-radius-2xl: 1.5rem;  // 24px
+$border-radius-full: 9999px;
 
 // Transitions
 $transition-fast: 0.15s ease-in-out;
 $transition-normal: 0.2s ease-in-out;
 $transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-all: all 0.2s ease-in-out;
 
-// Shadows
-$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+// Shadows (following Stitch design)
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-primary: 0 10px 25px -5px rgba(30, 64, 175, 0.2);
 
 // Typography
-$font-family-base: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 $font-family-monospace: 'Roboto Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
 
-$font-size-xs: 0.75rem;
-$font-size-sm: 0.875rem;
-$font-size-base: 1rem;
-$font-size-lg: 1.1rem;
-$font-size-xl: 1.75rem;
-$font-size-2xl: 2rem;
-$font-size-3xl: 3rem;
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
 
 $font-weight-light: 300;
 $font-weight-normal: 400;
 $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
+$font-weight-extrabold: 800;
 
-// Breakpoints
-$breakpoint-xs: 480px;
-$breakpoint-sm: 768px;
-$breakpoint-md: 1024px;
-$breakpoint-lg: 1280px;
-
-// Z-index
-$z-index-modal: 1000;
-$z-index-dropdown: 100;
-$z-index-fixed: 50;
-
-// App Bar
-$appbar-height: 64px;
+// Letter Spacing
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0em;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
 
 // ============================================================================
-// SASS Mixins
+// Base Styles
 // ============================================================================
 
-// Flexbox utilities
-@mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-@mixin flex-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-@mixin flex-column {
-    display: flex;
-    flex-direction: column;
-}
-
-// Card styles
-@mixin card-base {
-    border: 1px solid $color-border;
-    border-radius: $border-radius-lg;
-    transition: all $transition-slow;
-    background: $color-white;
-}
-
-@mixin card-hover {
-    box-shadow: $shadow-lg;
-    transform: translateY(-4px);
-}
-
-// Badge styles
-@mixin badge-base($bg-color, $text-color) {
-    background-color: $bg-color;
-    color: $text-color;
-    font-weight: $font-weight-semibold;
-    padding: 4px $spacing-md;
-    border-radius: $border-radius-sm;
-    font-size: $font-size-xs;
-    display: inline-block;
-}
-
-@mixin badge-large($bg-color, $text-color) {
-    background-color: $bg-color;
-    color: $text-color;
-    font-weight: $font-weight-bold;
-    padding: 6px $spacing-md;
-    border-radius: $border-radius-md;
-    font-size: $font-size-xs;
-    display: inline-block;
-}
-
-// Gradient utilities
-@mixin gradient-primary {
-    background: linear-gradient(135deg, $color-primary-gradient-start 0%, $color-primary-gradient-end 100%);
-}
-
-@mixin gradient-sharesies {
-    background: linear-gradient(135deg, $color-sharesies-primary 0%, $color-sharesies-dark 100%);
-}
-
-// Typography utilities
-@mixin text-monospace {
-    font-family: $font-family-monospace;
-}
-
-@mixin text-uppercase {
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-@mixin text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-// Responsive utilities
-@mixin respond-to($breakpoint) {
-    @if $breakpoint == xs {
-        @media (max-width: $breakpoint-xs) { @content; }
-    }
-    @else if $breakpoint == sm {
-        @media (max-width: $breakpoint-sm) { @content; }
-    }
-    @else if $breakpoint == md {
-        @media (max-width: $breakpoint-md) { @content; }
-    }
-    @else if $breakpoint == lg {
-        @media (max-width: $breakpoint-lg) { @content; }
-    }
-}
-
-// Table styles
-@mixin table-header {
-    font-size: $font-size-xs;
-    font-weight: $font-weight-bold;
-    @include text-uppercase;
-    color: $color-text-muted;
-    padding: $spacing-lg $spacing-xl;
-    border-bottom: 2px solid $color-border;
-}
-
-// Focus states
-@mixin focus-ring($color: $color-primary) {
-    box-shadow: 0 0 0 0.1rem $color-white, 0 0 0 0.25rem $color;
-}
-
-// Hover lift effect
-@mixin hover-lift {
-    transition: all $transition-normal;
-    
-    &:hover {
-        transform: translateY(-2px);
-    }
-}
-
-// Avatar icon with gradient
-@mixin avatar-icon {
-    background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-primary-darken) 100%);
-    box-shadow: 0 4px $spacing-md rgba(var(--mud-palette-primary-rgb), 0.3);
-}
-
-// Loading animation
-@mixin loading-animation($duration: 1.5s) {
-    animation: pulse $duration ease-in-out infinite;
-}
-
-// ============================================================================
-// Global Styles
-// ============================================================================
-
-html,
-body {
-    font-family: $font-family-base;
-    color: $color-text-primary;
-    background-color: $color-background;
+html, body {
+  font-family: $font-family-base;
+  color: $color-text-primary;
+  background-color: $color-bg-light-grey;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1:focus {
-    outline: none;
+  outline: none;
 }
 
-a,
-.btn-link {
-    color: $color-primary;
+a, .btn-link {
+  color: $color-primary;
 }
 
 .btn-primary {
-    color: $color-white;
-    background-color: $color-primary;
-    border-color: $color-primary-dark;
-    font-weight: $font-weight-semibold;
-    letter-spacing: 0.02em;
+  color: $color-text-white;
+  background-color: $color-primary;
+  border-color: $color-primary;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $letter-spacing-wide;
+  transition: $transition-all;
+  
+  &:hover {
+    background-color: $color-primary-hover;
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
 }
 
 .btn:focus,
@@ -269,583 +147,845 @@ a,
 .btn-link.nav-link:focus,
 .form-control:focus,
 .form-check-input:focus {
-    @include focus-ring;
+  box-shadow: 0 0 0 0.1rem $color-bg-white, 0 0 0 0.25rem $color-primary;
 }
 
 // ============================================================================
-// Loading Screen Styles
+// Loading Screen (keeping existing but with updated colors)
 // ============================================================================
 
 .app-loading {
-    @include flex-center;
-    flex-direction: column;
-    height: 100vh;
-    @include gradient-primary;
-    font-family: 'Roboto', sans-serif;
-    padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(135deg, $color-primary 0%, $color-deep-blue 100%);
+  font-family: $font-family-base;
+  padding: 1rem;
 }
 
 .loading-container {
-    text-align: center;
-    max-width: 90%;
+  text-align: center;
+  max-width: 90%;
 }
 
 .loading-logo {
-    font-size: $font-size-3xl;
-    font-weight: $font-weight-bold;
-    color: $color-white;
-    margin-bottom: 2rem;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .loading-spinner {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 1.5rem;
-    border: 4px solid rgba($color-white, 0.3);
-    border-top: 4px solid $color-white;
-    border-radius: $border-radius-circle;
-    animation: spin 1s linear infinite;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.5rem;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid $color-text-white;
+  border-radius: $border-radius-full;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loading-text {
-    color: $color-white;
-    font-size: $font-size-lg;
-    font-weight: $font-weight-normal;
-    opacity: 0.9;
-    @include loading-animation;
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-normal;
+  opacity: 0.9;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 .loading-dots {
-    display: inline-flex;
-    gap: $spacing-xs;
-    margin-left: $spacing-xs;
-
-    span {
-        width: 6px;
-        height: 6px;
-        background: $color-white;
-        border-radius: $border-radius-circle;
-        animation: bounce 1.4s infinite ease-in-out both;
-
-        &:nth-child(1) { animation-delay: -0.32s; }
-        &:nth-child(2) { animation-delay: -0.16s; }
-    }
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+  
+  span {
+    width: 6px;
+    height: 6px;
+    background: $color-text-white;
+    border-radius: $border-radius-full;
+    animation: bounce 1.4s infinite ease-in-out both;
+    
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+  }
 }
 
 @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
 
 .loading-subtitle {
-    color: rgba($color-white, 0.8);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-    font-weight: $font-weight-light;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-sm;
+  margin-top: 0.5rem;
+  font-weight: $font-weight-light;
 }
 
 .loading-logos {
-    @include flex-center;
-    gap: 2rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-
-    img {
-        height: 40px;
-        opacity: 0.9;
-    }
-
-    .divider {
-        width: 1px;
-        height: 40px;
-        background: rgba($color-white, 0.5);
-    }
-}
-
-// Mobile responsive adjustments for loading screen
-@include respond-to(sm) {
-    .loading-logo {
-        font-size: $font-size-2xl;
-        margin-bottom: 1.5rem;
-        letter-spacing: 1px;
-    }
-
-    .loading-spinner {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 1rem;
-    }
-
-    .loading-text {
-        font-size: $font-size-base;
-    }
-
-    .loading-subtitle {
-        font-size: 0.8rem;
-    }
-
-    .loading-logos {
-        gap: 1rem;
-        margin-top: 1.5rem;
-
-        img { height: 32px; }
-        .divider { height: 32px; }
-    }
-}
-
-@include respond-to(xs) {
-    .loading-logo {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border-width: 3px;
-    }
-
-    .loading-text {
-        font-size: 0.9rem;
-    }
-
-    .loading-subtitle {
-        font-size: 0.75rem;
-    }
-
-    .loading-logos {
-        gap: 0.75rem;
-        margin-top: 1rem;
-
-        img { height: 28px; }
-        .divider { height: 28px; }
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  
+  img {
+    height: 40px;
+    opacity: 0.9;
+  }
+  
+  .divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.5);
+  }
 }
 
 // ============================================================================
-// Card Styles
+// Cards - Stitch Design System
 // ============================================================================
 
 .stat-card {
-    @include card-base;
-    @include hover-lift;
-
-    &:hover {
-        box-shadow: $shadow-md !important;
-    }
+  border: 1px solid $color-border;
+  border-radius: $border-radius-xl;
+  transition: $transition-slow;
+  background: $color-bg-white;
+  box-shadow: $shadow-sm;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md !important;
+  }
 }
 
 .stat-label {
-    font-size: $font-size-xs !important;
-    font-weight: $font-weight-semibold !important;
-    @include text-uppercase;
-    color: $color-secondary !important;
+  font-size: $font-size-xs !important;
+  font-weight: $font-weight-semibold !important;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wider;
+  color: $color-text-secondary !important;
 }
 
 .stat-value {
-    font-size: $font-size-xl !important;
-    font-weight: $font-weight-bold !important;
-    color: $color-text-primary !important;
-    line-height: 1.2 !important;
+  font-size: $font-size-3xl !important;
+  font-weight: $font-weight-bold !important;
+  color: $color-text-primary !important;
+  line-height: 1.2 !important;
+  letter-spacing: $letter-spacing-tight;
 }
 
 .stat-change {
-    font-size: $font-size-sm !important;
-    font-weight: $font-weight-semibold !important;
-    margin-top: $spacing-xs !important;
+  font-size: $font-size-sm !important;
+  font-weight: $font-weight-semibold !important;
+  margin-top: 4px !important;
 }
 
+.stat-icon {
+  padding: $spacing-3;
+  border-radius: $border-radius-lg;
+  
+  &.primary {
+    background-color: rgba(30, 64, 175, 0.1);
+    color: $color-primary;
+  }
+  
+  &.success {
+    background-color: $color-stock-green-light;
+    color: $color-stock-green;
+  }
+  
+  &.neutral {
+    background-color: $color-bg-slate-100;
+    color: $color-text-secondary;
+  }
+}
+
+// ============================================================================
+// Holdings Cards & Tables
+// ============================================================================
+
 .holdings-card {
+  border-radius: $border-radius-xl !important;
+  border: 1px solid $color-border !important;
+  overflow: hidden !important;
+  box-shadow: $shadow-sm !important;
+  background: $color-bg-white;
+}
+
+// ============================================================================
+// MudBlazor Component Overrides - Stitch Design
+// ============================================================================
+
+// Portfolio Dashboard Stat Cards (matching Stitch design exactly)
+.port-dashboard-stat-card {
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-xl !important;
+  box-shadow: $shadow-sm !important;
+  background: $color-bg-white !important;
+  transition: $transition-slow !important;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md !important;
+  }
+  
+  .mud-card-content {
+    padding: $spacing-6 !important;
+  }
+}
+
+// Portfolio Dashboard Table Card
+.port-dashboard-table-card {
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-xl !important;
+  box-shadow: $shadow-sm !important;
+  background: $color-bg-white !important;
+  overflow: hidden !important;
+  
+  .mud-card-header {
+    padding: $spacing-6 !important;
+    border-bottom: 1px solid $color-border-light !important;
+    background: transparent !important;
+    
+    .mud-card-header-content {
+      h6 {
+        font-size: $font-size-lg !important;
+        font-weight: $font-weight-bold !important;
+        color: $color-text-primary !important;
+        margin-bottom: 4px !important;
+      }
+      
+      .mud-typography-body2 {
+        font-size: $font-size-sm !important;
+        color: $color-text-secondary !important;
+      }
+    }
+  }
+}
+
+// Portfolio Dashboard Table Styling (exact Stitch table look)
+.port-dashboard-table {
+  background: transparent !important;
+  
+  .mud-table-head {
+    background-color: $color-bg-slate-50 !important;
+    
+    th {
+      font-size: $font-size-xs !important;
+      font-weight: $font-weight-bold !important;
+      text-transform: uppercase !important;
+      letter-spacing: $letter-spacing-wider !important;
+      color: $color-text-secondary !important;
+      padding: $spacing-4 $spacing-6 !important;
+      border-bottom: 2px solid $color-border !important;
+    }
+  }
+  
+  .mud-table-body {
+    tr {
+      transition: background-color $transition-fast !important;
+      border-bottom: 1px solid $color-border-light !important;
+      
+      &:hover {
+        background-color: $color-bg-slate-50 !important;
+      }
+      
+      &:last-child {
+        border-bottom: none !important;
+      }
+      
+      td {
+        padding: $spacing-5 $spacing-6 !important;
+        font-size: $font-size-sm !important;
+      }
+    }
+  }
+}
+
+// Table Header specific styling
+.port-dashboard-table-header {
+  font-size: $font-size-xs !important;
+  font-weight: $font-weight-bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: $letter-spacing-wider !important;
+  color: $color-text-secondary !important;
+  padding: $spacing-4 $spacing-6 !important;
+}
+
+// Symbol avatars (matching Stitch rounded squares)
+.port-dashboard-table {
+  .mud-avatar {
+    width: 40px !important;
+    height: 40px !important;
     border-radius: $border-radius-md !important;
-    border: 1px solid $color-border !important;
-    overflow: hidden !important;
+    font-size: $font-size-xs !important;
+    font-weight: $font-weight-bold !important;
+  }
+}
+
+// Portfolio Dashboard Avatar Icons (for stat cards)
+.port-dashboard-avatar-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: $border-radius-lg !important;
+  
+  &.mud-avatar-filled {
+    background-color: rgba(30, 64, 175, 0.1) !important;
+    
+    .mud-icon-root {
+      color: $color-primary !important;
+    }
+  }
+  
+  // Success color override
+  &.mud-success {
+    background-color: $color-stock-green-light !important;
+    
+    .mud-icon-root {
+      color: $color-stock-green !important;
+    }
+  }
+  
+  // Info color override
+  &.mud-info {
+    background-color: $color-bg-slate-100 !important;
+    
+    .mud-icon-root {
+      color: $color-text-secondary !important;
+    }
+  }
+}
+
+// Portfolio Dashboard Badges
+.port-dashboard-badge-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: $color-stock-green-light;
+  color: $color-stock-green;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $border-radius-sm;
+}
+
+.port-dashboard-badge-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: $color-stock-red-light;
+  color: $color-stock-red;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $border-radius-sm;
+}
+
+// Portfolio Dashboard Return Badges (for percentages)
+.port-dashboard-return-badge-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: $color-stock-green-light;
+  color: $color-stock-green;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  border-radius: $border-radius-md;
+}
+
+.port-dashboard-return-badge-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: $color-stock-red-light;
+  color: $color-stock-red;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  border-radius: $border-radius-md;
+}
+
+// Currency chips (matching Stitch style)
+.currency-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: $color-bg-slate-100;
+  color: $color-text-secondary;
+  font-size: 10px;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-widest;
+  border-radius: $border-radius-sm;
+  text-transform: uppercase;
+}
+
+// Numeric text styling
+.numeric-text {
+  font-family: $font-family-base; // Using Inter instead of mono for cleaner look
+  font-weight: $font-weight-medium;
+}
+
+// MudBlazor Typography overrides for Stitch style
+.mud-typography-h4 {
+  font-size: $font-size-3xl !important;
+  font-weight: $font-weight-bold !important;
+  letter-spacing: $letter-spacing-tight !important;
+}
+
+.mud-typography-h6 {
+  font-size: $font-size-lg !important;
+  font-weight: $font-weight-bold !important;
+}
+
+.mud-typography-body2 {
+  font-size: $font-size-sm !important;
+}
+
+.mud-typography-caption {
+  font-size: $font-size-xs !important;
+  color: $color-text-muted !important;
+}
+
+// Holdings Card Specific
+.holdings-card {
+  border-radius: $border-radius-xl !important;
+  border: 1px solid $color-border !important;
+  overflow: hidden !important;
+  box-shadow: $shadow-sm !important;
+  background: $color-bg-white;
 }
 
 .holdings-title {
-    font-weight: $font-weight-semibold !important;
-    color: $color-text-primary !important;
+  font-weight: $font-weight-bold !important;
+  color: $color-text-primary !important;
+  font-size: $font-size-lg !important;
+}
+
+.holdings-subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: 2px;
 }
 
 .holdings-table {
-    background: transparent !important;
-
-    .mud-table-head {
-        background-color: $color-background !important;
+  background: transparent !important;
+  
+  .mud-table-head {
+    background-color: $color-bg-slate-50 !important;
+  }
+  
+  tbody tr {
+    transition: background-color $transition-fast;
+    border-bottom: 1px solid $color-border-light;
+    
+    &:hover {
+      background-color: $color-bg-slate-50 !important;
     }
-
-    tbody tr {
-        transition: background-color $transition-fast;
-
-        &:hover {
-            background-color: $color-background !important;
-        }
+    
+    &:last-child {
+      border-bottom: none;
     }
+  }
 }
 
 .table-header {
-    @include table-header;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wider;
+  color: $color-text-secondary;
+  padding: $spacing-4 $spacing-5;
+  border-bottom: 2px solid $color-border;
 }
 
 .symbol-cell {
-    font-weight: $font-weight-semibold !important;
-    color: $color-text-primary !important;
+  font-weight: $font-weight-bold !important;
+  color: $color-text-primary !important;
+}
+
+.symbol-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $border-radius-md;
+  background-color: $color-primary;
+  color: $color-text-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-xs;
+}
+
+.symbol-name {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-top: 2px;
 }
 
 .number-cell {
-    @include text-monospace;
-    font-size: $font-size-sm !important;
-    text-align: right !important;
+  font-family: $font-family-monospace;
+  font-size: $font-size-sm !important;
+  text-align: right !important;
 }
 
 .return-chip {
-    @include text-monospace;
-    font-weight: $font-weight-semibold !important;
-    font-size: 0.8rem !important;
+  font-family: $font-family-monospace;
+  font-weight: $font-weight-semibold !important;
+  font-size: $font-size-xs !important;
+  padding: 4px 12px;
+  border-radius: $border-radius-lg;
 }
 
-// Ynex-Style Dashboard Components
-.ynex-stat-card {
-    @include card-base;
+// ============================================================================
+// Badges & Chips
+// ============================================================================
 
-    &:hover {
-        @include card-hover;
-    }
-}
-
-.ynex-avatar-icon {
-    @include avatar-icon;
-}
-
-.ynex-table-card {
-    @include card-base;
-    overflow: hidden !important;
-}
-
-.ynex-table {
-    background: transparent !important;
-
-    .mud-table-head {
-        background-color: $color-background !important;
-    }
-
-    tbody tr {
-        transition: background-color $transition-normal !important;
-        border-bottom: 1px solid $color-border-light !important;
-
-        &:last-child {
-            border-bottom: none !important;
-        }
-
-        &:hover {
-            background-color: $color-background !important;
-        }
-    }
-
-    .mud-table-cell {
-        padding: $spacing-lg $spacing-xl !important;
-    }
-}
-
-.ynex-table-header {
-    @include table-header;
-}
-
-.numeric-text {
-    @include text-monospace;
-    font-size: $font-size-sm !important;
-}
-
-// Badge Styles
 .ynex-badge {
-    @include badge-base($color-background, $color-text-primary);
+  background-color: $color-bg-slate-100;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  display: inline-block;
 }
 
 .ynex-badge-success {
-    @include badge-base($color-success-bg, $color-success-text);
+  background-color: $color-stock-green-light;
+  color: $color-stock-green;
+  font-weight: $font-weight-semibold;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  display: inline-block;
 }
 
 .ynex-badge-error {
-    @include badge-base($color-error-bg, $color-error-text);
+  background-color: $color-stock-red-light;
+  color: $color-stock-red;
+  font-weight: $font-weight-semibold;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  display: inline-block;
 }
 
-.ynex-return-badge-success {
-    @include badge-large($color-success-bg, $color-success-text);
-}
-
-.ynex-return-badge-error {
-    @include badge-large($color-error-bg, $color-error-text);
-}
-
-// Currency Badge Styles
 .currency-chip,
 .currency-badge-lg {
-    background-color: $color-info-bg;
-    color: $color-info-text;
-    font-weight: $font-weight-semibold;
-    border-radius: $border-radius-sm;
-    display: inline-block;
+  background-color: rgba(30, 64, 175, 0.1);
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  border-radius: $border-radius-sm;
+  display: inline-block;
 }
 
 .currency-chip {
-    padding: 6px $spacing-md;
-    font-size: $font-size-xs;
+  padding: 6px 12px;
+  font-size: $font-size-xs;
 }
 
 .currency-badge-lg {
-    padding: $spacing-sm $spacing-lg;
-    display: inline-flex;
-    align-items: center;
-    font-size: $font-size-sm;
-}
-
-// Brokerage Logos
-.brokerage-logo-img {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
-    max-width: 32px !important;
-    max-height: 32px !important;
-    border-radius: $border-radius-circle !important;
-    object-fit: cover !important;
-    box-shadow: $shadow-sm !important;
-    display: inline-block !important;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  font-size: $font-size-sm;
 }
 
 // ============================================================================
-// AppBar & Navigation
+// Navigation & Layout - Stitch Design
 // ============================================================================
 
 .professional-appbar {
-    background: linear-gradient(135deg, $color-primary-dark 0%, $color-drawer-bg 100%) !important;
-    border-bottom: 1px solid rgba($color-white, 0.1) !important;
-    box-shadow: 0 2px $spacing-sm rgba(0, 0, 0, 0.15) !important;
-    height: $appbar-height !important;
+  background: $color-sidebar-navy !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: $shadow-sm !important;
+  height: 64px !important;
 }
 
 .appbar-title {
-    font-weight: $font-weight-semibold !important;
-    letter-spacing: 0.02em !important;
-    color: $color-white !important;
+  font-weight: $font-weight-semibold !important;
+  letter-spacing: $letter-spacing-tight !important;
+  color: $color-text-white !important;
+  font-size: $font-size-xl;
 }
 
 .appbar-logo-mobile {
-    display: none;
-    height: 32px;
-    width: 32px;
-    border-radius: $border-radius-circle;
+  display: none;
+  height: 32px;
+  width: 32px;
+  border-radius: $border-radius-full;
 }
 
 .appbar-logo-desktop {
-    display: block;
-    height: 40px;
-    width: 40px;
-    border-radius: $border-radius-circle;
-    padding: 3px;
-    background: rgba($color-white, 0.1);
-    border: 2px solid rgba($color-white, 0.2);
-    margin-right: $spacing-md;
-    transition: all $transition-normal;
-
-    &:hover {
-        background: rgba($color-white, 0.15);
-        border-color: rgba($color-white, 0.3);
-        transform: scale(1.05);
-    }
-}
-
-@include respond-to(sm) {
-    .appbar-title-desktop,
-    .appbar-logo-desktop,
-    .appbar-date-desktop {
-        display: none !important;
-    }
-    
-    .appbar-logo-mobile {
-        display: block !important;
-    }
-}
-
-@include respond-to(xs) {
-    .appbar-logo-mobile {
-        height: 28px;
-        width: 28px;
-    }
+  display: block;
+  height: 40px;
+  width: 40px;
+  border-radius: $border-radius-md;
+  padding: 3px;
+  background: $color-primary;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin-right: 12px;
+  transition: $transition-all;
+  
+  &:hover {
+    background: $color-primary-hover;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
 }
 
 .professional-drawer {
-    border-right: 1px solid $color-drawer-border !important;
-    background: $color-drawer-bg !important;
+  border-right: 1px solid $color-border-dark !important;
+  background: $color-sidebar-navy !important;
 }
 
 .drawer-header {
-    background: rgba($color-primary-dark, 0.6) !important;
-    border-bottom: 1px solid $color-drawer-border !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-bottom: 1px solid $color-border-dark !important;
+  padding: $spacing-6;
 }
 
 .drawer-title {
-    color: $color-text-secondary !important;
-    font-weight: $font-weight-semibold !important;
-    @include text-uppercase;
-    font-size: $font-size-sm !important;
+  color: $color-text-muted !important;
+  font-weight: $font-weight-semibold !important;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wider;
+  font-size: $font-size-xs !important;
 }
 
 .professional-content {
-    background-color: $color-background !important;
+  background-color: $color-bg-light-grey !important;
 }
 
-// Navigation Menu Styling
-.professional-drawer {
-    .mud-navmenu,
-    .mud-nav-link,
-    .mud-nav-link *,
-    .mud-nav-item {
-        --mud-palette-primary: #{$color-white} !important;
-        --mud-palette-primary-text: #{$color-white} !important;
-        --mud-palette-text-primary: #{$color-white} !important;
-    }
-
-    .mud-nav-link {
-        color: $color-white !important;
-
-        svg,
-        .mud-icon-root {
-            color: $color-white !important;
-            fill: $color-white !important;
-        }
-    }
+// Sidebar navigation items
+.professional-drawer .mud-navmenu,
+.professional-drawer .mud-nav-link,
+.professional-drawer .mud-nav-link *,
+.professional-drawer .mud-nav-item {
+  --mud-palette-primary: #{$color-text-white} !important;
+  --mud-palette-primary-text: #{$color-text-white} !important;
+  --mud-palette-text-primary: #{$color-text-white} !important;
 }
 
-.nav-menu-light {
-    .mud-nav-link,
-    .mud-nav-link *,
-    .mud-nav-link-text,
-    .mud-nav-item .mud-nav-link {
-        color: $color-white !important;
-    }
+.professional-drawer .mud-nav-link {
+  color: $color-text-muted !important;
+  border-radius: $border-radius-md;
+  padding: $spacing-3;
+  margin: 2px 0;
+  transition: $transition-all;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: $color-text-white !important;
+  }
+  
+  &.active {
+    background-color: rgba(30, 64, 175, 0.2) !important;
+    color: $color-text-white !important;
+    font-weight: $font-weight-medium !important;
+    border-left: 4px solid $color-primary;
+    padding-left: calc(#{$spacing-3} - 4px);
+  }
+}
 
-    .mud-nav-link {
-        &:hover,
-        &:hover *,
-        &:hover .mud-nav-link-text {
-            background-color: rgba($color-white, 0.08) !important;
-            color: $color-white !important;
-        }
-
-        &.active,
-        &.active *,
-        &.active .mud-nav-link-text {
-            background-color: rgba($color-primary, 0.4) !important;
-            color: $color-white !important;
-            font-weight: $font-weight-semibold !important;
-        }
-
-        .mud-icon-root,
-        svg {
-            color: $color-white !important;
-            fill: $color-white !important;
-        }
-    }
-
-    &.mud-navmenu {
-        .mud-nav-link.active:not(.mud-nav-link-disabled),
-        .mud-nav-link.active:not(.mud-nav-link-disabled) * {
-            background-color: rgba($color-primary, 0.4) !important;
-            color: $color-white !important;
-            font-weight: $font-weight-semibold !important;
-        }
-
-        .mud-nav-link.active:not(.mud-nav-link-disabled) {
-            .mud-icon-root,
-            svg {
-                color: $color-white !important;
-                fill: $color-white !important;
-            }
-        }
-    }
+.professional-drawer .mud-nav-link svg,
+.professional-drawer .mud-nav-link .mud-icon-root {
+  color: inherit !important;
+  fill: inherit !important;
 }
 
 // ============================================================================
-// Component-specific Styles
+// Buttons - Stitch Style
 // ============================================================================
 
-// Sharesies Login Button
 .sharesies-login-btn {
-    @include gradient-sharesies;
-    color: $color-white !important;
-    font-weight: $font-weight-semibold !important;
-    padding: $spacing-md $spacing-2xl !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: $spacing-md !important;
-    transition: all $transition-normal !important;
-
-    &:hover {
-        background: linear-gradient(135deg, $color-sharesies-dark 0%, $color-sharesies-darker 100%) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 $spacing-xs $spacing-md rgba(255, 71, 133, 0.4) !important;
-    }
-
-    img {
-        height: 28px;
-        width: 28px;
-        border-radius: $border-radius-circle;
-        object-fit: cover;
-    }
+  background: linear-gradient(135deg, $color-sharesies-primary 0%, $color-sharesies-dark 100%);
+  color: $color-text-white !important;
+  font-weight: $font-weight-semibold !important;
+  padding: 12px 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  transition: $transition-all !important;
+  border-radius: $border-radius-lg !important;
+  box-shadow: $shadow-md;
+  
+  &:hover {
+    background: linear-gradient(135deg, $color-sharesies-dark 0%, $color-sharesies-darker 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(255, 71, 133, 0.4) !important;
+  }
+  
+  img {
+    height: 28px;
+    width: 28px;
+    border-radius: $border-radius-full;
+    object-fit: cover;
+  }
 }
 
+// ============================================================================
+// Time & Market Status Card
+// ============================================================================
+
+.time-market-status-card {
+  background: linear-gradient(135deg, $color-primary 0%, $color-deep-blue 100%) !important;
+  border-radius: $border-radius-xl !important;
+  color: $color-text-white;
+  box-shadow: $shadow-primary !important;
+  border: none !important;
+  
+  .mud-card-content {
+    padding: $spacing-6 !important;
+  }
+  
+  .time-section {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    
+    .time-icon {
+      padding: $spacing-3;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: $border-radius-lg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .time-label {
+      font-size: $font-size-xs !important;
+      text-transform: uppercase !important;
+      font-weight: $font-weight-bold !important;
+      letter-spacing: $letter-spacing-wider !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+      margin-bottom: 2px !important;
+    }
+    
+    .time-value {
+      font-size: $font-size-2xl !important;
+      font-weight: $font-weight-bold !important;
+      letter-spacing: $letter-spacing-tight !important;
+      color: $color-text-white !important;
+    }
+  }
+  
+  .market-status-badge {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-widest;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.time-market-card {
+  background: linear-gradient(135deg, $color-primary 0%, $color-deep-blue 100%);
+  border-radius: $border-radius-xl;
+  padding: $spacing-6;
+  color: $color-text-white;
+  box-shadow: $shadow-primary;
+  margin-bottom: $spacing-6;
+  
+  .time-section {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    
+    .time-icon {
+      padding: $spacing-3;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: $border-radius-lg;
+    }
+    
+    .time-label {
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+      font-weight: $font-weight-bold;
+      letter-spacing: $letter-spacing-wider;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .time-value {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      letter-spacing: $letter-spacing-tight;
+    }
+  }
+  
+  .market-status-badge {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-widest;
+  }
+}
+
+// ============================================================================
 // Breadcrumbs
+// ============================================================================
+
 .mud-breadcrumbs {
-    font-size: $font-size-sm !important;
+  font-size: $font-size-sm !important;
 }
 
 .mud-breadcrumb-item {
-    color: $color-text-muted !important;
+  color: $color-text-secondary !important;
 }
 
-// Content wrapper
+// ============================================================================
+// Content & Utilities
+// ============================================================================
+
 .content {
-    padding-top: 1.1rem;
+  padding-top: 1.1rem;
 }
-
-// ============================================================================
-// Utility Classes
-// ============================================================================
 
 .text-muted {
-    color: $color-text-muted !important;
+  color: $color-text-secondary !important;
 }
 
 .fw-bold {
-    font-weight: $font-weight-bold !important;
+  font-weight: $font-weight-bold !important;
 }
 
 .fw-semibold {
-    font-weight: $font-weight-semibold !important;
+  font-weight: $font-weight-semibold !important;
 }
 
 .text-uppercase {
-    text-transform: uppercase !important;
+  text-transform: uppercase !important;
 }
 
 .gap-3 {
-    gap: $spacing-md;
+  gap: $spacing-3;
 }
 
 .rounded-lg {
-    border-radius: $spacing-md !important;
+  border-radius: $border-radius-lg !important;
 }
 
 // ============================================================================
@@ -853,28 +993,26 @@ a,
 // ============================================================================
 
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+  outline: 1px solid $color-stock-green;
 }
 
 .invalid {
-    outline: 1px solid red;
+  outline: 1px solid $color-stock-red;
 }
 
 .validation-message {
-    color: red;
+  color: $color-stock-red;
 }
 
-.form-floating {
-    > .form-control-plaintext::placeholder,
-    > .form-control::placeholder {
-        color: var(--bs-secondary-color);
-        text-align: end;
-    }
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
 
-    > .form-control-plaintext:focus::placeholder,
-    > .form-control:focus::placeholder {
-        text-align: start;
-    }
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
+  text-align: start;
 }
 
 // ============================================================================
@@ -882,40 +1020,228 @@ a,
 // ============================================================================
 
 #blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: $z-index-modal;
-
-    .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+  color-scheme: light only;
+  background: #ffffe0;
+  bottom: 0;
+  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  display: none;
+  left: 0;
+  padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  
+  .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+  }
 }
 
 .blazor-error-boundary {
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
-    padding: 1rem 1rem 1rem 3.7rem;
-    color: $color-white;
+  background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+  padding: 1rem 1rem 1rem 3.7rem;
+  color: $color-text-white;
+  
+  &::after {
+    content: "An error has occurred.";
+  }
+}
 
-    &::after {
-        content: "An error has occurred.";
-    }
+code {
+  color: #c02d76;
 }
 
 // ============================================================================
-// Miscellaneous
+// Responsive Design
 // ============================================================================
 
-code {
-    color: #c02d76;
+@media (max-width: 768px) {
+  .appbar-title-desktop,
+  .appbar-logo-desktop,
+  .appbar-date-desktop {
+    display: none !important;
+  }
+  
+  .appbar-logo-mobile {
+    display: block !important;
+  }
+  
+  .stat-value {
+    font-size: $font-size-2xl !important;
+  }
+  
+  .loading-logo {
+    font-size: $font-size-2xl;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+  }
+  
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1rem;
+  }
+  
+  .loading-text {
+    font-size: $font-size-base;
+  }
+  
+  .loading-subtitle {
+    font-size: $font-size-sm;
+  }
+  
+  .loading-logos {
+    gap: 1rem;
+    margin-top: 1.5rem;
+    
+    img {
+      height: 32px;
+    }
+    
+    .divider {
+      height: 32px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .appbar-logo-mobile {
+    height: 28px;
+    width: 28px;
+  }
+  
+  .loading-logo {
+    font-size: $font-size-xl;
+    margin-bottom: 1rem;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+  
+  .loading-text {
+    font-size: $font-size-sm;
+  }
+  
+  .loading-subtitle {
+    font-size: $font-size-xs;
+  }
+  
+  .loading-logos {
+    gap: 0.75rem;
+    margin-top: 1rem;
+    
+    img {
+      height: 28px;
+    }
+    
+    .divider {
+      height: 28px;
+    }
+  }
+}
+// ============================================================================
+// Additional MudBlazor Global Overrides for Stitch Design
+// ============================================================================
+
+// Remove all MudBlazor elevation shadows
+.mud-elevation-0 {
+  box-shadow: none !important;
+}
+
+// Override MudCard defaults
+.mud-card {
+  background-color: $color-bg-white !important;
+  border-radius: $border-radius-xl !important;
+}
+
+.mud-card-content {
+  padding: $spacing-6 !important;
+}
+
+// Override MudTable styling globally
+.mud-table {
+  border: none !important;
+  
+  .mud-table-container {
+    overflow-x: auto;
+    border-radius: 0;
+  }
+  
+  .mud-table-head {
+    th {
+      background-color: $color-bg-slate-50 !important;
+      border-bottom: 2px solid $color-border !important;
+    }
+  }
+  
+  .mud-table-body {
+    background-color: transparent !important;
+  }
+  
+  .mud-table-row {
+    &:hover {
+      background-color: $color-bg-slate-50 !important;
+    }
+  }
+  
+  .mud-table-cell {
+    border-bottom: 1px solid $color-border-light !important;
+    font-size: $font-size-sm !important;
+  }
+}
+
+// MudGrid spacing
+.mud-grid {
+  .mud-grid-item {
+    padding: $spacing-2 !important;
+  }
+}
+
+// Better text alignment utilities
+.text-right {
+  text-align: right !important;
+}
+
+// MudBlazor button overrides
+.mud-button-root {
+  border-radius: $border-radius-lg !important;
+  font-weight: $font-weight-semibold !important;
+}
+
+// Icon button overrides
+.mud-icon-button {
+  border-radius: $border-radius-md !important;
+  
+  &:hover {
+    background-color: $color-bg-slate-50 !important;
+  }
+}
+
+// MudChip overrides for market status
+.mud-chip {
+  border-radius: $border-radius-full !important;
+  font-weight: $font-weight-semibold !important;
+}
+
+// MudAvatar size overrides for tables
+.mud-table {
+  .mud-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: $font-size-sm !important;
+  }
+}
+
+// Brokerage logo sizing
+.brokerage-logo-img {
+  width: 24px !important;
+  height: 24px !important;
+  object-fit: contain;
+  border-radius: $border-radius-sm;
 }

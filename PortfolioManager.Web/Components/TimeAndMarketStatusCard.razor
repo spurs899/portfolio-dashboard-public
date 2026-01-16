@@ -1,48 +1,60 @@
 @using MudBlazor
 
-<MudCard Elevation="0" Class="mb-4" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <MudCardContent Class="pa-3 pa-sm-4">
+<MudCard Elevation="0" Class="time-market-status-card mb-4">
+    <MudCardContent Class="pa-4 pa-sm-6">
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
             <!-- Desktop/Tablet View - Horizontal Layout -->
-            <div class="d-flex justify-space-between align-center flex-wrap">
-                <div class="d-flex align-center">
-                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Medium" Class="mr-3" Style="color: white;" />
+            <div class="d-flex justify-space-between align-center flex-wrap gap-4">
+                <div class="d-flex align-center time-section">
+                    <div class="time-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Medium" Style="color: white;" />
+                    </div>
                     <div>
-                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.9); font-weight: 500;">Local Time (@LocalTimeZone)</MudText>
-                        <MudText Typo="Typo.h6" Style="color: white; font-weight: 600;">@LocalTime</MudText>
+                        <MudText Typo="Typo.caption" Class="time-label">Local Time (@LocalTimeZone)</MudText>
+                        <MudText Typo="Typo.h5" Class="time-value">@LocalTime</MudText>
                     </div>
                 </div>
-                <div class="d-flex align-center">
-                    <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Medium" Class="mr-3" Style="color: white;" />
+                <div class="d-flex align-center time-section">
+                    <div class="time-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Medium" Style="color: white;" />
+                    </div>
                     <div>
-                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.9); font-weight: 500;">NYSE (Eastern Time)</MudText>
-                        <MudText Typo="Typo.h6" Style="color: white; font-weight: 600;">@NyseTime</MudText>
+                        <MudText Typo="Typo.caption" Class="time-label">NYSE (Eastern Time)</MudText>
+                        <MudText Typo="Typo.h5" Class="time-value">@NyseTime</MudText>
                     </div>
                 </div>
-                <div class="d-flex align-center">
-                    <MudChip T="string" Size="Size.Small" Class="@GetMarketStatusClass()">@MarketStatus</MudChip>
+                <div>
+                    <div class="market-status-badge">
+                        Market Status: <span style="color: rgba(255,255,255,0.95);">@MarketStatus</span>
+                    </div>
                 </div>
             </div>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndUp">
             <!-- Mobile View - Compact Layout -->
-            <div class="d-flex justify-space-between align-center">
-                <div class="d-flex align-center" style="flex: 1;">
-                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Small" Class="mr-2" Style="color: white;" />
+            <div class="d-flex justify-space-between align-center flex-wrap gap-2">
+                <div class="d-flex align-center time-section" style="flex: 1; min-width: 140px;">
+                    <div class="time-icon" style="padding: 8px;">
+                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" Size="Size.Small" Style="color: white;" />
+                    </div>
                     <div>
-                        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.9);">@LocalTimeZone</MudText>
-                        <MudText Typo="Typo.body2" Style="color: white; font-weight: 600;">@LocalTime</MudText>
+                        <MudText Typo="Typo.caption" Class="time-label" Style="font-size: 10px !important;">@LocalTimeZone</MudText>
+                        <MudText Typo="Typo.body1" Class="time-value" Style="font-size: 1.1rem !important;">@LocalTime</MudText>
                     </div>
                 </div>
-                <div class="d-flex align-center" style="flex: 1;">
-                    <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Small" Class="mr-2" Style="color: white;" />
+                <div class="d-flex align-center time-section" style="flex: 1; min-width: 120px;">
+                    <div class="time-icon" style="padding: 8px;">
+                        <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Default" Size="Size.Small" Style="color: white;" />
+                    </div>
                     <div>
-                        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.9);">NYSE</MudText>
-                        <MudText Typo="Typo.body2" Style="color: white; font-weight: 600;">@NyseTime</MudText>
+                        <MudText Typo="Typo.caption" Class="time-label" Style="font-size: 10px !important;">NYSE</MudText>
+                        <MudText Typo="Typo.body1" Class="time-value" Style="font-size: 1.1rem !important;">@NyseTime</MudText>
                     </div>
                 </div>
-                <div>
-                    <MudChip T="string" Size="Size.Small" Class="@GetMarketStatusClass()">@MarketStatus</MudChip>
+                <div style="width: 100%; margin-top: 8px;">
+                    <div class="market-status-badge" style="font-size: 10px; padding: 6px 12px;">
+                        Status: <span style="color: rgba(255,255,255,0.95);">@MarketStatus</span>
+                    </div>
                 </div>
             </div>
         </MudHidden>
