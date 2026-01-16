@@ -1,0 +1,24 @@
+/* Market Status Chips */
+.market-status-open {
+    background-color: #4caf50 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.market-status-closed {
+    background-color: #9e9e9e !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.market-status-premarket {
+    background-color: #ff9800 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.market-status-afterhours {
+    background-color: #2196f3 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}

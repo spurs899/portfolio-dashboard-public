@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="d-flex align-center">
-                    <MudChip T="string" Size="Size.Small" Style="@GetMarketStatusStyle()">@MarketStatus</MudChip>
+                    <MudChip T="string" Size="Size.Small" Class="@GetMarketStatusClass()">@MarketStatus</MudChip>
                 </div>
             </div>
         </MudHidden>
@@ -42,35 +42,9 @@
                     </div>
                 </div>
                 <div>
-                    <MudChip T="string" Size="Size.Small" Style="@GetMarketStatusStyle()">@MarketStatus</MudChip>
+                    <MudChip T="string" Size="Size.Small" Class="@GetMarketStatusClass()">@MarketStatus</MudChip>
                 </div>
             </div>
         </MudHidden>
     </MudCardContent>
 </MudCard>
-
-@code {
-    [Parameter]
-    public string LocalTime { get; set; } = "";
-
-    [Parameter]
-    public string LocalTimeZone { get; set; } = "";
-
-    [Parameter]
-    public string NyseTime { get; set; } = "";
-
-    [Parameter]
-    public string MarketStatus { get; set; } = "";
-
-    private string GetMarketStatusStyle()
-    {
-        return MarketStatus switch
-        {
-            "Market Open" => "background-color: #4caf50; color: white; font-weight: 600;",
-            "Market Closed (Weekend)" => "background-color: #9e9e9e; color: white; font-weight: 600;",
-            "Pre-Market" => "background-color: #ff9800; color: white; font-weight: 600;",
-            "After Hours" => "background-color: #2196f3; color: white; font-weight: 600;",
-            _ => "background-color: #9e9e9e; color: white; font-weight: 600;"
-        };
-    }
-}

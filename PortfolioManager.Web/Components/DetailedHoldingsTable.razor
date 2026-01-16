@@ -21,14 +21,14 @@
                   AllowUnsorted="true"
                   Dense="false">
             <HeaderContent>
-                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.SharesOwned)">Shares</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<HoldingViewModel, object>(x => x.InvestmentValue)">Market Value</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturn)">Daily Return</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.DailyReturnPercentage)">Return %</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<HoldingViewModel, object>(x => x.BrokerageType)">Brokerage</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.SharesOwned)">Shares</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.InvestmentValue)">Market Value</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.DailyReturn)">Daily Return</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.DailyReturnPercentage)">Return %</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<ViewModels.DetailedHoldingsTable.HoldingViewModel, object>(x => x.BrokerageType)">Brokerage</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Symbol">
@@ -78,52 +78,3 @@
         </MudTable>
     </MudCardContent>
 </MudCard>
-
-@code {
-    private const int MinSymbolAvatarLength = 1;
-    private const int MaxSymbolAvatarLength = 2;
-
-    [Parameter]
-    public List<HoldingViewModel> Holdings { get; set; } = new();
-
-    private string GetSymbolAvatarText(string symbol)
-    {
-        if (string.IsNullOrEmpty(symbol) || symbol.Length < MinSymbolAvatarLength)
-            return "??";
-        
-        return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
-    }
-
-    private string GetBrokerageName(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => Constants.BrokerageSharesies,
-            1 => Constants.BrokerageIbkrAcronym,
-            _ => "Unknown"
-        };
-    }
-
-    private string GetBrokerageLogoUrl(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => "images/sharesies-logo.png",
-            1 => "images/ibkr-logo.svg",
-            _ => ""
-        };
-    }
-
-    public class HoldingViewModel
-    {
-        public string Symbol { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Currency { get; set; } = "";
-        public decimal SharePrice { get; set; }
-        public decimal SharesOwned { get; set; }
-        public decimal InvestmentValue { get; set; }
-        public decimal DailyReturn { get; set; }
-        public decimal DailyReturnPercentage { get; set; }
-        public int BrokerageType { get; set; }
-    }
-}

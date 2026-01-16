@@ -21,13 +21,13 @@
                   AllowUnsorted="true"
                   Dense="false">
             <HeaderContent>
-                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalShares)">Total Shares</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalValue)">Total Value</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.TotalReturn)">Total Return</MudTableSortLabel></MudTh>
-                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingViewModel, object>(x => x.AverageReturnPercentage)">Avg Return %</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalShares)">Total Shares</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalValue)">Total Value</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalReturn)">Total Return</MudTableSortLabel></MudTh>
+                <MudTh Class="ynex-table-header text-right"><MudTableSortLabel SortBy="new Func<ViewModels.AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.AverageReturnPercentage)">Avg Return %</MudTableSortLabel></MudTh>
                 <MudTh Class="ynex-table-header">Brokerages</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -81,52 +81,3 @@
         </MudTable>
     </MudCardContent>
 </MudCard>
-
-@code {
-    private const int MinSymbolAvatarLength = 1;
-    private const int MaxSymbolAvatarLength = 2;
-
-    [Parameter]
-    public List<AggregatedHoldingViewModel> Holdings { get; set; } = new();
-
-    private string GetSymbolAvatarText(string symbol)
-    {
-        if (string.IsNullOrEmpty(symbol) || symbol.Length < MinSymbolAvatarLength)
-            return "??";
-        
-        return symbol.Substring(0, Math.Min(MaxSymbolAvatarLength, symbol.Length));
-    }
-
-    private string GetBrokerageName(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => Constants.BrokerageSharesies,
-            1 => Constants.BrokerageIbkrAcronym,
-            _ => "Unknown"
-        };
-    }
-
-    private string GetBrokerageLogoUrl(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => "images/sharesies-logo.png",
-            1 => "images/ibkr-logo.svg",
-            _ => ""
-        };
-    }
-
-    public class AggregatedHoldingViewModel
-    {
-        public string Symbol { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Currency { get; set; } = "";
-        public decimal SharePrice { get; set; }
-        public decimal TotalShares { get; set; }
-        public decimal TotalValue { get; set; }
-        public decimal TotalReturn { get; set; }
-        public decimal AverageReturnPercentage { get; set; }
-        public List<int> BrokerageTypes { get; set; } = new();
-    }
-}
