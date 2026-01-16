@@ -15,6 +15,7 @@ $color-primary-dark: #1e3a8a;
 $color-primary-hover: #1d4ed8;
 $color-sidebar-navy: #0f172a; // Dark Navy Blue
 $color-deep-blue: #1a365d;
+$color-light-blue: #637bc7;
 
 // Colors - Background
 $color-bg-light-grey: #f1f5f9; // Light Grey Background
@@ -160,7 +161,7 @@ a, .btn-link {
   justify-content: center;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, $color-primary 0%, $color-deep-blue 100%);
+  background: linear-gradient(135deg, $color-light-blue 0%, $color-deep-blue 100%);
   font-family: $font-family-base;
   padding: 1rem;
 }
