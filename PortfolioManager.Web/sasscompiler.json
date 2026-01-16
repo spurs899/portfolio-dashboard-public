@@ -1,0 +1,11 @@
+{
+  "Configurations": [
+    {
+      "Source": "wwwroot/css/",
+      "Target": "wwwroot/css/",
+      "Arguments": "--style=expanded",
+      "GenerateScopedCss": false,
+      "IncludePaths": []
+    }
+  ]
+}
