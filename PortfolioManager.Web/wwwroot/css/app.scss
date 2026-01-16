@@ -1347,7 +1347,12 @@ code {
   border: 1px solid $color-border-light !important;
   border-radius: $border-radius-xl !important;
   box-shadow: none !important;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &.expanded {
+    border-color: $color-primary !important;
+    box-shadow: $shadow-sm !important;
+  }
   
   &:hover {
     background-color: $color-bg-slate-50 !important;
@@ -1355,8 +1360,8 @@ code {
   }
 
   .mobile-brokerage-icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     object-fit: cover;
     border-radius: 50%;
     background: $color-bg-white;
@@ -1376,6 +1381,51 @@ code {
     font-weight: $font-weight-bold !important;
     background-color: rgba(30, 64, 175, 0.1) !important;
     color: $color-primary !important;
+  }
+
+  .mobile-holding-details {
+    border-top: 1px solid $color-border-light;
+    overflow: hidden;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top;
+  }
+
+  .mobile-holding-detail-row {
+    border-bottom: 1px solid $color-border-light;
+    opacity: 0;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+    
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .mobile-detail-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-3;
+    margin-left: 28px;
+  }
+
+  .mobile-detail-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  // Expand/collapse icon animation
+  .mud-icon-root {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &.expanded .mud-icon-root {
+    transform: rotate(180deg);
   }
   
   .mobile-holding-return {
@@ -1403,5 +1453,28 @@ code {
     .mud-icon-root {
       font-size: 14px !important;
     }
+  }
+}
+
+// Keyframe animations
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

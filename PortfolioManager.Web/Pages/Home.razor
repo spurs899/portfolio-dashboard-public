@@ -97,9 +97,11 @@ else if (_portfolioData != null)
         <div class="mobile-holdings-list">
             @foreach (var holding in GetAggregatedHoldings())
             {
-                <MudCard Class="mobile-holding-card mb-2" Elevation="0">
+                var isExpanded = _expandedMobileHoldings.Contains(holding.Symbol);
+                var cardClass = $"mobile-holding-card mb-2 {(isExpanded ? "expanded" : "")}";
+                <MudCard Class="@cardClass" Elevation="0">
                     <MudCardContent Class="pa-3">
-                        <div class="d-flex justify-space-between align-center">
+                        <div class="d-flex justify-space-between align-center" @onclick="@(() => ToggleMobileHolding(holding.Symbol))" style="cursor: pointer;">
                             <div class="d-flex align-center gap-3">
                                 <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="mobile-holding-avatar">
                                     @GetSymbolAvatarText(holding.Symbol)
@@ -120,14 +122,56 @@ else if (_portfolioData != null)
                                     <MudText Typo="Typo.caption" Class="text-muted">@holding.Name</MudText>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.TotalValue.ToString("C")</MudText>
-                                <div class="mobile-holding-return @(holding.AverageReturnPercentage >= 0 ? "positive" : "negative")">
-                                    <MudIcon Icon="@(holding.AverageReturnPercentage >= 0 ? Icons.Material.Filled.ArrowDropUp : Icons.Material.Filled.ArrowDropDown)" Size="Size.Small" />
-                                    <MudText Typo="Typo.caption" Class="fw-bold">@(holding.AverageReturnPercentage >= 0 ? "+" : "")@holding.AverageReturnPercentage.ToString("F2")%</MudText>
+                            <div class="text-right d-flex align-center gap-2">
+                                <div>
+                                    <MudText Typo="Typo.body1" Class="fw-bold mb-0">@holding.TotalValue.ToString("C")</MudText>
+                                    <div class="mobile-holding-return @(holding.AverageReturnPercentage >= 0 ? "positive" : "negative")">
+                                        <MudIcon Icon="@(holding.AverageReturnPercentage >= 0 ? Icons.Material.Filled.ArrowDropUp : Icons.Material.Filled.ArrowDropDown)" Size="Size.Small" />
+                                        <MudText Typo="Typo.caption" Class="fw-bold">@(holding.AverageReturnPercentage >= 0 ? "+" : "")@holding.AverageReturnPercentage.ToString("F2")%</MudText>
+                                    </div>
                                 </div>
+                                <MudIcon Icon="@(isExpanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" Class="text-muted" />
                             </div>
                         </div>
+                        
+                        @if (isExpanded)
+                        {
+                            <div class="mobile-holding-details mt-3 pt-3">
+                                @foreach (var detail in GetHoldings().Where(h => h.Symbol == holding.Symbol))
+                                {
+                                    <div class="mobile-holding-detail-row mb-2 pb-2">
+                                        <div class="d-flex justify-space-between align-center mb-1">
+                                            <div class="d-flex align-center gap-2">
+                                                <img src="@GetBrokerageIcon(detail.BrokerageType)" 
+                                                     alt="@GetBrokerageName(detail.BrokerageType)"
+                                                     class="mobile-brokerage-icon" />
+                                                <MudText Typo="Typo.body2" Class="fw-semibold">@GetBrokerageName(detail.BrokerageType)</MudText>
+                                            </div>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">@detail.InvestmentValue.ToString("C")</MudText>
+                                        </div>
+                                        <div class="mobile-detail-stats">
+                                            <div class="mobile-detail-stat">
+                                                <MudText Typo="Typo.caption" Class="text-muted">Shares</MudText>
+                                                <MudText Typo="Typo.caption" Class="fw-semibold">@detail.SharesOwned.ToString("N2")</MudText>
+                                            </div>
+                                            <div class="mobile-detail-stat">
+                                                <MudText Typo="Typo.caption" Class="text-muted">Price</MudText>
+                                                <MudText Typo="Typo.caption" Class="fw-semibold">@detail.SharePrice.ToString("C")</MudText>
+                                            </div>
+                                            <div class="mobile-detail-stat">
+                                                <MudText Typo="Typo.caption" Class="text-muted">Return</MudText>
+                                                @{
+                                                    var returnClass = $"fw-semibold {(detail.DailyReturnPercentage >= 0 ? "text-success" : "text-danger")}";
+                                                }
+                                                <MudText Typo="Typo.caption" Class="@returnClass">
+                                                    @(detail.DailyReturnPercentage >= 0 ? "+" : "")@detail.DailyReturnPercentage.ToString("F2")%
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </MudCardContent>
                 </MudCard>
             }

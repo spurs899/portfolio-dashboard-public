@@ -30,6 +30,9 @@ public partial class Home : IDisposable
     private decimal _cachedDailyReturn;
     private decimal _cachedDailyReturnPercentage;
     
+    // Mobile expanded holdings tracking
+    private HashSet<string> _expandedMobileHoldings = new();
+    
     // Time and timezone tracking
     private Timer? _timer;
     private string _localTime = "";
@@ -380,5 +383,17 @@ public partial class Home : IDisposable
             1 => "Interactive Brokers",
             _ => "Unknown"
         };
+    }
+
+    private void ToggleMobileHolding(string symbol)
+    {
+        if (_expandedMobileHoldings.Contains(symbol))
+        {
+            _expandedMobileHoldings.Remove(symbol);
+        }
+        else
+        {
+            _expandedMobileHoldings.Add(symbol);
+        }
     }
 }
