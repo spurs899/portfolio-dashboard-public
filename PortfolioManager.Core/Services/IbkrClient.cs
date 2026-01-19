@@ -15,10 +15,10 @@ public interface IIbkrAuthClient
 
 public interface IIbkrDataClient
 {
-    Task<IbkrAccountsResponse?> GetAccountsAsync();
-    Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId);
-    Task<List<IbkrPosition>?> GetPositionsAsync(string accountId);
-    Task<List<IbkrSecurityDefinition>?> GetSecurityDefinitionsAsync(List<int> conIds);
+    Task<IbkrAccountsResponse?> GetAccountsAsync(string? username = null);
+    Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId, string? username = null);
+    Task<List<IbkrPosition>?> GetPositionsAsync(string accountId, string? username = null);
+    Task<List<IbkrSecurityDefinition>?> GetSecurityDefinitionsAsync(List<int> conIds, string? username = null);
 }
 
 // Composite interface for backward compatibility
@@ -52,7 +52,8 @@ public class IbkrClient : IIbkrClient
         _logger = logger;
         
         // Default to local Client Portal Gateway
-        _baseUrl = baseUrl ?? "https://localhost:5000";
+        //_baseUrl = baseUrl ?? "https://localhost:5000";
+        _baseUrl = "https://www.interactivebrokers.com.au";
         _useWebPortal = _baseUrl.Contains("interactivebrokers.com");
         
         _httpClient.BaseAddress = new Uri(_baseUrl);
@@ -246,15 +247,23 @@ public class IbkrClient : IIbkrClient
         }
     }
 
-    public async Task<IbkrAccountsResponse?> GetAccountsAsync()
+    public async Task<IbkrAccountsResponse?> GetAccountsAsync(string? username = null)
     {
         try
         {
             var request = new HttpRequestMessage(HttpMethod.Get, AccountsPath);
             
-            // Add headers from HAR file
+            // Add username header for session management
+            if (!string.IsNullOrEmpty(username))
+            {
+                request.Headers.TryAddWithoutValidation("X-IBKR-Username", username);
+            }
+            
+            // Add headers from HAR file - User-Agent is CRITICAL
             request.Headers.TryAddWithoutValidation("Accept", "*/*");
+            request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br, zstd");
             request.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
+            request.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
             request.Headers.TryAddWithoutValidation("Referer", "https://www.interactivebrokers.com.au/portal/?loginType=1&action=ACCT_MGMT_MAIN&clt=0&RL=1&locale=en_US");
             request.Headers.TryAddWithoutValidation("sec-ch-ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"");
             request.Headers.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
@@ -267,7 +276,27 @@ public class IbkrClient : IIbkrClient
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<IbkrAccountsResponse>();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                _logger.LogDebug("Accounts response: {Response}", responseBody);
+                
+                // The API returns an array of account objects
+                try
+                {
+                    var accounts = await response.Content.ReadFromJsonAsync<List<IbkrAccount>>();
+                    if (accounts != null && accounts.Count > 0)
+                    {
+                        return new IbkrAccountsResponse
+                        {
+                            Accounts = accounts,
+                            SelectedAccount = accounts[0].Id
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to deserialize accounts response: {Response}", responseBody);
+                    return null;
+                }
             }
 
             _logger.LogWarning("Failed to get accounts, Status: {StatusCode}", response.StatusCode);
@@ -280,12 +309,18 @@ public class IbkrClient : IIbkrClient
         }
     }
 
-    public async Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId)
+    public async Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId, string? username = null)
     {
         try
         {
             var url = string.Format(PortfolioSummaryPath, accountId);
             var request = new HttpRequestMessage(HttpMethod.Get, url);
+            
+            // Add username header for session management
+            if (!string.IsNullOrEmpty(username))
+            {
+                request.Headers.TryAddWithoutValidation("X-IBKR-Username", username);
+            }
             
             // Add headers from HAR file
             request.Headers.TryAddWithoutValidation("Accept", "*/*");
@@ -316,12 +351,18 @@ public class IbkrClient : IIbkrClient
         }
     }
 
-    public async Task<List<IbkrPosition>?> GetPositionsAsync(string accountId)
+    public async Task<List<IbkrPosition>?> GetPositionsAsync(string accountId, string? username = null)
     {
         try
         {
             var url = string.Format(PositionsPath, accountId);
             var request = new HttpRequestMessage(HttpMethod.Get, url);
+            
+            // Add username header for session management
+            if (!string.IsNullOrEmpty(username))
+            {
+                request.Headers.TryAddWithoutValidation("X-IBKR-Username", username);
+            }
             
             // Add headers from HAR file
             request.Headers.TryAddWithoutValidation("Accept", "*/*");
@@ -354,7 +395,7 @@ public class IbkrClient : IIbkrClient
         }
     }
 
-    public async Task<List<IbkrSecurityDefinition>?> GetSecurityDefinitionsAsync(List<int> conIds)
+    public async Task<List<IbkrSecurityDefinition>?> GetSecurityDefinitionsAsync(List<int> conIds, string? username = null)
     {
         try
         {
@@ -370,6 +411,12 @@ public class IbkrClient : IIbkrClient
             {
                 Content = content
             };
+            
+            // Add username header for session management
+            if (!string.IsNullOrEmpty(username))
+            {
+                request.Headers.TryAddWithoutValidation("X-IBKR-Username", username);
+            }
             
             // Add headers from HAR file
             request.Headers.TryAddWithoutValidation("Accept", "*/*");

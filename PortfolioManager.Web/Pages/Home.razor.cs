@@ -16,6 +16,7 @@ public partial class Home : IDisposable
     
     [Inject] private IBrokerageService BrokerageService { get; set; } = default!;
     [Inject] private IAuthStateService AuthStateService { get; set; } = default!;
+    [Inject] private IIbkrService IbkrService { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
@@ -25,6 +26,7 @@ public partial class Home : IDisposable
     private bool _isLoggedIn;
     private bool _isLoading;
     private string? _userId;
+    private string? _ibkrUsername; // Track IBKR login separately
     private PortfolioResponse? _portfolioData;
     
     // Cached computed values
@@ -203,15 +205,11 @@ public partial class Home : IDisposable
 
     private async Task OnIbkrLoginSuccess(string username)
     {
+        _ibkrUsername = username;
         Snackbar.Add($"Successfully connected to IBKR as {username}!", Severity.Success);
         
-        // For now, we don't load portfolio data automatically since IBKR integration
-        // might need additional setup. In the future, you can load IBKR portfolio here:
-        // _isLoggedIn = true;
-        // _userId = username;
-        // await LoadPortfolioData();
-        
-        // Just show a success message for now
+        // Load IBKR portfolio data
+        await LoadPortfolioData();
         StateHasChanged();
     }
 
@@ -222,6 +220,8 @@ public partial class Home : IDisposable
             _isLoading = true;
             StateHasChanged();
 
+            // Load Sharesies data if logged in
+            PortfolioResponse? sharesiesData = null;
             if (!string.IsNullOrEmpty(_userId))
             {
                 var (_, userId, tokens) = await AuthStateService.GetAuthDataAsync();
@@ -240,14 +240,27 @@ public partial class Home : IDisposable
                     Step = AuthenticationStep.Completed
                 };
                 
-                _portfolioData = await BrokerageService.GetPortfolioAsync(authResult);
+                sharesiesData = await BrokerageService.GetPortfolioAsync(authResult);
                 
-                if (_portfolioData == null)
+                if (sharesiesData == null)
                 {
                     await HandleAuthenticationExpired();
                     return;
                 }
-                
+            }
+
+            // Load IBKR data if logged in
+            PortfolioResponse? ibkrData = null;
+            if (!string.IsNullOrEmpty(_ibkrUsername))
+            {
+                ibkrData = await LoadIbkrPortfolioData();
+            }
+
+            // Aggregate data from both brokerages
+            _portfolioData = AggregatePortfolioData(sharesiesData, ibkrData);
+            
+            if (_portfolioData != null)
+            {
                 ComputePortfolioMetrics();
             }
 
@@ -266,11 +279,98 @@ public partial class Home : IDisposable
         }
     }
 
+    private async Task<PortfolioResponse?> LoadIbkrPortfolioData()
+    {
+        try
+        {
+            // Get IBKR accounts
+            var accounts = await IbkrService.GetAccountsAsync();
+            if (accounts?.Accounts == null || !accounts.Accounts.Any())
+            {
+                Snackbar.Add("No IBKR accounts found", Severity.Warning);
+                return null;
+            }
+
+            var firstAccount = accounts.Accounts.First();
+            
+            // Get positions
+            var positions = await IbkrService.GetPositionsAsync(firstAccount.Id!);
+            if (positions == null || !positions.Any())
+            {
+                return new PortfolioResponse
+                {
+                    UserProfile = new UserProfileDto
+                    {
+                        Name = "IBKR User",
+                        BrokerageType = 2 // 1=Sharesies, 2=IBKR
+                    },
+                    Instruments = new List<InstrumentDto>()
+                };
+            }
+
+            // Convert IBKR positions to InstrumentDto format
+            var instruments = positions.Select(pos => new InstrumentDto
+            {
+                Id = pos.ConId?.ToString() ?? "0",
+                Name = pos.ContractDesc ?? pos.Ticker ?? "Unknown",
+                Symbol = pos.Ticker ?? "N/A",
+                SharesOwned = pos.Position ?? 0,
+                SharePrice = pos.MktPrice ?? 0,
+                InvestmentValue = pos.MktValue ?? 0,
+                CostBasis = (pos.AvgCost ?? 0) * (pos.Position ?? 0),
+                TotalReturn = pos.UnrealizedPnl ?? 0,
+                SimpleReturn = pos.UnrealizedPnl ?? 0,
+                DividendsReceived = 0,
+                Currency = pos.Currency ?? "USD",
+                BrokerageType = 2 // IBKR
+            }).ToList();
+
+            return new PortfolioResponse
+            {
+                UserProfile = new UserProfileDto
+                {
+                    Name = $"IBKR - {_ibkrUsername ?? "User"}",
+                    BrokerageType = 2
+                },
+                Instruments = instruments
+            };
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading IBKR portfolio: {ex.Message}", Severity.Warning);
+            return null;
+        }
+    }
+
+    private PortfolioResponse? AggregatePortfolioData(PortfolioResponse? sharesies, PortfolioResponse? ibkr)
+    {
+        // If only one source has data, return it
+        if (sharesies == null && ibkr == null) return null;
+        if (sharesies == null) return ibkr;
+        if (ibkr == null) return sharesies;
+
+        // Combine instruments from both sources
+        var allInstruments = new List<InstrumentDto>();
+        
+        if (sharesies.Instruments != null)
+            allInstruments.AddRange(sharesies.Instruments);
+        
+        if (ibkr.Instruments != null)
+            allInstruments.AddRange(ibkr.Instruments);
+
+        return new PortfolioResponse
+        {
+            UserProfile = sharesies.UserProfile ?? ibkr.UserProfile,
+            Instruments = allInstruments
+        };
+    }
+
     private async Task HandleAuthenticationExpired()
     {
         await AuthStateService.ClearAuthStateAsync();
         _isLoggedIn = false;
         _userId = null;
+        _ibkrUsername = null; // Also clear IBKR
         _portfolioData = null;
         _isLoading = false;
         

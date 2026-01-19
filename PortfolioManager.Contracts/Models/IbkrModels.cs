@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace PortfolioManager.Contracts.Models;
 
 // Authentication Response Models
@@ -29,16 +31,95 @@ public class IbkrAccountsResponse
 
 public class IbkrAccount
 {
+    [JsonPropertyName("id")]
     public string? Id { get; set; }
+    
+    [JsonPropertyName("accountId")]
     public string? AccountId { get; set; }
+    
+    [JsonPropertyName("accountVan")]
     public string? AccountVan { get; set; }
+    
+    [JsonPropertyName("accountTitle")]
     public string? AccountTitle { get; set; }
+    
+    [JsonPropertyName("displayName")]
     public string? DisplayName { get; set; }
+    
+    [JsonPropertyName("accountAlias")]
     public string? AccountAlias { get; set; }
-    public string? AccountStatus { get; set; }
+    
+    [JsonPropertyName("accountStatus")]
+    public long? AccountStatus { get; set; }  // Unix timestamp
+    
+    [JsonPropertyName("currency")]
     public string? Currency { get; set; }
+    
+    [JsonPropertyName("type")]
     public string? Type { get; set; }
-    public bool? TradingType { get; set; }
+    
+    [JsonPropertyName("tradingType")]
+    public string? TradingType { get; set; }
+    
+    [JsonPropertyName("businessType")]
+    public string? BusinessType { get; set; }
+    
+    [JsonPropertyName("category")]
+    public string? Category { get; set; }
+    
+    [JsonPropertyName("ibEntity")]
+    public string? IbEntity { get; set; }
+    
+    [JsonPropertyName("faclient")]
+    public bool? Faclient { get; set; }
+    
+    [JsonPropertyName("clearingStatus")]
+    public string? ClearingStatus { get; set; }
+    
+    [JsonPropertyName("covestor")]
+    public bool? Covestor { get; set; }
+    
+    [JsonPropertyName("noClientTrading")]
+    public bool? NoClientTrading { get; set; }
+    
+    [JsonPropertyName("trackVirtualFXPortfolio")]
+    public bool? TrackVirtualFXPortfolio { get; set; }
+    
+    [JsonPropertyName("acctCustType")]
+    public string? AcctCustType { get; set; }
+    
+    [JsonPropertyName("parent")]
+    public IbkrAccountParent? Parent { get; set; }
+    
+    [JsonPropertyName("desc")]
+    public string? Desc { get; set; }
+    
+    [JsonPropertyName("brokerageAccess")]
+    public bool? BrokerageAccess { get; set; }
+    
+    [JsonPropertyName("PrepaidCrypto-Z")]
+    public bool? PrepaidCryptoZ { get; set; }
+    
+    [JsonPropertyName("PrepaidCrypto-P")]
+    public bool? PrepaidCryptoP { get; set; }
+}
+
+public class IbkrAccountParent
+{
+    [JsonPropertyName("mmc")]
+    public List<string>? Mmc { get; set; }
+    
+    [JsonPropertyName("accountId")]
+    public string? AccountId { get; set; }
+    
+    [JsonPropertyName("isMParent")]
+    public bool? IsMParent { get; set; }
+    
+    [JsonPropertyName("isMChild")]
+    public bool? IsMChild { get; set; }
+    
+    [JsonPropertyName("isMultiplex")]
+    public bool? IsMultiplex { get; set; }
 }
 
 // Portfolio Summary

@@ -4,10 +4,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using PortfolioManager.Web;
 using PortfolioManager.Web.Services;
+using Blazored.LocalStorage;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+
+// Add localStorage support
+builder.Services.AddBlazoredLocalStorage();
 
 // Load configuration from appsettings.json
 var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
@@ -35,6 +39,9 @@ else
 {
     builder.Services.AddScoped<ISharesiesService, SharesiesService>();
 }
+
+// IBKR service
+builder.Services.AddScoped<IIbkrService, IbkrService>();
 
 // Auth state services
 builder.Services.AddScoped<AuthStateService>();

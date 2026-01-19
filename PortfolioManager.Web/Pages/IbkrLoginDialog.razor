@@ -5,6 +5,7 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
+@inject PortfolioManager.Web.Services.IIbkrService IbkrService
 @implements IAsyncDisposable
 
 <MudDialog>
@@ -123,7 +124,6 @@
 
     private enum AuthStep { Input, ShowingQR, Success }
 
-    private HubConnection? _hubConnection;
     private MudForm? _form;
     private bool _isFormValid;
     private bool _demoMode;
@@ -135,45 +135,9 @@
     private string _statusMessage = "";
     private string _errorMessage = "";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _demoMode = Configuration.GetValue<bool>("DemoMode");
-
-        if (!_demoMode)
-        {
-            // Get the API base URL from HttpClient configuration
-            var apiBaseUrl = Http.BaseAddress?.ToString().TrimEnd('/') ?? "https://localhost:7262";
-            
-            // Create SignalR connection to API server
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl($"{apiBaseUrl}/hubs/ibkrauth")
-                .WithAutomaticReconnect()
-                .Build();
-
-            // Listen for QR code images
-            _hubConnection.On<string>("ReceiveQRCode", (base64Image) =>
-            {
-                _qrCodeBase64 = base64Image;
-                _authStep = AuthStep.ShowingQR;
-                InvokeAsync(StateHasChanged);
-            });
-
-            // Listen for auth status updates
-            _hubConnection.On<string>("ReceiveAuthStatus", (message) =>
-            {
-                _statusMessage = message;
-                InvokeAsync(StateHasChanged);
-            });
-
-            try
-            {
-                await _hubConnection.StartAsync();
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = $"Failed to connect to SignalR: {ex.Message}";
-            }
-        }
     }
 
     private string? ValidateUsername(string username)
@@ -206,7 +170,7 @@
             return;
         }
 
-        if (_form == null || _hubConnection == null)
+        if (_form == null)
             return;
 
         await _form.Validate();
@@ -220,34 +184,31 @@
         
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/ibkrsession/authenticate", new
-            {
-                username = _username,
-                password = _password,
-                connectionId = _hubConnection.ConnectionId
-            });
+            var result = await IbkrService.AuthenticateAsync(
+                _username, 
+                _password,
+                onQRCodeReceived: (base64Image) =>
+                {
+                    _qrCodeBase64 = base64Image;
+                    _authStep = AuthStep.ShowingQR;
+                    InvokeAsync(StateHasChanged);
+                },
+                onStatusUpdate: (message) =>
+                {
+                    _statusMessage = message;
+                    InvokeAsync(StateHasChanged);
+                });
 
-            if (response.IsSuccessStatusCode)
+            if (result.Success)
             {
-                var result = await response.Content.ReadFromJsonAsync<AuthResult>();
-                
-                if (result?.Success == true)
-                {
-                    _authStep = AuthStep.Success;
-                    Snackbar.Add($"Connected to IBKR! Captured {result.CookieCount} session cookies.", Severity.Success);
-                    await OnLoginSuccess.InvokeAsync(_username);
-                    MudDialog.Close(DialogResult.Ok(_username));
-                }
-                else
-                {
-                    _errorMessage = result?.Message ?? "Authentication failed";
-                    _authStep = AuthStep.Input;
-                }
+                _authStep = AuthStep.Success;
+                Snackbar.Add($"Connected to IBKR! Captured {result.CookieCount} session cookies.", Severity.Success);
+                await OnLoginSuccess.InvokeAsync(_username);
+                MudDialog.Close(DialogResult.Ok(_username));
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _errorMessage = $"Server error: {response.StatusCode} - {errorContent}";
+                _errorMessage = result.Message ?? "Authentication failed";
                 _authStep = AuthStep.Input;
             }
         }
@@ -274,16 +235,7 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_hubConnection is not null)
-        {
-            await _hubConnection.DisposeAsync();
-        }
-    }
-
-    private class AuthResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public int CookieCount { get; set; }
+        // Service handles its own disposal
+        await ValueTask.CompletedTask;
     }
 }

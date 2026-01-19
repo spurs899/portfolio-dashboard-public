@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
+using PortfolioManager.Core.Services;
+using PortfolioManager.Contracts.Models;
 
 namespace PortfolioManager.Api.Controllers;
 
@@ -13,12 +15,20 @@ public class IbkrController : ControllerBase
 {
     private readonly IMemoryCache _cache;
     private readonly ILogger<IbkrController> _logger;
+    private readonly IIbkrSessionManager _sessionManager;
+    private readonly IIbkrClient _ibkrClient;
     private static readonly TimeSpan SessionExpiration = TimeSpan.FromMinutes(5);
 
-    public IbkrController(IMemoryCache cache, ILogger<IbkrController> logger)
+    public IbkrController(
+        IMemoryCache cache, 
+        ILogger<IbkrController> logger,
+        IIbkrSessionManager sessionManager,
+        IIbkrClient ibkrClient)
     {
         _cache = cache;
         _logger = logger;
+        _sessionManager = sessionManager;
+        _ibkrClient = ibkrClient;
     }
 
     [HttpPost("start")]
@@ -137,6 +147,111 @@ public class IbkrController : ControllerBase
         }
         
         return NotFound(new { message = "Session not found or expired" });
+    }
+
+    [HttpGet("accounts")]
+    public async Task<IActionResult> GetAccounts()
+    {
+        try
+        {
+            // Get username from custom header
+            if (!Request.Headers.TryGetValue("X-IBKR-Username", out var usernameHeader))
+            {
+                return Unauthorized(new { message = "IBKR username not provided" });
+            }
+
+            var username = usernameHeader.ToString();
+            
+            // Get session cookies from session manager
+            var cookieContainer = _sessionManager.GetSessionCookies(username);
+            if (cookieContainer == null)
+            {
+                return Unauthorized(new { message = "IBKR session not found. Please authenticate first." });
+            }
+
+            // Pass username to IbkrClient for cookie injection via IbkrSessionHandler
+            var accounts = await _ibkrClient.GetAccountsAsync(username);
+            
+            if (accounts == null)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve accounts from IBKR" });
+            }
+
+            return Ok(accounts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving IBKR accounts");
+            return StatusCode(500, new { message = "Failed to retrieve accounts" });
+        }
+    }
+
+    [HttpGet("portfolio/{accountId}")]
+    public async Task<IActionResult> GetPortfolio(string accountId)
+    {
+        try
+        {
+            if (!Request.Headers.TryGetValue("X-IBKR-Username", out var usernameHeader))
+            {
+                return Unauthorized(new { message = "IBKR username not provided" });
+            }
+
+            var username = usernameHeader.ToString();
+            
+            var cookieContainer = _sessionManager.GetSessionCookies(username);
+            if (cookieContainer == null)
+            {
+                return Unauthorized(new { message = "IBKR session not found. Please authenticate first." });
+            }
+
+            var portfolio = await _ibkrClient.GetPortfolioSummaryAsync(accountId, username);
+            
+            if (portfolio == null)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve portfolio from IBKR" });
+            }
+
+            return Ok(portfolio);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving IBKR portfolio for account {AccountId}", accountId);
+            return StatusCode(500, new { message = "Failed to retrieve portfolio" });
+        }
+    }
+
+    [HttpGet("positions/{accountId}")]
+    public async Task<IActionResult> GetPositions(string accountId)
+    {
+        try
+        {
+            if (!Request.Headers.TryGetValue("X-IBKR-Username", out var usernameHeader))
+            {
+                return Unauthorized(new { message = "IBKR username not provided" });
+            }
+
+            var username = usernameHeader.ToString();
+            
+            var cookieContainer = _sessionManager.GetSessionCookies(username);
+            if (cookieContainer == null)
+            {
+                return Unauthorized(new { message = "IBKR session not found. Please authenticate first." });
+            }
+
+            var positions = await _ibkrClient.GetPositionsAsync(accountId, username);
+            
+            if (positions == null)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve positions from IBKR" });
+            }
+
+            return Ok(positions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving IBKR positions for account {AccountId}", accountId);
+            return StatusCode(500, new { message = "Failed to retrieve positions" });
+        }
     }
 
     private static string GenerateSecureSessionId()

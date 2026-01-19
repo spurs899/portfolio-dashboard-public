@@ -3,6 +3,7 @@ using PortfolioManager.Core.Services.Brokerage;
 using PortfolioManager.Core.Services.Market;
 using PortfolioManager.Api.Hubs;
 using PortfolioManager.Api.Services;
+using PortfolioManager.Api.Handlers;
 using Sentry.AspNetCore;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -59,27 +60,24 @@ builder.Services.AddHttpContextAccessor();
 // SignalR for real-time IBKR auth updates
 builder.Services.AddSignalR();
 
-// IBKR Client with web portal URL and session management
+// Register IBKR session handler
+builder.Services.AddTransient<IbkrSessionHandler>();
+
+// IBKR Client with web portal URL and session management via custom handler
 builder.Services.AddHttpClient<IbkrClient>((sp, client) =>
 {
     // Use web portal URL for Option B
     client.BaseAddress = new Uri("https://www.interactivebrokers.com.au");
 })
-.ConfigurePrimaryHttpMessageHandler(sp =>
+.AddHttpMessageHandler<IbkrSessionHandler>()
+.ConfigurePrimaryHttpMessageHandler(() =>
 {
-    var sessionManager = sp.GetRequiredService<IIbkrSessionManager>();
-    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-    
-    // Get current user (if authenticated)
-    var userId = httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "anonymous";
-    
-    var handler = new HttpClientHandler
+    // Base handler - cookies will be injected per-request by IbkrSessionHandler via Cookie header
+    return new HttpClientHandler
     {
-        UseCookies = true,
-        CookieContainer = sessionManager.GetSessionCookies(userId) ?? new System.Net.CookieContainer()
+        UseCookies = false, // IMPORTANT: Disable automatic cookie handling, we add them manually
+        CookieContainer = new System.Net.CookieContainer()
     };
-    
-    return handler;
 });
 
 builder.Services.AddScoped<IIbkrClient>(sp => sp.GetRequiredService<IbkrClient>());
