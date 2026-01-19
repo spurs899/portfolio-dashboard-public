@@ -89,10 +89,10 @@ else if (_portfolioData != null)
                                 var isExpanded = _expandedDesktopHoldings.Contains(context.Symbol);
                                 var rowClass = isExpanded ? "desktop-expandable-row expanded" : "desktop-expandable-row";
                             }
-                            <MudTd DataLabel="" Class="expand-icon-cell" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
-                                <MudIcon Icon="@(isExpanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" Class="expand-icon" />
+                            <MudTd DataLabel="" Class="expand-icon-cell" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;" role="button" tabindex="0" aria-label="@($"Expand {context.Symbol} details")" @onkeydown="@((e) => HandleExpandKeyDown(e, context.Symbol))">
+                                <MudIcon Icon="@(isExpanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" Class="expand-icon" aria-hidden="true" />
                             </MudTd>
-                            <MudTd DataLabel="Symbol" Class="@rowClass" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                            <MudTd DataLabel="Symbol" Class="@rowClass" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;" role="button" tabindex="0" aria-expanded="@isExpanded" @onkeydown="@((e) => HandleExpandKeyDown(e, context.Symbol))">
                                 <div class="d-flex align-center">
                                     <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
                                         @GetSymbolAvatarText(context.Symbol)

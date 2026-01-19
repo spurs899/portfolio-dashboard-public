@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using PortfolioManager.Contracts.Models.Brokerage;
 using PortfolioManager.Contracts.Web;
 using PortfolioManager.Web.Services;
+using PortfolioManager.Web.Helpers;
 using AggregatedHoldingsTable = PortfolioManager.Web.Components.ViewModels.AggregatedHoldingsTable;
 using DetailedHoldingsTable = PortfolioManager.Web.Components.ViewModels.DetailedHoldingsTable;
 
@@ -360,33 +362,11 @@ public partial class Home : IDisposable
             .ToList();
     }
 
-    private string GetSymbolAvatarText(string symbol)
-    {
-        if (string.IsNullOrEmpty(symbol) || symbol == "N/A")
-            return "?";
-        
-        return symbol.Length >= 2 ? symbol[..2].ToUpper() : symbol.ToUpper();
-    }
+    private string GetSymbolAvatarText(string symbol) => BrokerageHelpers.GetSymbolAvatarText(symbol);
 
-    private string GetBrokerageIcon(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => "images/sharesies-logo.png",
-            1 => "images/ibkr-logo.svg",
-            _ => ""
-        };
-    }
+    private string GetBrokerageIcon(int brokerageType) => BrokerageHelpers.GetBrokerageIcon(brokerageType);
 
-    private string GetBrokerageName(int brokerageType)
-    {
-        return brokerageType switch
-        {
-            0 => "Sharesies",
-            1 => "Interactive Brokers",
-            _ => "Unknown"
-        };
-    }
+    private string GetBrokerageName(int brokerageType) => BrokerageHelpers.GetBrokerageName(brokerageType);
 
     private void ToggleMobileHolding(string symbol)
     {
@@ -409,6 +389,14 @@ public partial class Home : IDisposable
         else
         {
             _expandedDesktopHoldings.Add(symbol);
+        }
+    }
+
+    private void HandleExpandKeyDown(KeyboardEventArgs e, string symbol)
+    {
+        if (e.Key == "Enter" || e.Key == " ")
+        {
+            ToggleDesktopHolding(symbol);
         }
     }
 }

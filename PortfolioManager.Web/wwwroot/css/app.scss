@@ -48,24 +48,60 @@ $color-sharesies-primary: #ff4785;
 $color-sharesies-dark: #ff1f6b;
 $color-sharesies-darker: #e6195e;
 
-// Spacing Scale (following Tailwind conventions) - SCALED DOWN
-$spacing-1: 0.25rem; // 4px
-$spacing-2: 0.5rem;  // 8px
-$spacing-3: 0.5rem;  // 8px (scaled down from 12px)
-$spacing-4: 0.75rem; // 12px (scaled down from 16px)
-$spacing-5: 0.75rem; // 12px (scaled down from 20px)
-$spacing-6: 1rem;    // 16px (scaled down from 24px)
-$spacing-8: 2rem;    // 32px
-$spacing-10: 2.5rem; // 40px
-$spacing-12: 3rem;   // 48px
+// Spacing Scale (following Tailwind conventions)
+$spacing-1: 0.25rem;  // 4px
+$spacing-2: 0.5rem;   // 8px
+$spacing-3: 0.75rem;  // 12px
+$spacing-4: 1rem;     // 16px
+$spacing-5: 1.25rem;  // 20px
+$spacing-6: 1.5rem;   // 24px
+$spacing-8: 2rem;     // 32px
+$spacing-10: 2.5rem;  // 40px
+$spacing-12: 3rem;    // 48px
 
-// Border Radius (following Stitch design) - SCALED DOWN
+// Border Radius (following Stitch design)
 $border-radius-sm: 0.5rem;   // 8px
-$border-radius-md: 0.5rem;   // 8px (scaled from 12px)
-$border-radius-lg: 0.75rem;  // 12px (scaled from 16px)
-$border-radius-xl: 0.75rem;  // 12px (scaled from 20px)
+$border-radius-md: 0.75rem;  // 12px
+$border-radius-lg: 1rem;     // 16px
+$border-radius-xl: 1.25rem;  // 20px
 $border-radius-2xl: 1.5rem;  // 24px
 $border-radius-full: 9999px;
+
+// Breakpoints (Mobile-First)
+$breakpoint-sm: 640px;   // Small devices (landscape phones)
+$breakpoint-md: 768px;   // Medium devices (tablets)
+$breakpoint-lg: 1024px;  // Large devices (desktops)
+$breakpoint-xl: 1280px;  // Extra large devices (large desktops)
+$breakpoint-2xl: 1536px; // 2X large devices
+
+// Responsive Mixins (Mobile-First Approach)
+@mixin sm {
+  @media (min-width: $breakpoint-sm) { @content; }
+}
+
+@mixin md {
+  @media (min-width: $breakpoint-md) { @content; }
+}
+
+@mixin lg {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
+
+@mixin xl {
+  @media (min-width: $breakpoint-xl) { @content; }
+}
+
+@mixin mobile-only {
+  @media (max-width: $breakpoint-md - 1) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg - 1) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
 
 // Transitions
 $transition-fast: 0.15s ease-in-out;
@@ -1080,59 +1116,60 @@ code {
 }
 
 // ============================================================================
-// Responsive Design
+// Responsive Design (Mobile-First Approach)
 // ============================================================================
 
-@media (max-width: 768px) {
-  .appbar-title-desktop,
-  .appbar-logo-desktop,
-  .appbar-date-desktop {
-    display: none !important;
+// Mobile defaults - define mobile styles as the baseline
+
+.appbar-title-desktop,
+.appbar-logo-desktop,
+.appbar-date-desktop {
+  display: none;
+}
+
+.appbar-logo-mobile {
+  display: block;
+}
+
+.stat-value {
+  font-size: $font-size-2xl !important;
+}
+
+.loading-logo {
+  font-size: $font-size-2xl;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  font-size: $font-size-base;
+}
+
+.loading-subtitle {
+  font-size: $font-size-sm;
+}
+
+.loading-logos {
+  gap: 1rem;
+  margin-top: 1.5rem;
+  
+  img {
+    height: 32px;
   }
   
-  .appbar-logo-mobile {
-    display: block !important;
-  }
-  
-  .stat-value {
-    font-size: $font-size-2xl !important;
-  }
-  
-  .loading-logo {
-    font-size: $font-size-2xl;
-    margin-bottom: 1.5rem;
-    letter-spacing: 1px;
-  }
-  
-  .loading-spinner {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 1rem;
-  }
-  
-  .loading-text {
-    font-size: $font-size-base;
-  }
-  
-  .loading-subtitle {
-    font-size: $font-size-sm;
-  }
-  
-  .loading-logos {
-    gap: 1rem;
-    margin-top: 1.5rem;
-    
-    img {
-      height: 32px;
-    }
-    
-    .divider {
-      height: 32px;
-    }
+  .divider {
+    height: 32px;
   }
 }
 
-@media (max-width: 480px) {
+// Small devices (smaller phones)
+@include sm {
   .appbar-logo-mobile {
     height: 28px;
     width: 28px;
@@ -1170,6 +1207,57 @@ code {
     }
   }
 }
+
+// Desktop overrides (tablets and up)
+@include md {
+  .appbar-title-desktop,
+  .appbar-logo-desktop,
+  .appbar-date-desktop {
+    display: block;
+  }
+  
+  .appbar-logo-mobile {
+    display: none;
+  }
+  
+  .stat-value {
+    font-size: $font-size-3xl !important;
+  }
+  
+  .loading-logo {
+    font-size: $font-size-3xl;
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+  }
+  
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .loading-text {
+    font-size: $font-size-lg;
+  }
+  
+  .loading-subtitle {
+    font-size: $font-size-base;
+  }
+  
+  .loading-logos {
+    gap: 2rem;
+    margin-top: 2rem;
+    
+    img {
+      height: 40px;
+    }
+    
+    .divider {
+      height: 40px;
+    }
+  }
+}
+
 // ============================================================================
 // Additional MudBlazor Global Overrides for Stitch Design
 // ============================================================================
