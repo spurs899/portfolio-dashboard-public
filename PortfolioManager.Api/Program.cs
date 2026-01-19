@@ -36,27 +36,12 @@ builder.Services.AddScoped<ISharesiesClient>(sp => sp.GetRequiredService<Sharesi
 builder.Services.AddScoped<ISharesiesAuthClient>(sp => sp.GetRequiredService<SharesiesClient>());
 builder.Services.AddScoped<ISharesiesDataClient>(sp => sp.GetRequiredService<SharesiesClient>());
 
-builder.Services.AddHttpClient<InteractiveBrokersClient>()
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-    {
-        UseCookies = true,
-        CookieContainer = new System.Net.CookieContainer()
-    });
-
-builder.Services.AddScoped<IInteractiveBrokersClient>(sp => sp.GetRequiredService<InteractiveBrokersClient>());
-builder.Services.AddScoped<IIbkrAuthClient>(sp => sp.GetRequiredService<InteractiveBrokersClient>());
-builder.Services.AddScoped<IIbkrDataClient>(sp => sp.GetRequiredService<InteractiveBrokersClient>());
-
 // Brokerage services - Register all implementations with ISP interfaces
 builder.Services.AddScoped<IQrAuthenticationService, IbkrQrAuthenticationService>();
 builder.Services.AddScoped<SharesiesBrokerageService>();
-builder.Services.AddScoped<InteractiveBrokersBrokerageService>();
 builder.Services.AddScoped<IBrokerageService, SharesiesBrokerageService>();
-builder.Services.AddScoped<IBrokerageService, InteractiveBrokersBrokerageService>();
 builder.Services.AddScoped<IBrokerageAuthenticationService, SharesiesBrokerageService>(sp => sp.GetRequiredService<SharesiesBrokerageService>());
 builder.Services.AddScoped<IBrokeragePortfolioService, SharesiesBrokerageService>(sp => sp.GetRequiredService<SharesiesBrokerageService>());
-builder.Services.AddScoped<IBrokerageAuthenticationService, InteractiveBrokersBrokerageService>(sp => sp.GetRequiredService<InteractiveBrokersBrokerageService>());
-builder.Services.AddScoped<IBrokeragePortfolioService, InteractiveBrokersBrokerageService>(sp => sp.GetRequiredService<InteractiveBrokersBrokerageService>());
 builder.Services.AddScoped<IBrokerageServiceFactory, BrokerageServiceFactory>();
 
 // Legacy coordinator
