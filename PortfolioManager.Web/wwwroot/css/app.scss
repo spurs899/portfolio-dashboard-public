@@ -1502,3 +1502,167 @@ code {
     transform: translateY(0);
   }
 }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================================================
+// Desktop Expandable Holdings Styles
+// ============================================================================
+
+.desktop-expandable-table {
+  .expand-icon-cell {
+    padding: $spacing-4 $spacing-2 !important;
+    cursor: pointer;
+    transition: $transition-normal;
+    vertical-align: middle;
+    
+    &:hover {
+      background-color: $color-bg-slate-50;
+    }
+  }
+  
+  .expand-icon {
+    color: $color-text-muted;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+  }
+  
+  .desktop-expandable-row {
+    transition: background-color 0.2s ease;
+    
+    &.expanded {
+      background-color: $color-bg-slate-50;
+    }
+  }
+  
+  tr:has(.desktop-expandable-row.expanded) {
+    background-color: $color-bg-slate-50 !important;
+    
+    .expand-icon {
+      color: $color-primary;
+      transform: rotate(180deg);
+    }
+  }
+  
+  tr:hover {
+    .expand-icon {
+      color: $color-primary;
+    }
+  }
+}
+
+.desktop-expanded-content {
+  background-color: transparent !important;
+  
+  .desktop-expanded-cell {
+    padding: 0 $spacing-4 $spacing-4 $spacing-4 !important;
+    background-color: $color-bg-slate-50 !important;
+  }
+}
+
+.desktop-holding-details {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: $color-bg-white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-5;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid $color-border-light;
+}
+
+.desktop-details-header {
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.desktop-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $spacing-4;
+}
+
+.desktop-detail-card {
+  background: $color-bg-white;
+  border: 1px solid $color-border-light;
+  border-radius: $border-radius-lg;
+  padding: $spacing-5;
+  transition: all 0.2s ease;
+  opacity: 0;
+  animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.2s; }
+  
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.desktop-detail-brokerage {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-3;
+  border-bottom: 2px solid $color-border-light;
+  
+  .desktop-brokerage-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: $border-radius-md;
+    border: 1px solid $color-border-light;
+    padding: 4px;
+    background: $color-bg-white;
+  }
+}
+
+.desktop-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4 $spacing-5;
+}
+
+.desktop-detail-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  
+  .mud-typography {
+    margin: 0;
+  }
+}
+
+.desktop-return-badge-success,
+.desktop-return-badge-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+}
+
+.desktop-return-badge-success {
+  background-color: $color-stock-green-light;
+  color: darken($color-stock-green, 10%);
+}
+
+.desktop-return-badge-error {
+  background-color: $color-stock-red-light;
+  color: darken($color-stock-red, 5%);
+}

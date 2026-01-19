@@ -33,6 +33,9 @@ public partial class Home : IDisposable
     // Mobile expanded holdings tracking
     private HashSet<string> _expandedMobileHoldings = new();
     
+    // Desktop expanded holdings tracking
+    private HashSet<string> _expandedDesktopHoldings = new();
+    
     // Time and timezone tracking
     private Timer? _timer;
     private string _localTime = "";
@@ -394,6 +397,18 @@ public partial class Home : IDisposable
         else
         {
             _expandedMobileHoldings.Add(symbol);
+        }
+    }
+
+    private void ToggleDesktopHolding(string symbol)
+    {
+        if (_expandedDesktopHoldings.Contains(symbol))
+        {
+            _expandedDesktopHoldings.Remove(symbol);
+        }
+        else
+        {
+            _expandedDesktopHoldings.Add(symbol);
         }
     }
 }

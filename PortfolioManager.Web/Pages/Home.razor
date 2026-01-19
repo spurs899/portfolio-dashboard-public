@@ -54,9 +54,148 @@ else if (_portfolioData != null)
             HoldingsCount="@GetHoldingsCount()" />
 
         <MudItem xs="12" Class="mt-4">
-            <AggregatedHoldingsTable Holdings="@GetAggregatedHoldings()" />
-            
-            <DetailedHoldingsTable Holdings="@GetHoldings()" />
+            <MudCard Elevation="0" Class="port-dashboard-table-card">
+                <MudCardHeader Class="pb-0">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Class="fw-bold">Portfolio Holdings</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">Aggregated positions - click to view breakdown by brokerage</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.PieChart" Color="Color.Default" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudTable Items="@GetAggregatedHoldings()" 
+                              Hover="true" 
+                              Class="port-dashboard-table desktop-expandable-table" 
+                              Elevation="0" 
+                              Bordered="false"
+                              SortLabel="Sort By"
+                              AllowUnsorted="true"
+                              Dense="false">
+                        <HeaderContent>
+                            <MudTh Class="port-dashboard-table-header" Style="width: 40px;"></MudTh>
+                            <MudTh Class="port-dashboard-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.Symbol)">Symbol</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.Currency)">Currency</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.SharePrice)">Share Price</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalShares)">Total Shares</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header text-right"><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalValue)">Total Value</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.TotalReturn)">Total Return</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header text-right"><MudTableSortLabel SortBy="new Func<AggregatedHoldingsTable.AggregatedHoldingViewModel, object>(x => x.AverageReturnPercentage)">Avg Return %</MudTableSortLabel></MudTh>
+                            <MudTh Class="port-dashboard-table-header">Brokerages</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            @{
+                                var isExpanded = _expandedDesktopHoldings.Contains(context.Symbol);
+                                var rowClass = isExpanded ? "desktop-expandable-row expanded" : "desktop-expandable-row";
+                            }
+                            <MudTd DataLabel="" Class="expand-icon-cell" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <MudIcon Icon="@(isExpanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" Class="expand-icon" />
+                            </MudTd>
+                            <MudTd DataLabel="Symbol" Class="@rowClass" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <div class="d-flex align-center">
+                                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3" aria-label="@($"Symbol {context.Symbol}")">
+                                        @GetSymbolAvatarText(context.Symbol)
+                                    </MudAvatar>
+                                    <div>
+                                        <MudText Typo="Typo.body2" Class="fw-bold">@context.Symbol</MudText>
+                                        <MudText Typo="Typo.caption" Class="text-muted">@context.Name</MudText>
+                                    </div>
+                                </div>
+                            </MudTd>
+                            <MudTd DataLabel="Currency" Class="@rowClass" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <span class="currency-chip">@context.Currency</span>
+                            </MudTd>
+                            <MudTd DataLabel="Share Price" Class="@($"{rowClass} text-right")" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <MudText Typo="Typo.body2" Class="numeric-text">@context.SharePrice.ToString("C")</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Shares" Class="@($"{rowClass} text-right")" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <MudText Typo="Typo.body2" Class="numeric-text">@context.TotalShares</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Value" Class="@($"{rowClass} text-right")" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <MudText Typo="Typo.body2" Class="fw-semibold numeric-text">@context.TotalValue.ToString("C")</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Total Return" Class="@($"{rowClass} text-right")" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <MudText Typo="Typo.body2" Color="@(context.TotalReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold numeric-text"
+                                         aria-label="@($"Total return {(context.TotalReturn >= 0 ? "gain" : "loss")} {context.TotalReturn.ToString("C")}")">
+                                    @(context.TotalReturn >= 0 ? "+" : "")@context.TotalReturn.ToString("C")
+                                </MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Avg Return %" Class="@($"{rowClass} text-right")" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <span class="@(context.AverageReturnPercentage >= 0 ? "port-dashboard-return-badge-success" : "port-dashboard-return-badge-error")"
+                                      aria-label="@($"Average return percentage {(context.AverageReturnPercentage >= 0 ? "gain" : "loss")} {Math.Abs(context.AverageReturnPercentage).ToString("F2")} percent")">
+                                    @(context.AverageReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(context.AverageReturnPercentage).ToString("F2")%
+                                </span>
+                            </MudTd>
+                            <MudTd DataLabel="Brokerages" Class="@rowClass" @onclick="@(() => ToggleDesktopHolding(context.Symbol))" style="cursor: pointer;">
+                                <div class="d-flex align-center gap-2">
+                                    @foreach (var brokerageType in context.BrokerageTypes)
+                                    {
+                                        <img src="@GetBrokerageIcon(brokerageType)" 
+                                             alt="@GetBrokerageName(brokerageType)" 
+                                             class="brokerage-logo-img" 
+                                             title="@GetBrokerageName(brokerageType)" />
+                                    }
+                                </div>
+                            </MudTd>
+                        </RowTemplate>
+                        <ChildRowContent>
+                            @{
+                                var currentSymbol = context.Symbol;
+                                var isCurrentExpanded = _expandedDesktopHoldings.Contains(currentSymbol);
+                            }
+                            @if (isCurrentExpanded)
+                            {
+                                var brokerageDetails = GetHoldings().Where(h => h.Symbol == currentSymbol).ToList();
+                                <MudTr Class="desktop-expanded-content">
+                                    <td colspan="9" class="desktop-expanded-cell">
+                                        <div class="desktop-holding-details">
+                                            <div class="desktop-details-header">
+                                                <MudText Typo="Typo.body2" Class="text-muted">Holdings breakdown by brokerage</MudText>
+                                            </div>
+                                            <div class="desktop-details-grid">
+                                                @foreach (var detail in brokerageDetails)
+                                                {
+                                                    <div class="desktop-detail-card">
+                                                        <div class="desktop-detail-brokerage">
+                                                            <img src="@GetBrokerageIcon(detail.BrokerageType)" 
+                                                                 alt="@GetBrokerageName(detail.BrokerageType)" 
+                                                                 class="desktop-brokerage-icon" />
+                                                            <MudText Typo="Typo.body1" Class="fw-bold">@GetBrokerageName(detail.BrokerageType)</MudText>
+                                                        </div>
+                                                        <div class="desktop-detail-stats">
+                                                            <div class="desktop-detail-stat-item">
+                                                                <MudText Typo="Typo.caption" Class="text-muted">Shares</MudText>
+                                                                <MudText Typo="Typo.body2" Class="fw-semibold">@detail.SharesOwned.ToString("N2")</MudText>
+                                                            </div>
+                                                            <div class="desktop-detail-stat-item">
+                                                                <MudText Typo="Typo.caption" Class="text-muted">Market Value</MudText>
+                                                                <MudText Typo="Typo.body2" Class="fw-bold">@detail.InvestmentValue.ToString("C")</MudText>
+                                                            </div>
+                                                            <div class="desktop-detail-stat-item">
+                                                                <MudText Typo="Typo.caption" Class="text-muted">Daily Return</MudText>
+                                                                <MudText Typo="Typo.body2" Color="@(detail.DailyReturn >= 0 ? Color.Success : Color.Error)" Class="fw-semibold">
+                                                                    @(detail.DailyReturn >= 0 ? "+" : "")@detail.DailyReturn.ToString("C")
+                                                                </MudText>
+                                                            </div>
+                                                            <div class="desktop-detail-stat-item">
+                                                                <MudText Typo="Typo.caption" Class="text-muted">Return %</MudText>
+                                                                <span class="@(detail.DailyReturnPercentage >= 0 ? "desktop-return-badge-success" : "desktop-return-badge-error")">
+                                                                    @(detail.DailyReturnPercentage >= 0 ? "▲" : "▼") @Math.Abs(detail.DailyReturnPercentage).ToString("F2")%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                </MudTr>
+                            }
+                        </ChildRowContent>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
         </MudItem>
     </div>
 
