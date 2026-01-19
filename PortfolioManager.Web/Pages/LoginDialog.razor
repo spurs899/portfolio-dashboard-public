@@ -16,41 +16,56 @@
             </MudAlert>
         }
         
-        @if (!_requiresMfa)
-        {
-            <MudTextField @bind-Value="_email" 
-                          Label="Email" 
-                          Variant="Variant.Outlined" 
-                          Class="mb-3"
-                          OnKeyDown="HandleKeyDown"
-                          Placeholder="@(_demoMode ? "demo@example.com" : "")" />
-            <MudTextField @bind-Value="_password" 
-                          Label="Password" 
-                          Variant="Variant.Outlined" 
-                          InputType="InputType.Password" 
-                          Class="mb-3"
-                          OnKeyDown="HandleKeyDown"
-                          Placeholder="@(_demoMode ? "any password" : "")" />
-        }
-        else
-        {
-            <MudAlert Severity="Severity.Info" Class="mb-3">
-                @if (_demoMode)
-                {
-                    <strong>Demo Mode:</strong> <text>Enter any MFA code to continue (e.g., 123456)</text>
-                }
-                else
-                {
-                    <text>An MFA code has been sent to your email. Please enter it below.</text>
-                }
-            </MudAlert>
-            <MudTextField @bind-Value="_mfaCode" 
-                          Label="MFA Code" 
-                          Variant="Variant.Outlined" 
-                          Class="mb-3"
-                          OnKeyDown="HandleKeyDown"
-                          Placeholder="@(_demoMode ? "123456" : "")" />
-        }
+        <MudForm @ref="_form" @bind-IsValid="@_isFormValid">
+            @if (!_requiresMfa)
+            {
+                <MudTextField @bind-Value="_email" 
+                              Label="Email" 
+                              Variant="Variant.Outlined" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "demo@example.com" : "")"
+                              Required="true"
+                              RequiredError="Email is required"
+                              Validation="@(new Func<string, string?>(ValidateEmail))"
+                              Immediate="true" />
+                <MudTextField @bind-Value="_password" 
+                              Label="Password" 
+                              Variant="Variant.Outlined" 
+                              InputType="InputType.Password" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "any password" : "")"
+                              Required="true"
+                              RequiredError="Password is required"
+                              Validation="@(new Func<string, string?>(ValidatePassword))"
+                              Immediate="true" />
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Class="mb-3">
+                    @if (_demoMode)
+                    {
+                        <strong>Demo Mode:</strong> <text>Enter any MFA code to continue (e.g., 123456)</text>
+                    }
+                    else
+                    {
+                        <text>An MFA code has been sent to your email. Please enter it below.</text>
+                    }
+                </MudAlert>
+                <MudTextField @bind-Value="_mfaCode" 
+                              Label="MFA Code" 
+                              Variant="Variant.Outlined" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "123456" : "")"
+                              Required="true"
+                              RequiredError="MFA code is required"
+                              Validation="@(new Func<string, string?>(ValidateMfaCode))"
+                              Immediate="true"
+                              MaxLength="6" />
+            }
+        </MudForm>
 
         @if (_isLoading)
         {
@@ -64,7 +79,10 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleLogin" Disabled="_isLoading">
+        <MudButton Color="Color.Primary" 
+                   Variant="Variant.Filled" 
+                   OnClick="HandleLogin" 
+                   Disabled="@(_isLoading || !_isFormValid)">
             @(_requiresMfa ? "Verify MFA" : "Login")
         </MudButton>
     </DialogActions>
@@ -75,6 +93,8 @@
     
     [Parameter] public EventCallback<string> OnLoginSuccess { get; set; }
 
+    private MudForm? _form;
+    private bool _isFormValid;
     private bool _demoMode;
     private string _email = "";
     private string _password = "";
@@ -88,10 +108,76 @@
         _demoMode = Configuration.GetValue<bool>("DemoMode");
     }
 
+    private string? ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "Email is required";
+        
+        if (_demoMode)
+            return null;
+        
+        if (!email.Contains("@"))
+            return "Email must contain '@'";
+        
+        if (!email.Contains("."))
+            return "Email must contain a domain";
+        
+        var parts = email.Split('@');
+        if (parts.Length != 2)
+            return "Invalid email format";
+        
+        if (string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
+            return "Invalid email format";
+        
+        if (email.Length < 3)
+            return "Email is too short";
+        
+        return null;
+    }
+
+    private string? ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required";
+        
+        if (_demoMode)
+            return null;
+        
+        if (password.Length < 6)
+            return "Password must be at least 6 characters";
+        
+        return null;
+    }
+
+    private string? ValidateMfaCode(string mfaCode)
+    {
+        if (string.IsNullOrWhiteSpace(mfaCode))
+            return "MFA code is required";
+        
+        if (_demoMode)
+            return null;
+        
+        if (!mfaCode.All(char.IsDigit))
+            return "MFA code must contain only digits";
+        
+        if (mfaCode.Length != 6)
+            return "MFA code must be exactly 6 digits";
+        
+        return null;
+    }
+
     private async Task HandleLogin()
     {
         try
         {
+            if (_form == null)
+                return;
+
+            await _form.Validate();
+            
+            if (!_isFormValid)
+                return;
+
             _isLoading = true;
             _errorMessage = null;
 
@@ -102,6 +188,7 @@
                 if (result.RequiresMfa)
                 {
                     _requiresMfa = true;
+                    _isFormValid = false;
                     Snackbar.Add("MFA code sent to your email", Severity.Info);
                 }
                 else if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
@@ -152,7 +239,7 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && !_isLoading)
+        if (e.Key == "Enter" && !_isLoading && _isFormValid)
         {
             await HandleLogin();
         }
