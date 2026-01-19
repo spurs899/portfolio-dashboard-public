@@ -1,6 +1,8 @@
 using PortfolioManager.Core.Services;
 using PortfolioManager.Core.Services.Brokerage;
 using PortfolioManager.Core.Services.Market;
+using PortfolioManager.Api.Hubs;
+using PortfolioManager.Api.Services;
 using Sentry.AspNetCore;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -36,12 +38,67 @@ builder.Services.AddScoped<ISharesiesClient>(sp => sp.GetRequiredService<Sharesi
 builder.Services.AddScoped<ISharesiesAuthClient>(sp => sp.GetRequiredService<SharesiesClient>());
 builder.Services.AddScoped<ISharesiesDataClient>(sp => sp.GetRequiredService<SharesiesClient>());
 
+// Brokerage clients
+builder.Services.AddHttpClient<SharesiesClient>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        UseCookies = true,
+        CookieContainer = new System.Net.CookieContainer()
+    });
+
+builder.Services.AddScoped<ISharesiesClient>(sp => sp.GetRequiredService<SharesiesClient>());
+builder.Services.AddScoped<ISharesiesAuthClient>(sp => sp.GetRequiredService<SharesiesClient>());
+builder.Services.AddScoped<ISharesiesDataClient>(sp => sp.GetRequiredService<SharesiesClient>());
+
+// IBKR Session Manager (for web portal authentication)
+builder.Services.AddSingleton<IIbkrSessionManager, IbkrSessionManager>();
+builder.Services.AddScoped<IIbkrAutomatedAuthService, IbkrAutomatedAuthService>();
+builder.Services.AddScoped<IIbkrAuthNotificationService, IbkrAuthNotificationService>();
+builder.Services.AddHttpContextAccessor();
+
+// SignalR for real-time IBKR auth updates
+builder.Services.AddSignalR();
+
+// IBKR Client with web portal URL and session management
+builder.Services.AddHttpClient<IbkrClient>((sp, client) =>
+{
+    // Use web portal URL for Option B
+    client.BaseAddress = new Uri("https://www.interactivebrokers.com.au");
+})
+.ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    var sessionManager = sp.GetRequiredService<IIbkrSessionManager>();
+    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+    
+    // Get current user (if authenticated)
+    var userId = httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "anonymous";
+    
+    var handler = new HttpClientHandler
+    {
+        UseCookies = true,
+        CookieContainer = sessionManager.GetSessionCookies(userId) ?? new System.Net.CookieContainer()
+    };
+    
+    return handler;
+});
+
+builder.Services.AddScoped<IIbkrClient>(sp => sp.GetRequiredService<IbkrClient>());
+builder.Services.AddScoped<IIbkrAuthClient>(sp => sp.GetRequiredService<IbkrClient>());
+builder.Services.AddScoped<IIbkrDataClient>(sp => sp.GetRequiredService<IbkrClient>());
+
 // Brokerage services - Register all implementations with ISP interfaces
 builder.Services.AddScoped<IQrAuthenticationService, IbkrQrAuthenticationService>();
+
 builder.Services.AddScoped<SharesiesBrokerageService>();
 builder.Services.AddScoped<IBrokerageService, SharesiesBrokerageService>();
 builder.Services.AddScoped<IBrokerageAuthenticationService, SharesiesBrokerageService>(sp => sp.GetRequiredService<SharesiesBrokerageService>());
 builder.Services.AddScoped<IBrokeragePortfolioService, SharesiesBrokerageService>(sp => sp.GetRequiredService<SharesiesBrokerageService>());
+
+builder.Services.AddScoped<IbkrBrokerageService>();
+builder.Services.AddScoped<IBrokerageService, IbkrBrokerageService>();
+builder.Services.AddScoped<IBrokerageAuthenticationService, IbkrBrokerageService>(sp => sp.GetRequiredService<IbkrBrokerageService>());
+builder.Services.AddScoped<IBrokeragePortfolioService, IbkrBrokerageService>(sp => sp.GetRequiredService<IbkrBrokerageService>());
+
 builder.Services.AddScoped<IBrokerageServiceFactory, BrokerageServiceFactory>();
 
 // Legacy coordinator
@@ -133,8 +190,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowBlazorWasm",
         policy => policy
             .WithOrigins(
-                "http://localhost:5262", 
-                "https://localhost:7262",
+                "http://localhost:5262",  // Blazor WASM HTTP
+                "https://localhost:7152", // Blazor WASM HTTPS
+                "https://localhost:7169", // API HTTPS (itself)
+                "http://localhost:5269",  // API HTTP (itself)
                 "https://spurs899.github.io")
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -197,9 +256,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRateLimiter();
-app.UseCors("AllowBlazorWasm");
 app.UseRouting();
+app.UseCors("AllowBlazorWasm");
 app.MapControllers();
+app.MapHub<IbkrAuthHub>("/hubs/ibkrauth").RequireCors("AllowBlazorWasm");
 
 SentrySdk.CaptureMessage("Sentry Initialised");
 

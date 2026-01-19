@@ -182,11 +182,36 @@ public partial class Home : IDisposable
         var dialog = await DialogService.ShowAsync<LoginDialog>("Login to Sharesies", parameters, options);
     }
 
+    private async Task ShowIbkrLoginDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { "OnLoginSuccess", EventCallback.Factory.Create<string>(this, OnIbkrLoginSuccess) }
+        };
+        
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<IbkrLoginDialog>("Connect to Interactive Brokers", parameters, options);
+    }
+
     private async Task OnLoginSuccess(string userId)
     {
         _userId = userId;
         _isLoggedIn = true;
         await LoadPortfolioData();
+        StateHasChanged();
+    }
+
+    private async Task OnIbkrLoginSuccess(string username)
+    {
+        Snackbar.Add($"Successfully connected to IBKR as {username}!", Severity.Success);
+        
+        // For now, we don't load portfolio data automatically since IBKR integration
+        // might need additional setup. In the future, you can load IBKR portfolio here:
+        // _isLoggedIn = true;
+        // _userId = username;
+        // await LoadPortfolioData();
+        
+        // Just show a success message for now
         StateHasChanged();
     }
 
