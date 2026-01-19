@@ -33,10 +33,10 @@ public partial class Home : IDisposable
     private decimal _cachedDailyReturnPercentage;
     
     // Mobile expanded holdings tracking
-    private HashSet<string> _expandedMobileHoldings = new();
+    private readonly HashSet<string> _expandedMobileHoldings = [];
     
     // Desktop expanded holdings tracking
-    private HashSet<string> _expandedDesktopHoldings = new();
+    private readonly HashSet<string> _expandedDesktopHoldings = [];
     
     // Time and timezone tracking
     private Timer? _timer;
@@ -99,7 +99,7 @@ public partial class Home : IDisposable
         _localTimeZone = $"UTC{GetUtcOffset(now)}";
         _nyseTime = nyseNow.ToString("h:mm:ss tt");
         
-        if (nyseNow.DayOfWeek == DayOfWeek.Saturday || nyseNow.DayOfWeek == DayOfWeek.Sunday)
+        if (nyseNow.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
         {
             _marketStatus = "Market Closed (Weekend)";
         }
