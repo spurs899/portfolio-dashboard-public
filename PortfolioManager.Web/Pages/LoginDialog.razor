@@ -12,7 +12,7 @@
         @if (_demoMode)
         {
             <MudAlert Severity="Severity.Info" Class="mb-3" Dense="true">
-                <strong>Demo Mode:</strong> Enter any credentials and MFA code to view sample portfolio data
+                <strong>Demo Mode:</strong> Use a valid email format (e.g., demo@example.com) and any password (6+ chars) to view sample portfolio data
             </MudAlert>
         }
         
@@ -46,7 +46,7 @@
                 <MudAlert Severity="Severity.Info" Class="mb-3">
                     @if (_demoMode)
                     {
-                        <strong>Demo Mode:</strong> <text>Enter any MFA code to continue (e.g., 123456)</text>
+                        <strong>Demo Mode:</strong> <text>Enter a 6-digit MFA code to continue (e.g., 123456)</text>
                     }
                     else
                     {
@@ -113,9 +113,6 @@
         if (string.IsNullOrWhiteSpace(email))
             return "Email is required";
         
-        if (_demoMode)
-            return null;
-        
         if (!email.Contains("@"))
             return "Email must contain '@'";
         
@@ -140,9 +137,6 @@
         if (string.IsNullOrWhiteSpace(password))
             return "Password is required";
         
-        if (_demoMode)
-            return null;
-        
         if (password.Length < 6)
             return "Password must be at least 6 characters";
         
@@ -153,9 +147,6 @@
     {
         if (string.IsNullOrWhiteSpace(mfaCode))
             return "MFA code is required";
-        
-        if (_demoMode)
-            return null;
         
         if (!mfaCode.All(char.IsDigit))
             return "MFA code must contain only digits";
