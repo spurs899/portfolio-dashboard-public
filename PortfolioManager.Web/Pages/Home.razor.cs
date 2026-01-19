@@ -179,7 +179,7 @@ public partial class Home : IDisposable
         };
 
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-        var dialog = await DialogService.ShowAsync<LoginDialog>("Login to Sharesies", parameters, options);
+        var dialog = await DialogService.ShowAsync<SharesiesLoginDialog>("Connect to Sharesies", parameters, options);
     }
 
     private async Task ShowIbkrLoginDialog()
@@ -189,7 +189,7 @@ public partial class Home : IDisposable
             { "OnLoginSuccess", EventCallback.Factory.Create<string>(this, OnIbkrLoginSuccess) }
         };
         
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
         var dialog = await DialogService.ShowAsync<IbkrLoginDialog>("Connect to Interactive Brokers", parameters, options);
     }
 

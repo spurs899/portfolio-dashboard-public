@@ -35,13 +35,14 @@
             <MudStack Row="true" Spacing="2">
                 <MudButton Variant="Variant.Filled" Class="sharesies-login-btn" OnClick="ShowLoginDialog">
                     <img src="images/sharesies-logo.png" alt="@Constants.BrokerageSharesies" class="mr-2" />
-                    @(_demoMode ? "Try Demo Login" : "Login with Sharesies")
+                    Connect to Sharesies
                 </MudButton>
                 
                 <MudButton Variant="Variant.Filled" 
-                          Color="Color.Primary" 
+                          Class="ibkr-login-btn"
                           OnClick="ShowIbkrLoginDialog"
                           Disabled="@_demoMode">
+                    <img src="images/ibkr-logo.svg" alt="Interactive Brokers" class="mr-2" />
                     Connect to IBKR
                 </MudButton>
             </MudStack>
