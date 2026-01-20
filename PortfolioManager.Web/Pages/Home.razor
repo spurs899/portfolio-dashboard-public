@@ -30,7 +30,7 @@
         }
         <MudText Typo="Typo.h6" Class="mb-3">@(!_isLoggedIn && string.IsNullOrEmpty(_ibkrUsername) ? "Connect Your Brokerage Accounts" : "Brokerage Connections")</MudText>
         
-        <MudStack Row="true" Spacing="2">
+        <MudStack Row="true" Spacing="2" Class="login-buttons-stack">
             <MudButton Variant="Variant.Filled" 
                       Class="@(_isLoggedIn ? "sharesies-login-btn-connected" : "sharesies-login-btn")" 
                       OnClick="ShowLoginDialog"
