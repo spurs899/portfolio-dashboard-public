@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using PortfolioManager.Contracts.Models.Brokerage;
+using PortfolioManager.Contracts.Models.Shared;
 using PortfolioManager.Contracts.Web;
 using PortfolioManager.Web.Services;
 using PortfolioManager.Web.Helpers;
@@ -328,37 +329,20 @@ public partial class Home : IDisposable
                     UserProfile = new UserProfileDto
                     {
                         Name = "IBKR User",
-                        BrokerageType = 2 // 1=Sharesies, 2=IBKR
+                        BrokerageType = (int)BrokerageType.InteractiveBrokers
                     },
-                    Instruments = new List<InstrumentDto>()
+                    Instruments = []
                 };
             }
-
-            // Convert IBKR positions to InstrumentDto format
-            var instruments = positions.Select(pos => new InstrumentDto
-            {
-                Id = pos.ConId?.ToString() ?? "0",
-                Name = pos.ContractDesc ?? pos.Ticker ?? "Unknown",
-                Symbol = pos.Ticker ?? "N/A",
-                SharesOwned = pos.Position ?? 0,
-                SharePrice = pos.MktPrice ?? 0,
-                InvestmentValue = pos.MktValue ?? 0,
-                CostBasis = (pos.AvgCost ?? 0) * (pos.Position ?? 0),
-                TotalReturn = pos.UnrealizedPnl ?? 0,
-                SimpleReturn = pos.UnrealizedPnl ?? 0,
-                DividendsReceived = 0,
-                Currency = pos.Currency ?? "USD",
-                BrokerageType = 2 // IBKR
-            }).ToList();
 
             return new PortfolioResponse
             {
                 UserProfile = new UserProfileDto
                 {
                     Name = $"IBKR - {_ibkrUsername ?? "User"}",
-                    BrokerageType = 2
+                    BrokerageType = (int)BrokerageType.InteractiveBrokers
                 },
-                Instruments = instruments
+                Instruments = positions
             };
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)

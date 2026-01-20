@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.SignalR.Client;
 using PortfolioManager.Contracts.Models;
+using PortfolioManager.Contracts.Web;
 
 namespace PortfolioManager.Web.Services;
 
@@ -10,7 +11,7 @@ public interface IIbkrService
     Task<IbkrAuthResult> AuthenticateAsync(string username, string password, Action<string> onQRCodeReceived, Action<string> onStatusUpdate);
     Task<IbkrAccountsResponse?> GetAccountsAsync();
     Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId);
-    Task<List<IbkrPosition>?> GetPositionsAsync(string accountId);
+    Task<List<InstrumentDto>?> GetPositionsAsync(string accountId);
     Task<string?> GetStoredUsernameAsync();
     Task<bool> ValidateSessionAsync();
     Task ClearSessionAsync();
@@ -170,7 +171,7 @@ public class IbkrService : IIbkrService
         }
     }
 
-    public async Task<List<IbkrPosition>?> GetPositionsAsync(string accountId)
+    public async Task<List<InstrumentDto>?> GetPositionsAsync(string accountId)
     {
         try
         {
@@ -187,7 +188,7 @@ public class IbkrService : IIbkrService
             
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<List<IbkrPosition>>();
+                return await response.Content.ReadFromJsonAsync<List<InstrumentDto>>();
             }
             
             return null;

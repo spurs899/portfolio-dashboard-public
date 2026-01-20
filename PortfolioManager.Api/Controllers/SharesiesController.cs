@@ -125,7 +125,7 @@ namespace PortfolioManager.Api.Controllers
             _logger.LogInformation("Portfolio retrieved: {HasProfile}, {HasInstruments}", 
                 portfolio.Item1 != null, portfolio.Item2 != null);
             
-            return portfolio.Item1 != null && portfolio.Item2 != null ? Ok(new
+            return portfolio is { Item1: not null, Item2: not null } ? Ok(new
             {
                 UserProfile = portfolio.Item1,
                 Instruments = portfolio.Item2

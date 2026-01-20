@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using PortfolioManager.Core.Services;
 using PortfolioManager.Contracts.Models;
+using PortfolioManager.Contracts.Web;
 
 namespace PortfolioManager.Api.Controllers;
 
@@ -245,7 +246,24 @@ public class IbkrController : ControllerBase
                 return StatusCode(500, new { message = "Failed to retrieve positions from IBKR" });
             }
 
-            return Ok(positions);
+            // Map IbkrPosition to InstrumentDto
+            var instrumentDtos = positions.Select(p => new InstrumentDto
+            {
+                Id = p.ConId?.ToString(),
+                Symbol = p.Ticker ?? p.ContractDesc,
+                Name = p.ContractDesc,
+                Currency = p.Currency,
+                BrokerageType = 1, // 1 = IBKR, adjust as needed
+                SharesOwned = p.Position ?? 0,
+                SharePrice = p.MktPrice ?? 0,
+                InvestmentValue = p.MktValue ?? 0,
+                CostBasis = p.AvgCost ?? 0,
+                TotalReturn = p.RealizedPnl ?? 0,
+                SimpleReturn = p.UnrealizedPnl ?? 0,
+                DividendsReceived = 0 // Not available from IBKRPosition
+            }).ToList();
+
+            return Ok(instrumentDtos);
         }
         catch (Exception ex)
         {
