@@ -20,7 +20,7 @@
         OnRefresh="@RefreshPortfolio" />
 </div>
 
-<MudCard Elevation="2" Class="pa-4 mb-4">
+<MudCard Elevation="1" Class="pa-4 mb-8">
     <MudCardContent>
         @if (_demoMode && !_isLoggedIn)
         {
@@ -40,7 +40,8 @@
             </MudButton>
             
             <MudButton Variant="Variant.Filled" 
-                      Class="@(!string.IsNullOrEmpty(_ibkrUsername) ? "ibkr-login-btn-connected" : "ibkr-login-btn")"
+                       Class="@(!string.IsNullOrEmpty(_ibkrUsername) ? "ibkr-login-btn-connected" : "ibkr-login-btn")"
+                       Style="color: #fff"
                       OnClick="ShowIbkrLoginDialog"
                       Disabled="@(_demoMode || !string.IsNullOrEmpty(_ibkrUsername))">
                 <img src="images/ibkr-logo.svg" alt="Interactive Brokers" class="mr-2" />
