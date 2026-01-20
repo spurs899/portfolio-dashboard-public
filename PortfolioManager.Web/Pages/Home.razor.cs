@@ -164,11 +164,34 @@ public partial class Home : IDisposable
 
     private async Task TryAutoLoginAsync()
     {
+        // Try to restore Sharesies session
         var isAuthenticated = await AuthStateService.IsAuthenticatedAsync();
         if (isAuthenticated)
         {
             _userId = await AuthStateService.GetUserIdAsync();
             _isLoggedIn = true;
+        }
+        
+        // Try to restore IBKR session
+        var storedIbkrUsername = await IbkrService.GetStoredUsernameAsync();
+        if (!string.IsNullOrEmpty(storedIbkrUsername))
+        {
+            // Validate if IBKR session is still valid by trying to fetch accounts
+            var isIbkrSessionValid = await IbkrService.ValidateSessionAsync();
+            if (isIbkrSessionValid)
+            {
+                _ibkrUsername = storedIbkrUsername;
+            }
+            else
+            {
+                // Session expired, clear it
+                await IbkrService.ClearSessionAsync();
+            }
+        }
+        
+        // Load portfolio data if either authentication is valid
+        if (_isLoggedIn || !string.IsNullOrEmpty(_ibkrUsername))
+        {
             await LoadPortfolioData();
         }
     }
@@ -287,7 +310,10 @@ public partial class Home : IDisposable
             var accounts = await IbkrService.GetAccountsAsync();
             if (accounts?.Accounts == null || !accounts.Accounts.Any())
             {
-                Snackbar.Add("No IBKR accounts found", Severity.Warning);
+                // Session likely expired or invalid
+                await IbkrService.ClearSessionAsync();
+                _ibkrUsername = null;
+                Snackbar.Add("IBKR session expired. Please reconnect.", Severity.Warning);
                 return null;
             }
 
@@ -335,6 +361,23 @@ public partial class Home : IDisposable
                 Instruments = instruments
             };
         }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+        {
+            // IBKR service is unavailable or session expired
+            await IbkrService.ClearSessionAsync();
+            _ibkrUsername = null;
+            Snackbar.Add("IBKR service is currently unavailable or session expired. Please reconnect.", Severity.Error);
+            return null;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized || 
+                                               ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            // Session expired or invalid
+            await IbkrService.ClearSessionAsync();
+            _ibkrUsername = null;
+            Snackbar.Add("IBKR session expired. Please reconnect.", Severity.Warning);
+            return null;
+        }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading IBKR portfolio: {ex.Message}", Severity.Warning);
@@ -368,9 +411,10 @@ public partial class Home : IDisposable
     private async Task HandleAuthenticationExpired()
     {
         await AuthStateService.ClearAuthStateAsync();
+        await IbkrService.ClearSessionAsync(); // Also clear IBKR session
         _isLoggedIn = false;
         _userId = null;
-        _ibkrUsername = null; // Also clear IBKR
+        _ibkrUsername = null;
         _portfolioData = null;
         _isLoading = false;
         

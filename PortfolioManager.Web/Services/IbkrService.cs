@@ -12,6 +12,7 @@ public interface IIbkrService
     Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId);
     Task<List<IbkrPosition>?> GetPositionsAsync(string accountId);
     Task<string?> GetStoredUsernameAsync();
+    Task<bool> ValidateSessionAsync();
     Task ClearSessionAsync();
 }
 
@@ -206,6 +207,27 @@ public class IbkrService : IIbkrService
         catch
         {
             return null;
+        }
+    }
+
+    public async Task<bool> ValidateSessionAsync()
+    {
+        try
+        {
+            var username = await GetStoredUsernameAsync();
+            if (string.IsNullOrEmpty(username))
+            {
+                return false;
+            }
+
+            // Validate session by actually trying to get accounts
+            // This will fail if session cookies are expired or invalid
+            var accounts = await GetAccountsAsync();
+            return accounts?.Accounts != null && accounts.Accounts.Any();
+        }
+        catch
+        {
+            return false;
         }
     }
 
