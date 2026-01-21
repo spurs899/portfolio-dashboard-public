@@ -20,43 +20,6 @@
         OnRefresh="@RefreshPortfolio" />
 </div>
 
-<MudCard Elevation="1" Class="pa-4 mb-8">
-    <MudCardContent>
-        @if (_demoMode && !_isLoggedIn)
-        {
-            <MudAlert Severity="Severity.Success" Class="mb-3" Dense="true" Icon="@Icons.Material.Filled.Info">
-                <strong>Demo Mode Active:</strong> This is a sample portfolio with demo data. Login with any credentials and MFA code to explore!
-            </MudAlert>
-        }
-        <MudText Typo="Typo.h6" Class="mb-3">@(!_isLoggedIn && string.IsNullOrEmpty(_ibkrUsername) ? "Connect Your Brokerage Accounts" : "Brokerage Connections")</MudText>
-        
-        <MudStack Row="true" Spacing="2" Class="login-buttons-stack">
-            <MudButton Variant="Variant.Filled" 
-                      Class="@(_isLoggedIn ? "sharesies-login-btn-connected" : "sharesies-login-btn")" 
-                      OnClick="ShowLoginDialog"
-                      Disabled="@_isLoggedIn">
-                <img src="images/sharesies-logo.png" alt="@Constants.BrokerageSharesies" class="mr-2" />
-                @(_isLoggedIn ? "Connected to Sharesies" : "Connect to Sharesies")
-            </MudButton>
-            
-            <MudButton Variant="Variant.Filled" 
-                       Class="@(!string.IsNullOrEmpty(_ibkrUsername) ? "ibkr-login-btn-connected" : "ibkr-login-btn")"
-                      OnClick="ShowIbkrLoginDialog"
-                      Disabled="@(_demoMode || !string.IsNullOrEmpty(_ibkrUsername))">
-                <img src="images/ibkr-logo.svg" alt="Interactive Brokers" class="mr-2" />
-                @(!string.IsNullOrEmpty(_ibkrUsername) ? "Connected to IBKR" : "Connect to IBKR")
-            </MudButton>
-        </MudStack>
-        
-        @if (_demoMode && !_isLoggedIn)
-        {
-            <MudText Typo="Typo.caption" Class="mt-2" Color="Color.Secondary">
-                Note: IBKR authentication is not available in demo mode
-            </MudText>
-        }
-    </MudCardContent>
-</MudCard>
-
 @if (_isLoading)
 {
     <MudProgressCircular Indeterminate="true" />
@@ -336,3 +299,40 @@ else if (_portfolioData != null)
         </div>
     </div>
 }
+
+<MudCard Elevation="1" Class="pa-4 mt-5">
+    <MudCardContent>
+        @if (_demoMode && !_isLoggedIn)
+        {
+            <MudAlert Severity="Severity.Success" Class="mb-3" Dense="true" Icon="@Icons.Material.Filled.Info">
+                <strong>Demo Mode Active:</strong> This is a sample portfolio with demo data. Login with any credentials and MFA code to explore!
+            </MudAlert>
+        }
+        <MudText Typo="Typo.h6" Class="mb-3">@(!_isLoggedIn && string.IsNullOrEmpty(_ibkrUsername) ? "Connect Your Brokerage Accounts" : "Brokerage Connections")</MudText>
+        
+        <MudStack Row="true" Spacing="2" Class="login-buttons-stack">
+            <MudButton Variant="Variant.Filled" 
+                       Class="@(_isLoggedIn ? "sharesies-login-btn-connected" : "sharesies-login-btn")" 
+                       OnClick="ShowLoginDialog"
+                       Disabled="@_isLoggedIn">
+                <img src="images/sharesies-logo.png" alt="@Constants.BrokerageSharesies" class="mr-2" />
+                @(_isLoggedIn ? "Connected to Sharesies" : "Connect to Sharesies")
+            </MudButton>
+            
+            <MudButton Variant="Variant.Filled" 
+                       Class="@(!string.IsNullOrEmpty(_ibkrUsername) ? "ibkr-login-btn-connected" : "ibkr-login-btn")"
+                       OnClick="ShowIbkrLoginDialog"
+                       Disabled="@(_demoMode || !string.IsNullOrEmpty(_ibkrUsername))">
+                <img src="images/ibkr-logo.svg" alt="Interactive Brokers" class="mr-2" />
+                @(!string.IsNullOrEmpty(_ibkrUsername) ? "Connected to IBKR" : "Connect to IBKR")
+            </MudButton>
+        </MudStack>
+        
+        @if (_demoMode && !_isLoggedIn)
+        {
+            <MudText Typo="Typo.caption" Class="mt-2" Color="Color.Secondary">
+                Note: IBKR authentication is not available in demo mode
+            </MudText>
+        }
+    </MudCardContent>
+</MudCard>
