@@ -41,7 +41,6 @@
             
             <MudButton Variant="Variant.Filled" 
                        Class="@(!string.IsNullOrEmpty(_ibkrUsername) ? "ibkr-login-btn-connected" : "ibkr-login-btn")"
-                       Style="color: #fff"
                       OnClick="ShowIbkrLoginDialog"
                       Disabled="@(_demoMode || !string.IsNullOrEmpty(_ibkrUsername))">
                 <img src="images/ibkr-logo.svg" alt="Interactive Brokers" class="mr-2" />
