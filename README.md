@@ -69,9 +69,11 @@ Manual deployment workflow for the demo site. Deploys a Blazor WASM app with dem
 - Instrument details and pricing
 - Real-time holdings tracking
 
-### Interactive Brokers (IBKR) ⚠️ In Development
+### Interactive Brokers (IBKR) ✅ Fully Supported
 - QR code authentication (Playwright automation)
-- Account and position data (implementation in progress)
+- Portfolio data retrieval
+- Account and position data
+- Real-time holdings tracking
 
 ## Getting Started
 
