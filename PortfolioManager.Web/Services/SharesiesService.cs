@@ -2,10 +2,11 @@ using System.Net.Http.Json;
 using PortfolioManager.Contracts;
 using PortfolioManager.Contracts.Models.Brokerage;
 using PortfolioManager.Contracts.Web;
+using PortfolioManager.Web.Models;
 
 namespace PortfolioManager.Web.Services;
 
-public interface IBrokerageService
+public interface ISharesiesService
 {
     Task<BrokerageAuthResult> AuthenticateAsync(string brokerageType, string username, string password);
     Task<BrokerageAuthResult> ContinueAuthenticationAsync(string brokerageType, AuthenticationContinuation continuation);
@@ -13,45 +14,12 @@ public interface IBrokerageService
     Task<List<SupportedBrokerage>> GetSupportedBrokeragesAsync();
 }
 
-public class BrokerageAuthResult
-{
-    public bool Success { get; set; }
-    public bool Authenticated { get; set; }
-    public AuthenticationStep Step { get; set; }
-    public string? SessionId { get; set; }
-    public string? UserId { get; set; }
-    public Dictionary<string, string>? Tokens { get; set; }
-    public string? Message { get; set; }
-    
-    // MFA
-    public bool RequiresMfa { get; set; }
-    public string? MfaType { get; set; }
-    
-    // QR Code
-    public bool RequiresQrScan { get; set; }
-    public string? QrCodeBase64 { get; set; }
-}
-
-public class AuthenticationContinuation
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-    public string? SessionId { get; set; }
-    public string? MfaCode { get; set; }
-}
-
-public class SupportedBrokerage
-{
-    public string Type { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-}
-
-public class BrokerageService : IBrokerageService
+public class SharesiesService : ISharesiesService
 {
     private readonly HttpClient _httpClient;
     private readonly bool _demoMode;
 
-    public BrokerageService(HttpClient httpClient, IConfiguration configuration)
+    public SharesiesService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _demoMode = configuration.GetValue<bool>("DemoMode");

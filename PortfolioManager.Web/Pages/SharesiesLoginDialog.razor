@@ -1,8 +1,9 @@
 @using MudBlazor
 @using Microsoft.AspNetCore.Components
 @using PortfolioManager.Contracts
+@using PortfolioManager.Web.Models
 @using PortfolioManager.Web.Services
-@inject IBrokerageService BrokerageService
+@inject ISharesiesService SharesiesService
 @inject IAuthStateService AuthStateService
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
@@ -174,7 +175,7 @@
 
             if (!_requiresMfa)
             {
-                var result = await BrokerageService.AuthenticateAsync(Constants.BrokerageSharesies, _email, _password);
+                var result = await SharesiesService.AuthenticateAsync(Constants.BrokerageSharesies, _email, _password);
                 
                 if (result.RequiresMfa)
                 {
@@ -203,7 +204,7 @@
                     MfaCode = _mfaCode
                 };
                 
-                var result = await BrokerageService.ContinueAuthenticationAsync(Constants.BrokerageSharesies, continuation);
+                var result = await SharesiesService.ContinueAuthenticationAsync(Constants.BrokerageSharesies, continuation);
                 
                 if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
                 {

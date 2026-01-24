@@ -15,7 +15,7 @@ public partial class Home : IDisposable
 {
     private const string DefaultCurrency = "N/A";
     
-    [Inject] private IBrokerageService BrokerageService { get; set; } = default!;
+    [Inject] private ISharesiesService SharesiesService { get; set; } = default!;
     [Inject] private IAuthStateService AuthStateService { get; set; } = default!;
     [Inject] private IIbkrService IbkrService { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
@@ -264,7 +264,7 @@ public partial class Home : IDisposable
                     Step = AuthenticationStep.Completed
                 };
                 
-                sharesiesData = await BrokerageService.GetPortfolioAsync(authResult);
+                sharesiesData = await SharesiesService.GetPortfolioAsync(authResult);
                 
                 if (sharesiesData == null)
                 {

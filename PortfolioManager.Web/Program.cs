@@ -27,7 +27,7 @@ var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5269";
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 // Brokerage services - New unified service
-builder.Services.AddScoped<IBrokerageService, BrokerageService>();
+builder.Services.AddScoped<ISharesiesService, SharesiesService>();
 
 // IBKR service
 builder.Services.AddScoped<IIbkrService, IbkrService>();
