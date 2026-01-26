@@ -46,6 +46,9 @@ try {
     if (Test-Path "PortfolioManager.Public.sln") {
         Copy-Item -Path "PortfolioManager.Public.sln" -Destination (Join-Path $tempDir "PortfolioManager.Public.sln") -Force
     }
+    if (Test-Path "update-version.ps1") {
+        Copy-Item -Path "update-version.ps1" -Destination (Join-Path $tempDir "update-version.ps1") -Force
+    }
     if (Test-Path ".gitignore") {
         Copy-Item -Path ".gitignore" -Destination (Join-Path $tempDir ".gitignore") -Force
     }
