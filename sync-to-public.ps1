@@ -28,16 +28,27 @@ try {
         Copy-Item -Path "Screenshots" -Destination $screenshotsDest -Recurse -Force
     }
     if (Test-Path ".github") {
-        # Copy .github but replace build-test.yml with build-public.yml
+        # Copy .github but replace workflows for public repo
         Copy-Item -Path ".github" -Destination $githubDest -Recurse -Force
         $buildTestPath = Join-Path $githubDest "workflows\build-test.yml"
         $buildPublicPath = Join-Path $githubDest "workflows\build-public.yml"
+        $deployPath = Join-Path $githubDest "workflows\deploy.yml"
+        $deployPublicPath = Join-Path $githubDest "workflows\deploy-public.yml"
+        
+        # Replace build-test.yml with build-public.yml
         if (Test-Path $buildTestPath) {
             Remove-Item $buildTestPath -Force
         }
-        # Rename build-public.yml to build-test.yml for consistency in public repo
         if (Test-Path $buildPublicPath) {
             Rename-Item $buildPublicPath -NewName "build-test.yml" -Force
+        }
+        
+        # Replace deploy.yml with deploy-public.yml
+        if (Test-Path $deployPath) {
+            Remove-Item $deployPath -Force
+        }
+        if (Test-Path $deployPublicPath) {
+            Rename-Item $deployPublicPath -NewName "deploy.yml" -Force
         }
     }
     if (Test-Path "PUBLIC_README.md") {

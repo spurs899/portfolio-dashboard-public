@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    
+    - name: Update cache version
+      run: |
+        pwsh -File update-version.ps1 -AutoIncrement
+    
+    - name: Enable Demo Mode
+      run: |
+        cat > PortfolioManager.Web/wwwroot/appsettings.json << 'EOF'
+        {
+          "DemoMode": true,
+          "ApiBaseUrl": "http://localhost:5269"
+        }
+        EOF
+    
+    - name: Publish
+      run: dotnet publish PortfolioManager.Web -c Release -o release
+    
+    - name: Fix base path
+      run: |
+        sed -i 's|<base href="/" />|<base href="/portfolio-dashboard-public/" />|g' release/wwwroot/index.html
+    
+    - name: Add .nojekyll
+      run: touch release/wwwroot/.nojekyll
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: release/wwwroot
