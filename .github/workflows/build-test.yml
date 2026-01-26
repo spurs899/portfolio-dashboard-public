@@ -26,13 +26,13 @@ jobs:
         dotnet-version: 9.0.x
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore PortfolioManager.sln
     
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build PortfolioManager.sln --no-restore --configuration Release
     
     - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test PortfolioManager.sln --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx"
     
     - name: Publish test results
       uses: dorny/test-reporter@v1
