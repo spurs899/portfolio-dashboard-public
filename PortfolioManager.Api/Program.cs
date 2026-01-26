@@ -9,6 +9,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 var builder = WebApplication.CreateBuilder(args);
 
