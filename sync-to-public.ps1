@@ -19,6 +19,7 @@ try {
     $webDest = Join-Path $tempDir "PortfolioManager.Web"
     $contractsDest = Join-Path $tempDir "PortfolioManager.Contracts"
     $screenshotsDest = Join-Path $tempDir "Screenshots"
+    $githubDest = Join-Path $tempDir ".github"
     
     Copy-Item -Path "PortfolioManager.Web" -Destination $webDest -Recurse -Force
     Copy-Item -Path "PortfolioManager.Contracts" -Destination $contractsDest -Recurse -Force
@@ -26,8 +27,24 @@ try {
     if (Test-Path "Screenshots") {
         Copy-Item -Path "Screenshots" -Destination $screenshotsDest -Recurse -Force
     }
+    if (Test-Path ".github") {
+        # Copy .github but replace build-test.yml with build-public.yml
+        Copy-Item -Path ".github" -Destination $githubDest -Recurse -Force
+        $buildTestPath = Join-Path $githubDest "workflows\build-test.yml"
+        $buildPublicPath = Join-Path $githubDest "workflows\build-public.yml"
+        if (Test-Path $buildTestPath) {
+            Remove-Item $buildTestPath -Force
+        }
+        # Rename build-public.yml to build-test.yml for consistency in public repo
+        if (Test-Path $buildPublicPath) {
+            Rename-Item $buildPublicPath -NewName "build-test.yml" -Force
+        }
+    }
     if (Test-Path "PUBLIC_README.md") {
         Copy-Item -Path "PUBLIC_README.md" -Destination (Join-Path $tempDir "README.md") -Force
+    }
+    if (Test-Path "PortfolioManager.Public.sln") {
+        Copy-Item -Path "PortfolioManager.Public.sln" -Destination (Join-Path $tempDir "PortfolioManager.Public.sln") -Force
     }
     if (Test-Path ".gitignore") {
         Copy-Item -Path ".gitignore" -Destination (Join-Path $tempDir ".gitignore") -Force
