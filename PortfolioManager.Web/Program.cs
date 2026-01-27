@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -14,12 +15,18 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBlazoredLocalStorage();
 
 // Load configuration from appsettings.json
+var isDemoMode = false;
 var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 var config = await httpClient.GetFromJsonAsync<Dictionary<string, object>>("appsettings.json");
 if (config != null)
 {
     builder.Configuration.AddInMemoryCollection(config.Select(kvp => 
         new KeyValuePair<string, string?>(kvp.Key, kvp.Value?.ToString())));
+    
+    if (config.TryGetValue("DemoMode", out var demoModeValue) && demoModeValue is JsonElement element)
+    {
+        isDemoMode = element.GetBoolean();
+    }
 }
 
 // Configure HttpClient with API base URL from configuration
@@ -27,10 +34,16 @@ var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5269";
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 // Brokerage services - New unified service
-builder.Services.AddScoped<ISharesiesService, SharesiesService>();
-
-// IBKR service
-builder.Services.AddScoped<IIbkrService, IbkrService>();
+if (isDemoMode)
+{
+    builder.Services.AddScoped<ISharesiesService, SharesiesDemoService>();
+    builder.Services.AddScoped<IIbkrService, IbkrDemoService>();
+}
+else
+{
+    builder.Services.AddScoped<ISharesiesService, SharesiesService>();
+    builder.Services.AddScoped<IIbkrService, IbkrService>();
+}
 
 // Auth state services
 builder.Services.AddScoped<AuthStateService>();
