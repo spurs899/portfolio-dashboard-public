@@ -22,6 +22,7 @@ public partial class Home : IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private IMarketStatusService MarketStatusService { get; set; } = default!;
+    [Inject] private ICurrencyService CurrencyService { get; set; } = default!;
     
     private bool _demoMode;
     private bool _isLoggedIn;
@@ -51,6 +52,8 @@ public partial class Home : IDisposable
     protected override async Task OnInitializedAsync()
     {
         _demoMode = Configuration.GetValue<bool>("DemoMode");
+        await CurrencyService.InitializeAsync();
+        CurrencyService.OnCurrencyChanged += OnCurrencyChanged;
         UpdateTimes();
         StartTimerAsync();
         await TryAutoLoginAsync();
@@ -161,6 +164,12 @@ public partial class Home : IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
+        CurrencyService.OnCurrencyChanged -= OnCurrencyChanged;
+    }
+    
+    private void OnCurrencyChanged()
+    {
+        StateHasChanged();
     }
 
     private async Task TryAutoLoginAsync()
@@ -435,10 +444,27 @@ public partial class Home : IDisposable
         await LoadPortfolioData();
         Snackbar.Add("Portfolio refreshed", Severity.Success);
     }
+    
+    private async Task SetCurrencyAsync(string currency)
+    {
+        await CurrencyService.SetCurrencyAsync(currency);
+    }
 
-    private decimal GetTotalValue() => _cachedTotalValue;
-    private decimal GetDailyReturn() => _cachedDailyReturn;
+    private decimal GetTotalValue() => ConvertCurrency(_cachedTotalValue, GetPortfolioCurrency());
+    private decimal GetDailyReturn() => ConvertCurrency(_cachedDailyReturn, GetPortfolioCurrency());
     private decimal GetDailyReturnPercentage() => _cachedDailyReturnPercentage;
+    
+    private decimal ConvertCurrency(decimal amount, string sourceCurrency)
+    {
+        if (string.IsNullOrEmpty(sourceCurrency) || sourceCurrency == DefaultCurrency)
+            return amount;
+        return CurrencyService.ConvertToSelectedCurrency(amount, sourceCurrency);
+    }
+    
+    private string FormatCurrency(decimal amount, string sourceCurrency)
+    {
+        return CurrencyService.FormatCurrency(amount, sourceCurrency);
+    }
 
     private int GetHoldingsCount()
     {
@@ -462,6 +488,7 @@ public partial class Home : IDisposable
             {
                 var instruments = group.ToList();
                 var firstInstrument = instruments.First();
+                var currency = firstInstrument.Currency ?? DefaultCurrency;
                 
                 var totalShares = instruments.Sum(i => i.SharesOwned);
                 var totalValue = instruments.Sum(i => i.InvestmentValue);
@@ -473,11 +500,11 @@ public partial class Home : IDisposable
                 {
                     Symbol = firstInstrument.Symbol ?? "N/A",
                     Name = firstInstrument.Name ?? "",
-                    Currency = firstInstrument.Currency ?? DefaultCurrency,
-                    SharePrice = firstInstrument.SharePrice,
+                    Currency = currency,
+                    SharePrice = ConvertCurrency(firstInstrument.SharePrice, currency),
                     TotalShares = totalShares,
-                    TotalValue = totalValue,
-                    TotalReturn = totalReturn,
+                    TotalValue = ConvertCurrency(totalValue, currency),
+                    TotalReturn = ConvertCurrency(totalReturn, currency),
                     AverageReturnPercentage = averageReturnPercentage,
                     BrokerageTypes = instruments.Select(i => i.BrokerageType).Distinct().OrderBy(x => x).ToList()
                 };
@@ -494,6 +521,7 @@ public partial class Home : IDisposable
         return _portfolioData.Instruments
             .Select(instrument =>
             {
+                var currency = instrument.Currency ?? DefaultCurrency;
                 var dailyReturnPercent = instrument.InvestmentValue > 0 
                     ? (instrument.SimpleReturn / instrument.InvestmentValue * 100) 
                     : 0;
@@ -502,11 +530,11 @@ public partial class Home : IDisposable
                 {
                     Symbol = instrument.Symbol ?? "N/A",
                     Name = instrument.Name ?? "",
-                    Currency = instrument.Currency ?? DefaultCurrency,
-                    SharePrice = instrument.SharePrice,
+                    Currency = currency,
+                    SharePrice = ConvertCurrency(instrument.SharePrice, currency),
                     SharesOwned = instrument.SharesOwned,
-                    InvestmentValue = instrument.InvestmentValue,
-                    DailyReturn = instrument.SimpleReturn,
+                    InvestmentValue = ConvertCurrency(instrument.InvestmentValue, currency),
+                    DailyReturn = ConvertCurrency(instrument.SimpleReturn, currency),
                     DailyReturnPercentage = dailyReturnPercent,
                     BrokerageType = instrument.BrokerageType
                 };

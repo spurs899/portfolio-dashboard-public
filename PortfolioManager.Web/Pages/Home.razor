@@ -189,7 +189,15 @@ else if (_portfolioData != null)
                 <div class="d-flex justify-space-between align-start mb-2">
                     <div class="d-flex align-center gap-2">
                         <MudText Typo="Typo.caption" Class="mobile-return-label">DAILY RETURN</MudText>
-                        <span class="mobile-currency-badge">@GetPortfolioCurrency()</span>
+                        <!-- Mobile Currency Toggle -->
+                        <div class="d-flex align-center gap-1" style="background: white; border-radius: 6px; padding: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                            <div @onclick="@(() => SetCurrencyAsync("USD"))" style="cursor: pointer;">
+                                <CurrencyFlag Currency="USD" Size="small" IsSelected="@(CurrencyService.SelectedCurrency == "USD")" />
+                            </div>
+                            <div @onclick="@(() => SetCurrencyAsync("NZD"))" style="cursor: pointer;">
+                                <CurrencyFlag Currency="NZD" Size="small" IsSelected="@(CurrencyService.SelectedCurrency == "NZD")" />
+                            </div>
+                        </div>
                     </div>
                     <MudIconButton Icon="@Icons.Material.Filled.Refresh" 
                                    Color="Color.Primary" 

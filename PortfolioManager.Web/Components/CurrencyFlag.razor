@@ -1,0 +1,51 @@
+@using MudBlazor
+
+<div class="currency-flag-container" style="@GetContainerStyle()">
+    <img src="@GetFlagImagePath()" alt="@Currency flag" style="@GetImageStyle()" />
+</div>
+
+@code {
+    [Parameter]
+    public string Currency { get; set; } = "USD";
+    
+    [Parameter]
+    public string Size { get; set; } = "medium"; // small, medium, large
+    
+    [Parameter]
+    public bool IsSelected { get; set; }
+    
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string GetContainerStyle()
+    {
+        var dimension = Size switch
+        {
+            "small" => "24px",
+            "large" => "48px",
+            _ => "32px"
+        };
+        
+        var cursor = OnClick.HasDelegate ? "cursor: pointer;" : "";
+        var opacity = IsSelected ? "opacity: 1;" : "opacity: 0.6;";
+        var transition = "transition: all 0.2s ease;";
+        var scale = IsSelected ? "transform: scale(1.05);" : "";
+        
+        return $"width: {dimension}; height: auto; {cursor} {opacity} {transition} {scale}";
+    }
+    
+    private string GetImageStyle()
+    {
+        return "width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);";
+    }
+    
+    private string GetFlagImagePath()
+    {
+        return Currency switch
+        {
+            "USD" => "images/us-flag.svg",
+            "NZD" => "images/nz-flag.svg",
+            _ => "images/us-flag.svg"
+        };
+    }
+}

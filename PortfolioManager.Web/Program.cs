@@ -53,6 +53,7 @@ builder.Services.AddScoped<IAuthStateWriter>(sp => sp.GetRequiredService<AuthSta
 
 // Other common services
 builder.Services.AddScoped<IMarketStatusService, MarketStatusService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

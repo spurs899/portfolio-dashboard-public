@@ -5,14 +5,16 @@
         <MudText Typo="Typo.h4" Class="fw-bold mb-1">Portfolio Dashboard</MudText>
         <MudBreadcrumbs Items="_breadcrumbItems" Class="pa-0"></MudBreadcrumbs>
     </div>
-    @if (!string.IsNullOrEmpty(Currency) && Currency != "N/A")
-    {
-        <div class="d-flex align-center gap-3">
-            <div class="currency-badge-lg">
-                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Small" Class="mr-1" />
-                @Currency
+    <div class="d-flex align-center gap-3">
+        <!-- Currency Toggle -->
+        <div class="d-flex align-center gap-2 pa-2" style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div @onclick="@(() => SetCurrency("USD"))" style="cursor: pointer;">
+                <CurrencyFlag Currency="USD" Size="medium" IsSelected="@(CurrencyService.SelectedCurrency == "USD")" />
             </div>
-            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Primary" Variant="Variant.Filled" OnClick="OnRefresh" Class="rounded-lg" />
+            <div @onclick="@(() => SetCurrency("NZD"))" style="cursor: pointer;">
+                <CurrencyFlag Currency="NZD" Size="medium" IsSelected="@(CurrencyService.SelectedCurrency == "NZD")" />
+            </div>
         </div>
-    }
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Primary" Variant="Variant.Filled" OnClick="OnRefresh" Class="rounded-lg" />
+    </div>
 </div>
