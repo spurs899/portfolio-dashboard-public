@@ -197,7 +197,7 @@ a, .btn-link {
   justify-content: center;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, $color-light-blue 0%, $color-deep-blue 100%);
+  background: #0d1b2a;
   font-family: $font-family-base;
   padding: 1rem;
 }
@@ -930,7 +930,7 @@ a, .btn-link {
 
 .ibkr-login-btn {
   background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  color: $color-text-white;
+  color: #fff !important;
   font-weight: $font-weight-semibold;
   padding: 12px 24px;
   display: inline-flex;
@@ -1017,7 +1017,7 @@ a, .btn-link {
 
 .ibkr-login-btn-connected {
   background: #9e9e9e ;
-  color: $color-text-white ;
+  color: #fff !important;
   font-weight: $font-weight-semibold ;
   padding: 12px 24px ;
   display: inline-flex ;
