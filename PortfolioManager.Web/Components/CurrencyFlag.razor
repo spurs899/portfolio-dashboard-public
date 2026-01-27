@@ -2,6 +2,7 @@
 
 <div class="currency-flag-container" style="@GetContainerStyle()">
     <img src="@GetFlagImagePath()" alt="@Currency flag" style="@GetImageStyle()" />
+    <img src="images/currency-dollar.svg" alt="Currency symbol" style="@GetCurrencyOverlayStyle()" />
 </div>
 
 @code {
@@ -31,12 +32,24 @@
         var transition = "transition: all 0.2s ease;";
         var scale = IsSelected ? "transform: scale(1.05);" : "";
         
-        return $"width: {dimension}; height: auto; {cursor} {opacity} {transition} {scale}";
+        return $"width: {dimension}; height: auto; position: relative; display: inline-block; {cursor} {opacity} {transition} {scale}";
     }
     
     private string GetImageStyle()
     {
-        return "width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);";
+        return "width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); display: block;";
+    }
+    
+    private string GetCurrencyOverlayStyle()
+    {
+        var overlaySize = Size switch
+        {
+            "small" => "14px",
+            "large" => "28px",
+            _ => "20px"
+        };
+        
+        return $"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: {overlaySize}; height: {overlaySize}; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));";
     }
     
     private string GetFlagImagePath()
