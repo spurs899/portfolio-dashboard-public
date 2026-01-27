@@ -1,5 +1,7 @@
 # PortfolioDashboard
 
+[![Build and Test](https://github.com/spurs899/portfolio-dashboard-public/actions/workflows/build-test.yml/badge.svg)](https://github.com/spurs899/portfolio-dashboard-public/actions/workflows/build-test.yml)
+[![Deploy to GitHub Pages](https://github.com/spurs899/portfolio-dashboard-public/actions/workflows/deploy.yml/badge.svg)](https://github.com/spurs899/portfolio-dashboard-public/actions/workflows/deploy.yml)
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
