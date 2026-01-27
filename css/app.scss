@@ -2054,18 +2054,10 @@ code {
 }
 
 .symbol-brokerage-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   border-radius: 4px;
-  background: rgba(255,255,255,0.1);
-  padding: 2px;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.15);
-    background: rgba(255,255,255,0.15);
-  }
 }
 
 .holding-value {
@@ -2081,11 +2073,96 @@ code {
   gap: 12px;
   align-items: center;
   padding: 12px;
-  margin-top: 8px;
-  font-size: 14px;
-  color: #8892a6;
-  background: rgba(255,255,255,0.02);
-  border-radius: 8px;
+}
+
+// ============================================================================
+// Dialog Styling - Dark Theme
+// ============================================================================
+
+.dialog-background {
+  backdrop-filter: blur(8px);
+}
+
+.mud-dialog-container {
+  .mud-dialog {
+    background: #1b263b !important;
+    color: #f8f9fa !important;
+  }
+  
+  .mud-dialog-title {
+    background: #1b263b !important;
+    color: #f8f9fa !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  
+  .mud-dialog-content {
+    background: #1b263b !important;
+    color: #f8f9fa !important;
+    
+    // Make all input labels and text white
+    .mud-input-label,
+    .mud-input-label-text {
+      color: #f8f9fa !important;
+    }
+    
+    .mud-input-text,
+    .mud-input-slot,
+    .mud-select-input {
+      color: #f8f9fa !important;
+    }
+    
+    // Autocomplete text
+    .mud-input {
+      color: #f8f9fa !important;
+    }
+    
+    // Make helper text white
+    .mud-input-helper-text {
+      color: #f8f9fa !important;
+      opacity: 0.7;
+    }
+    
+    // Make adornment icons white
+    .mud-input-adornment,
+    .mud-input-adornment-start,
+    .mud-input-adornment-end {
+      color: #f8f9fa !important;
+      
+      .mud-icon-root,
+      svg {
+        color: #f8f9fa !important;
+        fill: #f8f9fa !important;
+      }
+    }
+  }
+  
+  .mud-dialog-actions {
+    background: #1b263b !important;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+}
+
+// Dropdown menu styling (rendered in MudPopover, outside dialog)
+.mud-popover-open .mud-list,
+.mud-popover .mud-list {
+  background: #1b263b !important;
+  
+  .mud-list-item {
+    color: #f8f9fa !important;
+    
+    &:hover {
+      background: rgba(255,255,255,0.08) !important;
+    }
+    
+    &.mud-selected-item {
+      background: rgba(0, 230, 118, 0.15) !important;
+      color: #f8f9fa !important;
+    }
+  }
+  
+  .mud-list-item-text {
+    color: #f8f9fa !important;
+  }
 }
 
 .brokerage-name {
@@ -2093,6 +2170,7 @@ code {
   align-items: center;
   gap: 10px;
   min-width: 180px;
+  color: #f8f9fa;
 }
 
 .brokerage-icon {
@@ -2104,7 +2182,7 @@ code {
 
 .brokerage-shares {
   text-align: center;
-  color: #8892a6;
+  color: #f8f9fa;
 }
 
 .brokerage-value {
@@ -2122,7 +2200,7 @@ code {
   }
 
   &.negative {
-    color: #ff5252;
+    color: #ff9800; // Orange instead of red
   }
 }
 
@@ -2274,4 +2352,52 @@ code {
     text-align: left;
     padding-left: 34px;
   }
+}
+
+// ============================================================================
+// Holdings Management UI
+// ============================================================================
+
+.add-holding-btn {
+  background: #00e676 !important;
+  color: #0d1b2a !important;
+  font-weight: 600;
+  padding: 12px 24px !important;
+  
+  &:hover {
+    background: #00c966 !important;
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  min-height: 60vh;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.holding-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.holding-card:hover .holding-actions {
+  opacity: 1;
+}
+
+.holding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
