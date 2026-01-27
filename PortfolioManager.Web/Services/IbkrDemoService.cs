@@ -5,38 +5,38 @@ namespace PortfolioManager.Web.Services;
 
 public class IbkrDemoService : IIbkrService
 {
-    public Task<IbkrAuthResult> AuthenticateAsync(string username, string password, Action<string> onQRCodeReceived, Action<string> onStatusUpdate)
+    public async Task<IbkrAuthResult> AuthenticateAsync(string username, string password, Action<string> onQRCodeReceived, Action<string> onStatusUpdate)
     {
-        return null;
+        return await Task.FromResult(new IbkrAuthResult());
     }
 
-    public Task<IbkrAccountsResponse?> GetAccountsAsync()
+    public async Task<IbkrAccountsResponse?> GetAccountsAsync()
     {
-        return null;
+        return await Task.FromResult(new IbkrAccountsResponse());
     }
 
-    public Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId)
+    public async Task<IbkrPortfolioSummary?> GetPortfolioSummaryAsync(string accountId)
     {
-        return null;
+        return await Task.FromResult(new IbkrPortfolioSummary());
     }
 
     public async Task<List<InstrumentDto>?> GetPositionsAsync(string accountId)
     {
-        return new List<InstrumentDto>();
+        return await Task.FromResult(new List<InstrumentDto>())!;
     }
 
     public async Task<string?> GetStoredUsernameAsync()
     {
-        return "spurs899";
+        return await Task.FromResult("")!;
     }
 
     public async Task<bool> ValidateSessionAsync()
     {
-        return false;
+        return await Task.FromResult(false)!;
     }
 
     public async Task ClearSessionAsync()
     {
-        //TODO: no op as demo service
+        await Task.CompletedTask;
     }
 }
