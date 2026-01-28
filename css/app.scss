@@ -1946,6 +1946,25 @@ code {
   align-items: center;
 }
 
+.demo-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);
+  color: #0d1b2a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  animation: fadeInUp 0.5s ease-out;
+  letter-spacing: 0.5px;
+  
+  .mud-icon-root {
+    color: #0d1b2a;
+  }
+}
+
 .daily-return-container {
   display: flex;
   align-items: flex-start;
@@ -1986,8 +2005,8 @@ code {
 .holding-card {
   background: #1b263b;
   border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255,255,255,0.05);
@@ -2036,6 +2055,19 @@ code {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 24px;
+  
+  > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 .holding-symbol {
@@ -2051,6 +2083,13 @@ code {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.symbol-brokerages-more {
+  font-size: 12px;
+  color: #8892a6;
+  font-weight: 500;
+  margin-left: 2px;
 }
 
 .symbol-brokerage-icon {
@@ -2073,6 +2112,12 @@ code {
   gap: 12px;
   align-items: center;
   padding: 12px;
+}
+
+.brokerage-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 // ============================================================================
@@ -2181,7 +2226,7 @@ code {
 }
 
 .brokerage-shares {
-  text-align: center;
+  text-align: right;
   color: #f8f9fa;
 }
 
@@ -2399,10 +2444,10 @@ code {
   }
 
   .holding-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     gap: 12px;
+    align-items: center;
     padding: 12px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     
@@ -2443,6 +2488,12 @@ code {
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
+  }
+  
+  .brokerage-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
   }
 }
 
