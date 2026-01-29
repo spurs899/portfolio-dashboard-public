@@ -2332,7 +2332,7 @@ code {
 
 .brokerage-shares {
   text-align: right;
-  color: #f8f9fa;
+  color: #8892a6;
 }
 
 .brokerage-value {
@@ -2550,8 +2550,8 @@ code {
 
   .holding-details {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 12px;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
     align-items: center;
     padding: 12px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -2567,7 +2567,7 @@ code {
   }
 
   .brokerage-name {
-    min-width: auto;
+    min-width: 0;
     font-size: 15px;
     gap: 10px;
     flex: 0 0 auto;
