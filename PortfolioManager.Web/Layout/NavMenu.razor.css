@@ -1,0 +1,30 @@
+/* Override MudBlazor nav link colors for dark drawer background */
+::deep .mud-nav-link {
+    color: #FFFFFF !important;
+}
+
+::deep .mud-nav-link .mud-nav-link-text {
+    color: #FFFFFF !important;
+}
+
+::deep .mud-nav-link .mud-icon-root {
+    color: #FFFFFF !important;
+}
+
+::deep .mud-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+::deep .mud-navmenu .mud-nav-link.active {
+    background-color: rgba(26, 35, 126, 0.4) !important;
+    color: #FFFFFF !important;
+}
+
+::deep .mud-navmenu .mud-nav-link.active .mud-nav-link-text {
+    color: #FFFFFF !important;
+}
+
+::deep .mud-navmenu .mud-nav-link.active .mud-icon-root {
+    color: #FFFFFF !important;
+}
+

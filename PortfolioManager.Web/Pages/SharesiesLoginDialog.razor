@@ -1,0 +1,300 @@
+@using MudBlazor
+@using Microsoft.AspNetCore.Components
+@using PortfolioManager.Contracts
+@using PortfolioManager.Web.Models
+@using PortfolioManager.Web.Services
+@inject ISharesiesService SharesiesService
+@inject IAuthStateService AuthStateService
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+
+<MudDialog Class="robinhood-dialog">
+    <TitleContent>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="images/sharesies-logo.png" alt="Sharesies" style="height: 32px; width: 32px; border-radius: 50%;" />
+            <MudText Typo="Typo.h6">Connect to Sharesies</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        @if (_demoMode)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-3" Dense="true" Style="background: rgba(65, 90, 119, 0.2); border: 1px solid #415a77;">
+                <strong>Demo Mode:</strong> Use a valid email format (e.g., demo@example.com) and any password (6+ chars) to view sample portfolio data
+            </MudAlert>
+        }
+        
+        <MudForm @ref="_form" @bind-IsValid="@_isFormValid">
+            @if (!_requiresMfa)
+            {
+                <MudTextField @bind-Value="_email" 
+                              Label="Email" 
+                              Variant="Variant.Outlined" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "demo@example.com" : "")"
+                              Required="true"
+                              RequiredError="Email is required"
+                              Validation="@(new Func<string, string?>(ValidateEmail))"
+                              Immediate="true" />
+                <MudTextField @bind-Value="_password" 
+                              Label="Password" 
+                              Variant="Variant.Outlined" 
+                              InputType="InputType.Password" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "any password" : "")"
+                              Required="true"
+                              RequiredError="Password is required"
+                              Validation="@(new Func<string, string?>(ValidatePassword))"
+                              Immediate="true" />
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Class="mb-3" Style="background: rgba(65, 90, 119, 0.2); border: 1px solid #415a77;">
+                    @if (_demoMode)
+                    {
+                        <strong>Demo Mode:</strong> <text>Enter a 6-digit MFA code to continue (e.g., 123456)</text>
+                    }
+                    else
+                    {
+                        <text>An MFA code has been sent to your email. Please enter it below.</text>
+                    }
+                </MudAlert>
+                <MudTextField @bind-Value="_mfaCode" 
+                              Label="MFA Code" 
+                              Variant="Variant.Outlined" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Placeholder="@(_demoMode ? "123456" : "")"
+                              Required="true"
+                              RequiredError="MFA code is required"
+                              Validation="@(new Func<string, string?>(ValidateMfaCode))"
+                              Immediate="true"
+                              MaxLength="6" />
+            }
+        </MudForm>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-3" Style="background: rgba(255, 82, 82, 0.15); border: 1px solid #ff5252;">@_errorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="color: #8892a6;">Cancel</MudButton>
+        <MudButton Color="Color.Primary" 
+                   Variant="Variant.Filled" 
+                   OnClick="HandleLogin" 
+                   Disabled="@(_isLoading || !_isFormValid)"
+                   Class="sharesies-dialog-button">
+            @(_requiresMfa ? "Verify MFA" : "Login")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .robinhood-dialog .mud-dialog {
+        background: #1b263b !important;
+        color: #f8f9fa !important;
+    }
+    
+    .robinhood-dialog .mud-dialog-title {
+        background: #1b263b !important;
+        color: #f8f9fa !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .robinhood-dialog .mud-dialog-content {
+        background: #1b263b !important;
+    }
+    
+    .robinhood-dialog .mud-dialog-actions {
+        background: #1b263b !important;
+        border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .robinhood-dialog .mud-input {
+        color: #f8f9fa !important;
+    }
+    
+    .robinhood-dialog .mud-input-label {
+        color: #8892a6 !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined {
+        border-color: rgba(255,255,255,0.2) !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined:hover {
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined.mud-input-focused {
+        border-color: #00e676 !important;
+    }
+    
+    .sharesies-dialog-button {
+        background: linear-gradient(135deg, #ff4785 0%, #ff1f6b 100%) !important;
+        color: white !important;
+    }
+    
+    .sharesies-dialog-button:hover {
+        background: linear-gradient(135deg, #ff1f6b 0%, #e6195e 100%) !important;
+        box-shadow: 0 4px 12px rgba(255,71,133,.4) !important;
+    }
+</style>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+    
+    [Parameter] public EventCallback<string> OnLoginSuccess { get; set; }
+
+    private MudForm? _form;
+    private bool _isFormValid;
+    private bool _demoMode;
+    private string _email = "";
+    private string _password = "";
+    private string _mfaCode = "";
+    private bool _requiresMfa = false;
+    private bool _isLoading = false;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        _demoMode = Configuration.GetValue<bool>("DemoMode");
+    }
+
+    private string? ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "Email is required";
+        
+        if (!email.Contains("@"))
+            return "Email must contain '@'";
+        
+        if (!email.Contains("."))
+            return "Email must contain a domain";
+        
+        var parts = email.Split('@');
+        if (parts.Length != 2)
+            return "Invalid email format";
+        
+        if (string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
+            return "Invalid email format";
+        
+        if (email.Length < 3)
+            return "Email is too short";
+        
+        return null;
+    }
+
+    private string? ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required";
+        
+        if (password.Length < 6)
+            return "Password must be at least 6 characters";
+        
+        return null;
+    }
+
+    private string? ValidateMfaCode(string mfaCode)
+    {
+        if (string.IsNullOrWhiteSpace(mfaCode))
+            return "MFA code is required";
+        
+        if (!mfaCode.All(char.IsDigit))
+            return "MFA code must contain only digits";
+        
+        if (mfaCode.Length != 6)
+            return "MFA code must be exactly 6 digits";
+        
+        return null;
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            if (_form == null)
+                return;
+
+            await _form.Validate();
+            
+            if (!_isFormValid)
+                return;
+
+            _isLoading = true;
+            _errorMessage = null;
+
+            if (!_requiresMfa)
+            {
+                var result = await SharesiesService.AuthenticateAsync(Constants.BrokerageSharesies, _email, _password);
+                
+                if (result.RequiresMfa)
+                {
+                    _requiresMfa = true;
+                    _isFormValid = false;
+                    Snackbar.Add("MFA code sent to your email", Severity.Info);
+                }
+                else if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
+                {
+                    await AuthStateService.SaveAuthStateAsync(Constants.BrokerageSharesies, result.UserId, result.Tokens);
+                    Snackbar.Add("Login successful!", Severity.Success);
+                    await OnLoginSuccess.InvokeAsync(result.UserId);
+                    MudDialog.Close(DialogResult.Ok(result.UserId));
+                }
+                else
+                {
+                    _errorMessage = result.Message ?? "Login failed";
+                }
+            }
+            else
+            {
+                var continuation = new AuthenticationContinuation
+                {
+                    Username = _email,
+                    Password = _password,
+                    MfaCode = _mfaCode
+                };
+                
+                var result = await SharesiesService.ContinueAuthenticationAsync(Constants.BrokerageSharesies, continuation);
+                
+                if (result.Authenticated && !string.IsNullOrEmpty(result.UserId) && result.Tokens != null)
+                {
+                    await AuthStateService.SaveAuthStateAsync(Constants.BrokerageSharesies, result.UserId, result.Tokens);
+                    Snackbar.Add("Login successful!", Severity.Success);
+                    await OnLoginSuccess.InvokeAsync(result.UserId);
+                    MudDialog.Close(DialogResult.Ok(result.UserId));
+                }
+                else
+                {
+                    _errorMessage = result.Message ?? "MFA verification failed";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !_isLoading && _isFormValid)
+        {
+            await HandleLogin();
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

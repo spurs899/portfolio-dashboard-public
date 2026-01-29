@@ -1,0 +1,16 @@
+// Remove custom dialog styling - use MudBlazor's built-in dark theme
+.save-button {
+  background: #00e676 !important;
+  color: #0d1b2a !important;
+  font-weight: 600;
+  
+  &:hover:not(:disabled) {
+    background: #00c966 !important;
+  }
+  
+  &:disabled {
+    background: #415a77 !important;
+    color: #8892a6 !important;
+    opacity: 0.6;
+  }
+}

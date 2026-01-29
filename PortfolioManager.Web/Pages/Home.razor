@@ -1,0 +1,241 @@
+@page "/"
+@using PortfolioManager.Contracts
+@using PortfolioManager.Contracts.Web
+@using PortfolioManager.Contracts.Models.Brokerage
+@using PortfolioManager.Web.Components
+@using AggregatedHoldingsTable = PortfolioManager.Web.Components.ViewModels.AggregatedHoldingsTable
+@using DetailedHoldingsTable = PortfolioManager.Web.Components.ViewModels.DetailedHoldingsTable
+
+<PageTitle>Portfolio</PageTitle>
+
+<!-- Animated Background -->
+<div class="animated-background">
+    <div class="floating-ticker" style="--delay: 0s; --duration: 45s; --x: 10%;">AAPL</div>
+    <div class="floating-ticker" style="--delay: 5s; --duration: 55s; --x: 25%;">$342.50</div>
+    <div class="floating-ticker" style="--delay: 10s; --duration: 50s; --x: 40%;">MSFT</div>
+    <div class="floating-ticker" style="--delay: 2s; --duration: 60s; --x: 55%;">+2.3%</div>
+    <div class="floating-ticker" style="--delay: 15s; --duration: 48s; --x: 70%;">GOOGL</div>
+    <div class="floating-ticker" style="--delay: 8s; --duration: 52s; --x: 85%;">$145.20</div>
+    <div class="floating-ticker" style="--delay: 12s; --duration: 58s; --x: 15%;">TSLA</div>
+    <div class="floating-ticker" style="--delay: 18s; --duration: 46s; --x: 30%;">-1.2%</div>
+    <div class="floating-ticker" style="--delay: 6s; --duration: 54s; --x: 50%;">NVDA</div>
+    <div class="floating-ticker" style="--delay: 20s; --duration: 49s; --x: 65%;">$890.00</div>
+    <div class="floating-ticker" style="--delay: 4s; --duration: 57s; --x: 80%;">AMZN</div>
+    <div class="floating-ticker" style="--delay: 14s; --duration: 51s; --x: 95%;">+0.8%</div>
+    <div class="floating-ticker" style="--delay: 22s; --duration: 53s; --x: 20%;">META</div>
+    <div class="floating-ticker" style="--delay: 9s; --duration: 47s; --x: 35%;">$521.30</div>
+    <div class="floating-ticker" style="--delay: 16s; --duration: 56s; --x: 60%;">NFLX</div>
+    <div class="floating-ticker" style="--delay: 11s; --duration: 59s; --x: 75%;">+3.5%</div>
+    <div class="floating-ticker" style="--delay: 24s; --duration: 52s; --x: 5%;">GME 🚀</div>
+    <div class="floating-ticker" style="--delay: 3s; --duration: 49s; --x: 45%;">AMD</div>
+    <div class="floating-ticker" style="--delay: 19s; --duration: 55s; --x: 90%;">$678.90</div>
+    <div class="floating-ticker" style="--delay: 7s; --duration: 51s; --x: 12%;">INTC</div>
+    <div class="floating-ticker" style="--delay: 26s; --duration: 48s; --x: 28%;">+5.2%</div>
+    <div class="floating-ticker" style="--delay: 13s; --duration: 54s; --x: 42%;">DIS</div>
+    <div class="floating-ticker" style="--delay: 21s; --duration: 50s; --x: 58%;">-0.9%</div>
+    <div class="floating-ticker" style="--delay: 1s; --duration: 56s; --x: 72%;">ORCL</div>
+    <div class="floating-ticker" style="--delay: 17s; --duration: 47s; --x: 88%;">$234.50</div>
+    <div class="floating-ticker" style="--delay: 28s; --duration: 53s; --x: 8%;">SPOT</div>
+    <div class="floating-ticker" style="--delay: 23s; --duration: 49s; --x: 33%;">+1.7%</div>
+    <div class="floating-ticker" style="--delay: 30s; --duration: 58s; --x: 52%;">CRM</div>
+    <div class="floating-ticker" style="--delay: 25s; --duration: 46s; --x: 68%;">$445.80</div>
+    <div class="floating-ticker" style="--delay: 27s; --duration: 52s; --x: 82%;">ADBE</div>
+    <div class="floating-ticker" style="--delay: 29s; --duration: 50s; --x: 98%;">-2.1%</div>
+</div>
+
+@if (_isLoading)
+{
+    <div class="portfolio-loading-container">
+        <div class="portfolio-loading-content">
+            <MudProgressCircular Indeterminate="true" Color="Color.Success" Size="Size.Large" Class="loading-spinner" />
+            <MudText Typo="Typo.h6" Class="loading-text">Loading Portfolio</MudText>
+            <MudText Typo="Typo.body2" Class="loading-subtext">Fetching latest market data...</MudText>
+        </div>
+    </div>
+}
+else if (_portfolioData != null && _portfolioData.Instruments?.Any() == true)
+{
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div class="portfolio-value">
+                    <span class="portfolio-value-amount">@GetTotalValue().ToString("C0")</span>
+                    @if (_isDemoMode)
+                    {
+                        <span class="demo-mode-badge">
+                            <MudIcon Icon="@Icons.Material.Filled.Science" Size="Size.Small" />
+                            <span>Demo Mode</span>
+                        </span>
+                    }
+                    <div class="portfolio-currency-flags">
+                        <div @onclick="@(() => SetCurrencyAsync("USD"))" style="cursor: pointer;">
+                            <CurrencyFlag Currency="USD" Size="medium" IsSelected="@(CurrencyService.SelectedCurrency == "USD")" />
+                        </div>
+                        <div @onclick="@(() => SetCurrencyAsync("NZD"))" style="cursor: pointer;">
+                            <CurrencyFlag Currency="NZD" Size="medium" IsSelected="@(CurrencyService.SelectedCurrency == "NZD")" />
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="daily-return-container">
+                    @if (_hasDailyReturnError)
+                    {
+                        <div class="daily-return-error" style="font-size: 16px; color: #8892a6; font-weight: 400;">
+                            Unable to retrieve change for today :(
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="daily-return @(GetDailyReturnPercentage() >= 0 ? "positive" : "negative")">
+                            <span>@(GetDailyReturnPercentage() >= 0 ? "↑" : "↓") @GetDailyReturn().ToString("C2")</span>
+                            <span>(@(GetDailyReturnPercentage() >= 0 ? "+" : "")@GetDailyReturnPercentage().ToString("F2")%)</span>
+                            <span style="font-size: 16px; color: #8892a6; font-weight: 400;">Today</span>
+                        </div>
+                    }
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                                   OnClick="RefreshData"
+                                   Size="Size.Medium"
+                                   Style="color: #8892a6; margin-left: 12px;"
+                                   Title="Refresh prices" />
+                </div>
+            </div>
+            
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="ShowAddHoldingDialog"
+                       Class="add-holding-btn"
+                       Size="Size.Large">
+                Add Holding
+            </MudButton>
+        </div>
+    </div>
+    
+    <!-- Holdings List -->
+    <div class="holdings-list">
+        @foreach (var holding in GetAggregatedHoldings())
+        {
+            <div class="holding-card">
+                <div class="holding-header" @onclick="@(() => ToggleHolding(holding.Symbol))">
+                    <div>
+                        <div class="holding-symbol">
+                            <span>@holding.Symbol</span>
+                            <div class="symbol-brokerages">
+                                @{
+                                    var brokerages = GetHoldings().Where(h => h.Symbol == holding.Symbol).Select(h => h.BrokerageType).Distinct().ToList();
+                                    var maxIconsToShow = 3;
+                                    var brokeragesToShow = brokerages.Take(maxIconsToShow);
+                                    var remainingCount = brokerages.Count - maxIconsToShow;
+                                }
+                                @foreach (var brokerageType in brokeragesToShow)
+                                {
+                                    <img src="@GetBrokerageIcon(brokerageType)" 
+                                         alt="@GetBrokerageName(brokerageType)" 
+                                         title="@GetBrokerageName(brokerageType)"
+                                         class="symbol-brokerage-icon" />
+                                }
+                                @if (remainingCount > 0)
+                                {
+                                    <span class="symbol-brokerages-more" title="@string.Join(", ", brokerages.Skip(maxIconsToShow).Select(b => GetBrokerageName(b)))">
+                                        +@remainingCount
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div style="font-size: 14px; color: #8892a6; font-weight: 400;">
+                            @holding.Name
+                        </div>
+                        <div style="font-size: 14px; color: #8892a6;">
+                            @if (holding.SharePrice > 0)
+                            {
+                                @holding.SharePrice.ToString("C2")
+                            }
+                            else
+                            {
+                                <text>Price unavailable</text>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        @if (holding.SharePrice > 0)
+                        {
+                            <div class="holding-value">@holding.TotalValue.ToString("C2")</div>
+                            <div style="font-size: 13px; color: #8892a6; text-align: right;">
+                                @holding.TotalShares.ToString("N2") shares
+                            </div>
+                            @if (holding.HasCostBasis)
+                            {
+                                <div class="holding-return @(holding.TotalReturn >= 0 ? "positive" : "negative")" style="text-align: right;">
+                                    Return: @(holding.TotalReturn >= 0 ? "+" : "")@holding.TotalReturn.ToString("C2")
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="text-align: right; font-size: 13px; color: #8892a6;">
+                                    Return: N/A
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div style="font-size: 16px; color: #8892a6; text-align: right;">
+                                Unable to load price
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                @if (_expandedHoldings.Contains(holding.Symbol))
+                {
+                    <div class="brokerage-breakdown">
+                        @foreach (var detail in GetHoldings().Where(h => h.Symbol == holding.Symbol))
+                        {
+                            <div class="holding-details">
+                                <div class="brokerage-name">
+                                    <img src="@GetBrokerageIcon(detail.BrokerageType)" 
+                                         alt="@GetBrokerageName(detail.BrokerageType)" 
+                                         class="brokerage-icon" />
+                                    <span>@GetBrokerageName(detail.BrokerageType)</span>
+                                </div>
+                                <div class="brokerage-actions" @onclick:stopPropagation="true">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => ShowEditBrokerHoldingDialog(detail.Symbol, detail.BrokerageType))"
+                                                   Style="color: #8892a6;"
+                                                   title="Edit" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => DeleteBrokerHolding(detail.Symbol, detail.BrokerageType))"
+                                                   Style="color: #ff5252;"
+                                                   title="Delete" />
+                                </div>
+                                <div class="brokerage-value">
+                                    <div>@detail.InvestmentValue.ToString("C2")</div>
+                                    <div class="brokerage-shares">@detail.SharesOwned.ToString("N2") shares</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <!-- Empty State -->
+    <div class="empty-state">
+        <MudIcon Icon="@Icons.Material.Filled.ShowChart" Style="font-size: 120px; color: #415a77; margin-bottom: 24px;" />
+        <MudText Typo="Typo.h4" Style="color: #f8f9fa; margin-bottom: 12px; font-weight: 600;">No Holdings Yet</MudText>
+        <MudText Typo="Typo.body1" Style="color: #8892a6; margin-bottom: 32px; max-width: 400px; text-align: center;">
+            Start building your portfolio by adding your first holding
+        </MudText>
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="ShowAddHoldingDialog"
+                   Size="Size.Large"
+                   Class="add-holding-btn">
+            Add Your First Holding
+        </MudButton>
+    </div>
+}

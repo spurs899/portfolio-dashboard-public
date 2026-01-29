@@ -1,0 +1,89 @@
+@using PortfolioManager.Contracts.Models.Shared
+@using PortfolioManager.Contracts.Web
+@inject ITickerSearchService TickerSearchService
+
+<MudAutocomplete T="TickerSearchResult"
+                 Value="@SelectedTicker"
+                 ValueChanged="@OnValueChanged"
+                 SearchFunc="@SearchTickers"
+                 ToStringFunc="@(ticker => ticker?.DisplayText ?? string.Empty)"
+                 Label="Search by ticker or company name"
+                 Variant="Variant.Outlined"
+                 Adornment="Adornment.Start"
+                 AdornmentIcon="@Icons.Material.Filled.Search"
+                 Clearable="true"
+                 CoerceText="false"
+                 ResetValueOnEmptyText="true"
+                 DebounceInterval="300"
+                 MinCharacters="1"
+                 MaxItems="10"
+                 ShowProgressIndicator="true"
+                 Dense="true"
+                 Style="@CustomStyle">
+    <ItemTemplate Context="ticker">
+        <div class="ticker-search-item">
+            <div class="ticker-symbol">@ticker.Symbol</div>
+            <div class="ticker-name">@ticker.Name</div>
+        </div>
+    </ItemTemplate>
+    <NoItemsTemplate>
+        <div style="padding: 12px; color: #8892a6;">
+            @if (string.IsNullOrEmpty(_lastSearchQuery))
+            {
+                <span>Start typing to search...</span>
+            }
+            else
+            {
+                <span>No results found for "@_lastSearchQuery"</span>
+            }
+        </div>
+    </NoItemsTemplate>
+</MudAutocomplete>
+
+@code {
+    [Parameter]
+    public TickerSearchResult? SelectedTicker { get; set; }
+    
+    [Parameter]
+    public EventCallback<TickerSearchResult?> SelectedTickerChanged { get; set; }
+    
+    [Parameter]
+    public string? CustomStyle { get; set; }
+
+    private string _lastSearchQuery = string.Empty;
+
+    private async Task OnValueChanged(TickerSearchResult? ticker)
+    {
+        Console.WriteLine($"[TickerSearch] Value changed - Symbol: {ticker?.Symbol ?? "null"}, Name: {ticker?.Name ?? "null"}");
+        SelectedTicker = ticker;
+        await SelectedTickerChanged.InvokeAsync(ticker);
+    }
+
+    private async Task<IEnumerable<TickerSearchResult>> SearchTickers(string query, CancellationToken cancellationToken)
+    {
+        _lastSearchQuery = query;
+        Console.WriteLine($"[TickerSearch] Searching for: '{query}'");
+        
+        if (string.IsNullOrWhiteSpace(query) || query.Length < 1)
+        {
+            return Array.Empty<TickerSearchResult>();
+        }
+
+        try
+        {
+            var results = await TickerSearchService.SearchTickersAsync(query);
+            Console.WriteLine($"[TickerSearch] Found {results.Count()} results");
+            return results;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TickerSearch] Error searching tickers: {ex.Message}");
+            return Array.Empty<TickerSearchResult>();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine($"[TickerSearch] OnParametersSetAsync - SelectedTicker: {SelectedTicker?.Symbol ?? "null"}");
+    }
+}

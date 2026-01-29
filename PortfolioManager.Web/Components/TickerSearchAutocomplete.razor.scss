@@ -1,0 +1,38 @@
+.ticker-search-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+
+  .ticker-symbol {
+    font-weight: 600;
+    font-size: 15px;
+    color: #f8f9fa;
+  }
+
+  .ticker-name {
+    font-size: 13px;
+    color: #8892a6;
+  }
+}
+
+// Improve autocomplete dropdown visibility
+::ng-deep {
+  .mud-popover-open {
+    .mud-list {
+      background: #1b263b !important;
+    }
+    
+    .mud-list-item {
+      color: #f8f9fa !important;
+      
+      &:hover {
+        background: rgba(255,255,255,0.1) !important;
+      }
+      
+      &.mud-selected-item {
+        background: rgba(0, 230, 118, 0.15) !important;
+      }
+    }
+  }
+}

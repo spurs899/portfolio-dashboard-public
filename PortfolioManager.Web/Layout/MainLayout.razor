@@ -1,0 +1,178 @@
+﻿@inherits LayoutComponentBase
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject PortfolioManager.Contracts.Web.IHoldingsStorageService HoldingsStorage
+
+<MudThemeProvider Theme="@_theme" />
+<MudLayout>
+    <MudAppBar Elevation="0" Dense="false" Class="robinhood-appbar">
+        <img src="images/sloth-favicon-small.jpg" alt="Logo" class="appbar-logo" />
+        <MudText Typo="Typo.h6" Class="appbar-title">Portfolio Sloth</MudText>
+        <MudSpacer />
+        <MudMenu Icon="@Icons.Material.Filled.AccountCircle" 
+                 Color="Color.Inherit" 
+                 AnchorOrigin="Origin.BottomRight" 
+                 TransformOrigin="Origin.TopRight"
+                 Dense="true">
+            <MudMenuItem Icon="@Icons.Material.Filled.Person" IconColor="Color.Primary">
+                <MudText Typo="Typo.body2">Account</MudText>
+            </MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Icon="@Icons.Material.Filled.DeleteSweep" IconColor="Color.Error" OnClick="@ClearHoldings">
+                <MudText Typo="Typo.body2">Clear All Holdings</MudText>
+            </MudMenuItem>
+        </MudMenu>
+    </MudAppBar>
+    <MudMainContent Class="robinhood-content">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="py-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<style>
+    .robinhood-appbar {
+        background: #0d1b2a !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding: 0 24px;
+        transition: all 0.3s ease;
+    }
+    
+    .appbar-logo {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+        border-radius: 6px;
+        transition: transform 0.3s ease;
+    }
+    
+    .appbar-logo:hover {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .appbar-title {
+        color: #f8f9fa !important;
+        font-weight: 500;
+    }
+    
+    .robinhood-content {
+        background: #0d1b2a !important;
+        min-height: 100vh;
+    }
+    
+    /* Smooth icon button transitions */
+    .mud-icon-button {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    .mud-icon-button:hover {
+        background-color: rgba(255,255,255,0.08) !important;
+        transform: scale(1.1);
+    }
+    
+    .mud-icon-button:active {
+        transform: scale(0.95);
+    }
+    
+    /* Menu styling */
+    .mud-menu {
+        border-radius: 12px !important;
+    }
+    
+    .mud-popover {
+        background: #1b263b !important;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+    }
+    
+    .mud-menu-item {
+        color: #f8f9fa !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .mud-menu-item:hover {
+        background-color: rgba(255,255,255,0.05) !important;
+    }
+    
+    .mud-divider {
+        background-color: rgba(255,255,255,0.08) !important;
+    }
+    
+    /* Smooth page transitions */
+    .mud-container {
+        animation: pageEnter 0.3s ease-out;
+    }
+    
+    @@keyframes pageEnter {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code {
+    private MudTheme _theme = new MudTheme()
+    {
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#00e676",
+            Secondary = "#415a77",
+            Background = "#0d1b2a",
+            Surface = "#1b263b",
+            AppbarBackground = "#0d1b2a",
+            AppbarText = "#f8f9fa",
+            TextPrimary = "#f8f9fa",
+            TextSecondary = "#8892a6",
+            Success = "#00e676",
+            Error = "#ff5252",
+            Info = "#415a77",
+            Warning = "#ffa726",
+            Divider = "rgba(255,255,255,0.08)",
+            DrawerBackground = "#1b263b",
+            DrawerText = "#f8f9fa"
+        }
+    };
+
+    private async Task ClearHoldings()
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Clear All Holdings?",
+            "Are you sure you want to delete all holdings? This action cannot be undone.",
+            yesText: "Clear All",
+            cancelText: "Cancel");
+
+        if (confirmed == true)
+        {
+            try
+            {
+                var holdings = await HoldingsStorage.GetHoldingsAsync();
+                foreach (var holding in holdings.ToList())
+                {
+                    await HoldingsStorage.DeleteHoldingAsync(holding.Symbol);
+                }
+                
+                Snackbar.Add("All holdings cleared", Severity.Success);
+                Navigation.NavigateTo(Navigation.BaseUri, forceLoad: true);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error clearing holdings: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task Logout()
+    {
+        await AuthStateService.ClearAuthStateAsync();
+        Snackbar.Add("Logged out successfully", Severity.Success);
+        Navigation.NavigateTo(Navigation.BaseUri, forceLoad: true);
+    }
+}

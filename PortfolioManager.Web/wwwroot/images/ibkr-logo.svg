@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- IBKR logo adapted for circular format -->
+  <defs>
+    <linearGradient id="ibkrBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ibkrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0" style="stop-color:#D81222"/>
+      <stop offset="1" style="stop-color:#960B1A"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark circular background -->
+  <circle cx="40" cy="40" r="40" fill="url(#ibkrBg)"/>
+  
+  <!-- IBKR logo elements scaled and centered -->
+  <g transform="translate(40, 40) scale(0.35) translate(-135, -150)">
+    <!-- Triangle with gradient -->
+    <polygon points="0,150 0,0 150,150" fill="url(#ibkrGradient)"/>
+    <!-- Circle -->
+    <circle cx="165" cy="75" r="45" fill="#D81222"/>
+    <!-- Second polygon -->
+    <polygon points="0,0 0,150 150,350" fill="#D81222"/>
+  </g>
+</svg>

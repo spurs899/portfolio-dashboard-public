@@ -1,0 +1,167 @@
+@using PortfolioManager.Contracts.Models.Shared
+@using PortfolioManager.Web.Components
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="@_isValid">
+            <MudStack Spacing="3">
+                @if (ExistingHolding == null)
+                {
+                    <TickerSearchAutocomplete SelectedTicker="@_selectedTicker" 
+                                              SelectedTickerChanged="@OnTickerSelectedAsync" />
+                }
+                else
+                {
+                    <MudTextField @bind-Value="@_symbol"
+                                  Label="Symbol"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="true" />
+                    <MudTextField @bind-Value="@_name"
+                                  Label="Company Name"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="true" />
+                }
+                
+                <MudNumericField Value="@_shares"
+                                 ValueChanged="@((decimal val) => { _shares = val; Console.WriteLine($"[Dialog] Shares changed to: {val}, CanSave: {CanSave()}"); StateHasChanged(); })"
+                                 Label="Number of Shares"
+                                 Variant="Variant.Outlined"
+                                 Min="0.0001m"
+                                 Step="1"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Filled.Tag" />
+                
+                <MudNumericField Value="@_averageCost"
+                                 ValueChanged="@((decimal? val) => { _averageCost = val; Console.WriteLine($"[Dialog] Cost basis changed to: {val?.ToString("C2") ?? "null"}"); StateHasChanged(); })"
+                                 Label="Cost Basis (Optional)"
+                                 Variant="Variant.Outlined"
+                                 Min="0"
+                                 Step="0.01m"
+                                 Format="C2"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                 HelperText="Average cost per share (leave empty if unknown)" />
+                
+                <MudSelect Value="@_brokerageType"
+                           ValueChanged="@((string val) => { _brokerageType = val; Console.WriteLine($"[Dialog] Brokerage changed to: {val}"); StateHasChanged(); })"
+                           Label="Brokerage"
+                           Variant="Variant.Outlined"
+                           Adornment="Adornment.Start"
+                           AdornmentIcon="@Icons.Material.Filled.AccountBalance">
+                    <MudSelectItem Value="@("Sharesies")">Sharesies</MudSelectItem>
+                    <MudSelectItem Value="@("Hatch")">Hatch</MudSelectItem>
+                    <MudSelectItem Value="@("Stake")">Stake</MudSelectItem>
+                    <MudSelectItem Value="@("ASB Securities")">ASB Securities</MudSelectItem>
+                    <MudSelectItem Value="@("ANZ Securities")">ANZ Securities</MudSelectItem>
+                    <MudSelectItem Value="@("Invest Direct")">Invest Direct</MudSelectItem>
+                    <MudSelectItem Value="@("IBKR")">Interactive Brokers</MudSelectItem>
+                    <MudSelectItem Value="@("Other")">Other</MudSelectItem>
+                </MudSelect>
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton OnClick="Save" 
+                   Variant="Variant.Filled" 
+                   Color="Color.Primary"
+                   Disabled="@(!CanSave())">
+            @(ExistingHolding == null ? "Add Holding" : "Save Changes")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
+    
+    [Parameter]
+    public Holding? ExistingHolding { get; set; }
+
+    private MudForm _form = default!;
+    private bool _isValid;
+    private TickerSearchResult? _selectedTicker;
+    private string _symbol = string.Empty;
+    private string _name = string.Empty;
+    private decimal _shares;
+    private decimal? _averageCost;
+    private string _brokerageType = "Other";
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine($"[Dialog] OnInitialized - ExistingHolding: {ExistingHolding?.Symbol ?? "null"}");
+        
+        if (ExistingHolding != null)
+        {
+            _symbol = ExistingHolding.Symbol;
+            _name = ExistingHolding.Name;
+            _shares = ExistingHolding.Shares;
+            _averageCost = ExistingHolding.AverageCost > 0 ? ExistingHolding.AverageCost : null;
+            _brokerageType = ExistingHolding.BrokerageType;
+            
+            Console.WriteLine($"[Dialog] Loaded holding - Symbol: {_symbol}, Shares: {_shares}, Cost: {_averageCost?.ToString("C2") ?? "null"}, Brokerage: {_brokerageType}");
+        }
+    }
+
+    private async Task OnTickerSelectedAsync(TickerSearchResult? ticker)
+    {
+        _selectedTicker = ticker;
+        Console.WriteLine($"[Dialog] Ticker selected - Symbol: {ticker?.Symbol ?? "null"}, Name: {ticker?.Name ?? "null"}");
+        Console.WriteLine($"[Dialog] CanSave after ticker: {CanSave()}");
+        StateHasChanged();
+    }
+
+    private bool CanSave()
+    {
+        bool result;
+        
+        // For new holdings, need ticker selected and shares > 0
+        if (ExistingHolding == null)
+        {
+            result = _selectedTicker != null && _shares > 0;
+            Console.WriteLine($"[Dialog] CanSave (new) - Ticker: {_selectedTicker?.Symbol ?? "null"}, Shares: {_shares}, Result: {result}");
+        }
+        else
+        {
+            // For edits, just need shares > 0
+            result = _shares > 0;
+            Console.WriteLine($"[Dialog] CanSave (edit) - Shares: {_shares}, Result: {result}");
+        }
+        
+        return result;
+    }
+
+    private void Cancel()
+    {
+        Console.WriteLine("[Dialog] Cancel clicked");
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        Console.WriteLine("[Dialog] Save clicked - starting validation");
+        await _form.Validate();
+        
+        if (!CanSave())
+        {
+            Console.WriteLine("[Dialog] Save aborted - CanSave returned false");
+            return;
+        }
+
+        var holding = new Holding
+        {
+            Symbol = ExistingHolding?.Symbol ?? _selectedTicker?.Symbol ?? string.Empty,
+            Name = ExistingHolding?.Name ?? _selectedTicker?.Name ?? string.Empty,
+            Shares = _shares,
+            AverageCost = _averageCost ?? 0m, // 0 means no cost basis set
+            BrokerageType = _brokerageType,
+            Notes = null,
+            AddedDate = ExistingHolding?.AddedDate ?? DateTime.UtcNow
+        };
+
+        Console.WriteLine($"[Dialog] Saving holding - Symbol: {holding.Symbol}, Name: {holding.Name}, Shares: {holding.Shares}, Cost: {(_averageCost.HasValue ? _averageCost.Value.ToString("C2") : "N/A")}, Brokerage: {holding.BrokerageType}");
+        
+        MudDialog.Close(DialogResult.Ok(holding));
+    }
+}

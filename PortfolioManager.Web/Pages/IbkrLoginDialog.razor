@@ -1,0 +1,302 @@
+@using MudBlazor
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+@inject PortfolioManager.Web.Services.IIbkrService IbkrService
+@implements IAsyncDisposable
+
+<MudDialog Class="robinhood-dialog">
+    <TitleContent>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="images/ibkr-logo.svg" alt="Interactive Brokers" style="height: 32px; width: 32px; background: white; padding: 4px; border-radius: 4px;" />
+            <MudText Typo="Typo.h6">Connect to IBKR</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        @if (_demoMode)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-3" Dense="true" Style="background: rgba(65, 90, 119, 0.2); border: 1px solid #415a77;">
+                <strong>Demo Mode:</strong> IBKR authentication is not available in demo mode
+            </MudAlert>
+        }
+        
+        <MudForm @ref="_form" @bind-IsValid="@_isFormValid">
+            @if (_authStep == AuthStep.Input)
+            {
+                <MudTextField @bind-Value="_username" 
+                              Label="IBKR Username" 
+                              Variant="Variant.Outlined" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Required="true"
+                              RequiredError="Username is required"
+                              Validation="@(new Func<string, string?>(ValidateUsername))"
+                              Immediate="true"
+                              Disabled="@_demoMode" />
+                              
+                <MudTextField @bind-Value="_password" 
+                              Label="Password" 
+                              Variant="Variant.Outlined" 
+                              InputType="InputType.Password" 
+                              Class="mb-3"
+                              OnKeyDown="HandleKeyDown"
+                              Required="true"
+                              RequiredError="Password is required"
+                              Validation="@(new Func<string, string?>(ValidatePassword))"
+                              Immediate="true"
+                              Disabled="@_demoMode" />
+            }
+            
+            @if (_authStep == AuthStep.ShowingQR)
+            {
+                <MudPaper Class="pa-4" Elevation="0" Style="background: #0d1b2a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                    <MudText Typo="Typo.h6" Class="mb-3" Align="Align.Center" Style="color: #f8f9fa;">
+                        Scan QR Code with IBKR Mobile
+                    </MudText>
+                    
+                    @if (!string.IsNullOrEmpty(_qrCodeBase64))
+                    {
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <img src="data:image/png;base64,@_qrCodeBase64" 
+                                 alt="IBKR QR Code" 
+                                 style="max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="text-align: center; padding: 40px;">
+                            <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2" Class="mt-2" Style="color: #8892a6;">Loading QR code...</MudText>
+                        </div>
+                    }
+                    
+                    <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3" Style="background: rgba(65, 90, 119, 0.2); border: 1px solid #415a77;">
+                        <MudText Typo="Typo.body2" Style="color: #f8f9fa;">
+                            <strong>Steps:</strong>
+                            <ol style="margin: 8px 0; padding-left: 20px;">
+                                <li>Open IBKR Mobile app on your phone</li>
+                                <li>Go to More → Settings → Authenticate</li>
+                                <li>Scan the QR code above</li>
+                            </ol>
+                        </MudText>
+                    </MudAlert>
+                    
+                    <MudProgressLinear Indeterminate="true" Class="mt-3" Color="Color.Primary" />
+                </MudPaper>
+            }
+        </MudForm>
+
+        @if (!string.IsNullOrEmpty(_statusMessage))
+        {
+            <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-2" Style="color: #8892a6;">
+                @_statusMessage
+            </MudText>
+        }
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-3" Style="background: rgba(255, 82, 82, 0.15); border: 1px solid #ff5252;">@_errorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="color: #8892a6;">Cancel</MudButton>
+        @if (_authStep == AuthStep.Input)
+        {
+            <MudButton Color="Color.Primary" 
+                       Variant="Variant.Filled" 
+                       OnClick="StartAuthentication" 
+                       Disabled="@(_isLoading || !_isFormValid || _demoMode)"
+                       Class="ibkr-dialog-button">
+                @if (_isLoading)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <span>Connecting...</span>
+                }
+                else
+                {
+                    <span>Connect</span>
+                }
+            </MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .robinhood-dialog .mud-dialog {
+        background: #1b263b !important;
+        color: #f8f9fa !important;
+    }
+    
+    .robinhood-dialog .mud-dialog-title {
+        background: #1b263b !important;
+        color: #f8f9fa !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .robinhood-dialog .mud-dialog-content {
+        background: #1b263b !important;
+    }
+    
+    .robinhood-dialog .mud-dialog-actions {
+        background: #1b263b !important;
+        border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .robinhood-dialog .mud-input {
+        color: #f8f9fa !important;
+    }
+    
+    .robinhood-dialog .mud-input-label {
+        color: #8892a6 !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined {
+        border-color: rgba(255,255,255,0.2) !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined:hover {
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    
+    .robinhood-dialog .mud-input-outlined.mud-input-focused {
+        border-color: #00e676 !important;
+    }
+    
+    .ibkr-dialog-button {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%) !important;
+        color: white !important;
+        border: 1px solid #c8102e !important;
+    }
+    
+    .ibkr-dialog-button:hover {
+        background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) !important;
+        box-shadow: 0 4px 12px rgba(200,16,46,.4) !important;
+        border-color: #e01234 !important;
+    }
+</style>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+    
+    [Parameter] public EventCallback<string> OnLoginSuccess { get; set; }
+
+    private enum AuthStep { Input, ShowingQR, Success }
+
+    private MudForm? _form;
+    private bool _isFormValid;
+    private bool _demoMode;
+    private string _username = "";
+    private string _password = "";
+    private AuthStep _authStep = AuthStep.Input;
+    private bool _isLoading = false;
+    private string _qrCodeBase64 = "";
+    private string _statusMessage = "";
+    private string _errorMessage = "";
+
+    protected override void OnInitialized()
+    {
+        _demoMode = Configuration.GetValue<bool>("DemoMode");
+    }
+
+    private string? ValidateUsername(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return "Username is required";
+        
+        if (username.Length < 3)
+            return "Username must be at least 3 characters";
+        
+        return null;
+    }
+
+    private string? ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required";
+        
+        if (password.Length < 6)
+            return "Password must be at least 6 characters";
+        
+        return null;
+    }
+
+    private async Task StartAuthentication()
+    {
+        if (_demoMode)
+        {
+            Snackbar.Add("IBKR authentication is not available in demo mode", Severity.Warning);
+            return;
+        }
+
+        if (_form == null)
+            return;
+
+        await _form.Validate();
+        
+        if (!_isFormValid)
+            return;
+
+        _isLoading = true;
+        _errorMessage = "";
+        _statusMessage = "Starting authentication...";
+        
+        try
+        {
+            var result = await IbkrService.AuthenticateAsync(
+                _username, 
+                _password,
+                onQRCodeReceived: (base64Image) =>
+                {
+                    _qrCodeBase64 = base64Image;
+                    _authStep = AuthStep.ShowingQR;
+                    InvokeAsync(StateHasChanged);
+                },
+                onStatusUpdate: (message) =>
+                {
+                    _statusMessage = message;
+                    InvokeAsync(StateHasChanged);
+                });
+
+            if (result.Success)
+            {
+                _authStep = AuthStep.Success;
+                Snackbar.Add($"Connected to IBKR! Captured {result.CookieCount} session cookies.", Severity.Success);
+                await OnLoginSuccess.InvokeAsync(_username);
+                MudDialog.Close(DialogResult.Ok(_username));
+            }
+            else
+            {
+                _errorMessage = result.Message ?? "Authentication failed";
+                _authStep = AuthStep.Input;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error: {ex.Message}";
+            _authStep = AuthStep.Input;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !_isLoading && _isFormValid && _authStep == AuthStep.Input)
+        {
+            await StartAuthentication();
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    public async ValueTask DisposeAsync()
+    {
+        // Service handles its own disposal
+        await ValueTask.CompletedTask;
+    }
+}
