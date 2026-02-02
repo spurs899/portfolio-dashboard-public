@@ -1,0 +1,30 @@
+{
+  "name": "Hedgey - Portfolio Dashboard",
+  "short_name": "Hedgey",
+  "description": "Track your stock portfolio with real-time market data",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#15171c",
+  "theme_color": "#00e676",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/hedgey-logo-green.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/hedgey-logo-green.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
