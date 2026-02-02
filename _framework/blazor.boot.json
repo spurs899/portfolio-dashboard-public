@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "PortfolioManager.Web",
   "resources": {
-    "hash": "sha256-/RncE7/8+q584JWOnquY/IwMsBz+3fvQyw06HI6M01c=",
+    "hash": "sha256-RPSYiE/RCYcY+3+GiocjtiECwPX0PYnE9Lr1Nse072A=",
     "fingerprinting": {
       "Blazored.LocalStorage.rtee5ama0k.wasm": "Blazored.LocalStorage.wasm",
       "Microsoft.AspNetCore.Components.Forms.x80val28il.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
@@ -32,8 +32,8 @@
       "Microsoft.JSInterop.WebAssembly.gaaakzidp6.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
       "Microsoft.JSInterop.wfiurpcsm8.wasm": "Microsoft.JSInterop.wasm",
       "MudBlazor.o1ib9ctr8w.wasm": "MudBlazor.wasm",
-      "PortfolioManager.Contracts.a3n5afylse.wasm": "PortfolioManager.Contracts.wasm",
-      "PortfolioManager.Web.b0jwpoie5a.wasm": "PortfolioManager.Web.wasm",
+      "PortfolioManager.Contracts.j8vf6b1gkv.wasm": "PortfolioManager.Contracts.wasm",
+      "PortfolioManager.Web.m9ca25rpk0.wasm": "PortfolioManager.Web.wasm",
       "System.7mkjnfwul0.wasm": "System.wasm",
       "System.Buffers.1arwynhae3.wasm": "System.Buffers.wasm",
       "System.Collections.Concurrent.afzzw7g7nr.wasm": "System.Collections.Concurrent.wasm",
@@ -131,8 +131,8 @@
       "Microsoft.JSInterop.WebAssembly.gaaakzidp6.wasm": "sha256-aE26/6+UpUrW0uBYwOc6NmMa3HnhNIHmrg3PE+OV19g=",
       "Microsoft.JSInterop.wfiurpcsm8.wasm": "sha256-3Hdtk8HeRS8EE9WPAhYRxnL94YsT1qp680aG/jS9JVs=",
       "MudBlazor.o1ib9ctr8w.wasm": "sha256-5ObjEuJhwVa+LyNJeEWeC3g3YuW/WQK5RabMW+wgHnM=",
-      "PortfolioManager.Contracts.a3n5afylse.wasm": "sha256-2rV8BvLASb2zYfjjBXn8vuJmETFrs/6g1RaDU6f7OZY=",
-      "PortfolioManager.Web.b0jwpoie5a.wasm": "sha256-xR5FfDxDC1S5TVQdCOlr8P3Okt/Xy0slSOvs0SJ7uZA=",
+      "PortfolioManager.Contracts.j8vf6b1gkv.wasm": "sha256-4y1drvbjmKJ8/eBc30H7B3bOZ5IIRv1q/7ShtQZshhY=",
+      "PortfolioManager.Web.m9ca25rpk0.wasm": "sha256-Zj1h6l/ccMHy8pLSLJS4RSvWbMLmbzcG1aTDcoW9GWY=",
       "System.7mkjnfwul0.wasm": "sha256-H4K9w0OHWwZCaMDfVwQjW0dSqnnS/iuCkysBB+Q2c3A=",
       "System.Buffers.1arwynhae3.wasm": "sha256-5//DIyXGLiSMoALsyx7DjVTpuDUOdkZAWfKFoLDCK30=",
       "System.Collections.Concurrent.afzzw7g7nr.wasm": "sha256-FvrfFtu+NO5aoPM3SH+nxICW5O/2QzTzOBH/VSvYjUc=",
