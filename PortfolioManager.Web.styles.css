@@ -1,5 +1,42 @@
 /* /Components/CurrencyFlag.razor.rz.scp.css */
 .currency-flag-container:hover[b-oubxnvv367]{opacity:1 !important;transform:scale(1.1) !important}.currency-flag-container:active[b-oubxnvv367]{transform:scale(0.98) !important}
+/* /Components/PriceChartDialog.razor.rz.scp.css */
+/* Prevent horizontal overflow in dialog */
+[b-7xwi7akxsb] .mud-dialog {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+[b-7xwi7akxsb] .mud-dialog-content {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+[b-7xwi7akxsb] .mud-dialog-container {
+    overflow: hidden !important;
+}
+
+[b-7xwi7akxsb] .mud-chart {
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+[b-7xwi7akxsb] .mud-dialog-title {
+    overflow: hidden !important;
+}
+
+[b-7xwi7akxsb] .mud-dialog-actions {
+    overflow: hidden !important;
+}
+
+/* Prevent button hover from causing layout shift */
+[b-7xwi7akxsb] .mud-button {
+    transform: none !important;
+}
+
+[b-7xwi7akxsb] .mud-icon-button {
+    transform: none !important;
+}
 /* /Components/TickerSearchAutocomplete.razor.rz.scp.css */
 .ticker-search-item[b-ts1d9e96yh]{display:flex;flex-direction:column;gap:4px;padding:8px 0}.ticker-search-item .ticker-symbol[b-ts1d9e96yh]{font-weight:600;font-size:15px;color:#f8f9fa}.ticker-search-item .ticker-name[b-ts1d9e96yh]{font-size:13px;color:#8892a6}::ng-deep .mud-popover-open .mud-list[b-ts1d9e96yh]{background:#1b263b !important}::ng-deep .mud-popover-open .mud-list-item[b-ts1d9e96yh]{color:#f8f9fa !important}::ng-deep .mud-popover-open .mud-list-item:hover[b-ts1d9e96yh]{background:rgba(255,255,255,.1) !important}::ng-deep .mud-popover-open .mud-list-item.mud-selected-item[b-ts1d9e96yh]{background:rgba(0,230,118,.15) !important}
 /* /Components/TimeAndMarketStatusCard.razor.rz.scp.css */
