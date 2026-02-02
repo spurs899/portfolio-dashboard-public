@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "PortfolioManager.Web",
   "resources": {
-    "hash": "sha256-HuE6RceDXZc/SFD8O4q+ddXDuV8t+NKZMNSL0tc77sE=",
+    "hash": "sha256-28pASesvxb71xSQxalQdQ339esnwOEp7gbjx6rgNO5s=",
     "fingerprinting": {
       "Blazored.LocalStorage.rtee5ama0k.wasm": "Blazored.LocalStorage.wasm",
       "Microsoft.AspNetCore.Components.Forms.x80val28il.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
@@ -31,9 +31,9 @@
       "Microsoft.Extensions.Primitives.lflqanr0jf.wasm": "Microsoft.Extensions.Primitives.wasm",
       "Microsoft.JSInterop.WebAssembly.gaaakzidp6.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
       "Microsoft.JSInterop.wfiurpcsm8.wasm": "Microsoft.JSInterop.wasm",
-      "MudBlazor.p0ehn0nvam.wasm": "MudBlazor.wasm",
-      "PortfolioManager.Contracts.0erwz4w7j3.wasm": "PortfolioManager.Contracts.wasm",
-      "PortfolioManager.Web.go1u0ct25p.wasm": "PortfolioManager.Web.wasm",
+      "MudBlazor.fk7tslk5xp.wasm": "MudBlazor.wasm",
+      "PortfolioManager.Contracts.0blrz6cxem.wasm": "PortfolioManager.Contracts.wasm",
+      "PortfolioManager.Web.66ezr59ygp.wasm": "PortfolioManager.Web.wasm",
       "System.7mkjnfwul0.wasm": "System.wasm",
       "System.Buffers.1arwynhae3.wasm": "System.Buffers.wasm",
       "System.Collections.Concurrent.afzzw7g7nr.wasm": "System.Collections.Concurrent.wasm",
@@ -62,7 +62,7 @@
       "System.Net.WebSockets.bs8fq6g9zt.wasm": "System.Net.WebSockets.wasm",
       "System.Net.WebSockets.Client.6xwk2078ih.wasm": "System.Net.WebSockets.Client.wasm",
       "System.ObjectModel.e7e2agpnul.wasm": "System.ObjectModel.wasm",
-      "System.Private.CoreLib.58gwtpo3hu.wasm": "System.Private.CoreLib.wasm",
+      "System.Private.CoreLib.uihiw0x03k.wasm": "System.Private.CoreLib.wasm",
       "System.Private.Uri.yw1jp0tu6t.wasm": "System.Private.Uri.wasm",
       "System.Runtime.InteropServices.JavaScript.a9apmv6un1.wasm": "System.Runtime.InteropServices.JavaScript.wasm",
       "System.Runtime.Serialization.Formatters.ia4byqgqyh.wasm": "System.Runtime.Serialization.Formatters.wasm",
@@ -98,7 +98,7 @@
       "icudt_no_CJK.lfu7j35m59.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "coreAssembly": {
-      "System.Private.CoreLib.58gwtpo3hu.wasm": "sha256-JZt1jmGmXyxq1kCOLRzvaLE41LP1+AkKk3rUPQ3fQRU=",
+      "System.Private.CoreLib.uihiw0x03k.wasm": "sha256-yqZKUF211L78CSkUGRlZGO7o98/q+weatUPuugiDLL0=",
       "System.Runtime.InteropServices.JavaScript.a9apmv6un1.wasm": "sha256-LpJgtF19PIV5I74n8Lyhy929pa8LlCjBI5/8NoJYo6Y="
     },
     "assembly": {
@@ -130,9 +130,9 @@
       "Microsoft.Extensions.Primitives.lflqanr0jf.wasm": "sha256-AaUNPeWCmUYSh20W4X8Fdm1R64TV3W41hat/GJlV1rY=",
       "Microsoft.JSInterop.WebAssembly.gaaakzidp6.wasm": "sha256-aE26/6+UpUrW0uBYwOc6NmMa3HnhNIHmrg3PE+OV19g=",
       "Microsoft.JSInterop.wfiurpcsm8.wasm": "sha256-3Hdtk8HeRS8EE9WPAhYRxnL94YsT1qp680aG/jS9JVs=",
-      "MudBlazor.p0ehn0nvam.wasm": "sha256-OQjAJeqt02xh4eKXKPtyNA/YoXD5+gxv90YyxIbEkaQ=",
-      "PortfolioManager.Contracts.0erwz4w7j3.wasm": "sha256-qKV3ABRj8rIvl+U1ZXRlqpC2Ru2EGoliWlsLjG0xDu0=",
-      "PortfolioManager.Web.go1u0ct25p.wasm": "sha256-AGSf6Uxz3/kNAjUJ71DHH/G9Q0l7lrfaBorYCTfrYeg=",
+      "MudBlazor.fk7tslk5xp.wasm": "sha256-caSkFQcviqiyN0zYUgmfDMS8y4XmHZYzmHEFZhFJjHQ=",
+      "PortfolioManager.Contracts.0blrz6cxem.wasm": "sha256-ZIBKJROmoNe/NgSkaQliuiiGq31d+0JbgS2Ov8IlxvI=",
+      "PortfolioManager.Web.66ezr59ygp.wasm": "sha256-go7d+KZXHoG35tGh6w5fpB1O8q8aOfxPYjRGn7TgF9A=",
       "System.7mkjnfwul0.wasm": "sha256-H4K9w0OHWwZCaMDfVwQjW0dSqnnS/iuCkysBB+Q2c3A=",
       "System.Buffers.1arwynhae3.wasm": "sha256-5//DIyXGLiSMoALsyx7DjVTpuDUOdkZAWfKFoLDCK30=",
       "System.Collections.Concurrent.afzzw7g7nr.wasm": "sha256-FvrfFtu+NO5aoPM3SH+nxICW5O/2QzTzOBH/VSvYjUc=",
