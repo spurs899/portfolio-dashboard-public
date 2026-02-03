@@ -2495,6 +2495,35 @@ code {
     flex-shrink: 0;
   }
 
+  // Space out floating tickers on mobile
+  .floating-ticker {
+    font-size: 16px;
+    
+    &:nth-child(odd) {
+      font-size: 18px;
+    }
+    
+    &:nth-child(3n) {
+      font-size: 14px;
+    }
+    
+    // Hide more tickers and space them out horizontally
+    &:nth-child(n+10) {
+      display: none;
+    }
+    
+    // Spread remaining tickers across full width
+    &:nth-child(1) { left: 5% !important; }
+    &:nth-child(2) { left: 15% !important; }
+    &:nth-child(3) { left: 25% !important; }
+    &:nth-child(4) { left: 35% !important; }
+    &:nth-child(5) { left: 45% !important; }
+    &:nth-child(6) { left: 55% !important; }
+    &:nth-child(7) { left: 65% !important; }
+    &:nth-child(8) { left: 75% !important; }
+    &:nth-child(9) { left: 85% !important; }
+  }
+
   .daily-return-container {
     flex-wrap: wrap;
     gap: 12px;
