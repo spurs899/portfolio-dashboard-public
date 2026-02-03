@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "images/hedgey-logo-green-squared.png",
+      "src": "/portfolio-dashboard-public/images/hedgey-logo-green-squared.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "images/hedgey-logo-green-squared.png",
+      "src": "/portfolio-dashboard-public/images/hedgey-logo-green-squared.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
