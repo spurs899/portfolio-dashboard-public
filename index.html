@@ -16,8 +16,8 @@
     <link rel="apple-touch-icon" href="images/hedgey-logo-green-squared.png" />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#15171c" />
-    <link href="PortfolioManager.Web.styles.css?v=20260203.0927" rel="stylesheet" />
-    <link href="css/app.css?v=20260203.0927" rel="stylesheet" />
+    <link href="PortfolioManager.Web.styles.css?v=20260203.1030" rel="stylesheet" />
+    <link href="css/app.css?v=20260203.1030" rel="stylesheet" />
 </head>
 
 <body>
@@ -48,13 +48,14 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
-    <script src="_framework/blazor.webassembly.js?v=20260203.0927" autostart="false"></script>
+    <script src="_framework/blazor.webassembly.js?v=20260203.1030" autostart="false"></script>
     <script>
         // GitHub Pages SPA routing fix - restore redirected URL
         (function() {
-            var redirect = sessionStorage.redirect;
-            delete sessionStorage.redirect;
-            if (redirect && redirect != location.href) {
+            var redirect = sessionStorage.getItem('redirect');
+            sessionStorage.removeItem('redirect');
+            if (redirect && redirect !== window.location.pathname) {
+                console.log('Restoring path:', redirect);
                 history.replaceState(null, null, redirect);
             }
         })();
@@ -69,7 +70,7 @@
         }
         
         // Cache busting - Clear application cache on version change
-        const APP_VERSION = '20260203.0927';
+        const APP_VERSION = '20260203.1030';
         const storedVersion = localStorage.getItem('app_version');
         
         if (storedVersion !== APP_VERSION) {

@@ -5,8 +5,9 @@
     <title>Redirecting...</title>
     <script>
         // GitHub Pages SPA fallback
-        // When a 404 occurs, redirect to index.html with the path as a query parameter
-        sessionStorage.redirect = location.href;
+        // Store the full path for restoration in index.html
+        var fullPath = window.location.pathname + window.location.search + window.location.hash;
+        sessionStorage.setItem('redirect', fullPath);
     </script>
     <meta http-equiv="refresh" content="0;URL='/'">
 </head>
