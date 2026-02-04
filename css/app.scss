@@ -2143,13 +2143,18 @@ code {
 .holdings-list {
   margin-top: 40px;
   animation: fadeIn 0.4s ease-out;
+  
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
 }
 
 .holding-card {
   background: #1b263b;
   border-radius: 12px;
   padding: 24px;
-  margin-bottom: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255,255,255,0.05);
@@ -2158,6 +2163,10 @@ code {
   overflow: hidden;
   z-index: 1;
   animation: slideInLeft 0.4s ease-out backwards;
+  
+  @media (max-width: 767px) {
+    margin-bottom: 16px;
+  }
 
   &::before {
     content: '';
