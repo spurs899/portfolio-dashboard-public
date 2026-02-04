@@ -7,17 +7,14 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Hedgey</title>
+    <title>Portfolio Sloth</title>
     <base href="/portfolio-dashboard-public/" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="images/hedgey-logo-green.png" />
-    <link rel="apple-touch-icon" href="images/hedgey-logo-green-squared-180.png" />
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#15171c" />
-    <link href="PortfolioManager.Web.styles.css?v=20260204.0057" rel="stylesheet" />
-    <link href="css/app.css?v=20260204.0057" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="images/sloth-favicon-small.jpg" />
+    <link href="PortfolioManager.Web.styles.css?v=20260204.0520" rel="stylesheet" />
+    <link href="css/app.css?v=20260204.0520" rel="stylesheet" />
 </head>
 
 <body>
@@ -25,10 +22,7 @@
         <div class="app-loading">
             <div class="loading-container">
                 <div class="loading-logo-wrapper">
-                    <img src="images/hedgey-logo-green.png" alt="Hedgey" class="loading-sloth" />
-                </div>
-                <div class="loading-banner-wrapper">
-                    <img src="images/hedgey-text.svg" alt="Hedgey" class="loading-banner-text" />
+                    <img src="images/sloth.jpg" alt="Sloth" class="loading-sloth" />
                 </div>
                 <div class="loading-text">
                     Loading
@@ -38,7 +32,12 @@
                         <span></span>
                     </span>
                 </div>
-                <div class="loading-subtitle">Rustling in the hedges</div>
+                <div class="loading-subtitle">Preparing your dashboard</div>
+                <div class="loading-logos">
+                    <img src="images/sharesies-large-logo.svg" alt="Sharesies" />
+                    <div class="divider"></div>
+                    <img src="images/ibkr-large-logo.svg" alt="IBKR" />
+                </div>
             </div>
         </div>
     </div>
@@ -48,18 +47,8 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
-    <script src="_framework/blazor.webassembly.js?v=20260204.0057" autostart="false"></script>
+    <script src="_framework/blazor.webassembly.js?v=20260204.0520" autostart="false"></script>
     <script>
-        // GitHub Pages SPA routing fix - restore redirected URL
-        (function() {
-            var redirect = sessionStorage.getItem('redirect');
-            sessionStorage.removeItem('redirect');
-            if (redirect && redirect !== window.location.pathname) {
-                console.log('Restoring path:', redirect);
-                history.replaceState(null, null, redirect);
-            }
-        })();
-        
         // Service Worker Management - Force update on new version
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -70,7 +59,7 @@
         }
         
         // Cache busting - Clear application cache on version change
-        const APP_VERSION = '20260204.0057';
+        const APP_VERSION = '20260204.0520';
         const storedVersion = localStorage.getItem('app_version');
         
         if (storedVersion !== APP_VERSION) {
