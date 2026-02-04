@@ -4,19 +4,25 @@
   "description": "Track your stock portfolio with real-time market data",
   "start_url": "/portfolio-dashboard-public/",
   "scope": "/portfolio-dashboard-public/",
+  "scope": "/",
+  "prefer_related_applications": false,
   "display": "standalone",
   "background_color": "#15171c",
   "theme_color": "#15171c",
-  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/portfolio-dashboard-public/images/hedgey-logo-green-squared.png",
+      "src": "/images/hedgey-logo-green-squared-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/hedgey-logo-green-squared-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/portfolio-dashboard-public/images/hedgey-logo-green-squared.png",
+      "src": "/images/hedgey-logo-green-squared-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
